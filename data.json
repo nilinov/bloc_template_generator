@@ -1,0 +1,59 @@
+{
+  "name": "Coupon",
+  "states": [
+    {
+      "props": {
+        "items": {
+          "typeName": "Item",
+          "active": true
+        },
+        "meta": {
+          "typeName": "MetaPage",
+          "active":  true
+        },
+        "loadStatue": {
+          "typeName": "LoadStatusEnum",
+          "active":  true
+        },
+        "error": {
+          "typeName": "dynamic",
+          "active":  true
+        }
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "loading"
+    },
+    {
+      "name": "loaded",
+      "props": {
+        "items": {
+          "typeName": "Item",
+          "active": true
+        },
+        "meta": {
+          "typeName": "MetaPage",
+          "active":  true
+        }
+      }
+    },
+    {
+      "name": "loadFail",
+      "props": {
+        "error": {
+          "typeName": "dynamic",
+          "active":  true
+        }
+      }
+    }
+  ],
+  "bloc": {
+    "case_event": {
+      "loading": "state.copyWith(loadStatus: LoadStatusEnum.Loading)",
+      "loaded": "state.copyWith(loadStatus: LoadStatusEnum.Done, items: event.items, meta: event.meta)",
+      "loadFail": "state.copyWith(loadStatus: LoadStatusEnum.Error, items: [])"
+    }
+  }
+}

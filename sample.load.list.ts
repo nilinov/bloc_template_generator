@@ -35,7 +35,27 @@ const getters = (itemType: string): { [x: string]: BlocGetter } => ({
     canLoadNext: {
         name: 'canLoadNext',
         returnType: "bool",
-        content: "meta != null ? meta.lastPage > meta.currentPage : false"
+        content: "(meta != null ? meta.lastPage > meta.currentPage : false) && !processLoading"
+    },
+    loading: {
+        name: 'loading',
+        returnType: "bool",
+        content: "loadStatus == LoadStatusEnum.LOADING"
+    },
+    loadingNext: {
+        name: 'loadingNext',
+        returnType: "bool",
+        content: "loadStatus == LoadStatusEnum.LOADING_NEXT"
+    },
+    processLoading: {
+        name: 'processLoading',
+        returnType: "bool",
+        content: "[LoadStatusEnum.LOADING, LoadStatusEnum.LOADING_NEXT, LoadStatusEnum.REFRESH, LoadStatusEnum.SEARCH].contains(loadStatus)"
+    },
+    showList: {
+        name: 'showList',
+        returnType: "bool",
+        content: "[LoadStatusEnum.DONE, LoadStatusEnum.REFRESH, LoadStatusEnum.LOADING_NEXT].contains(loadStatus)"
     }
 })
 
@@ -91,7 +111,7 @@ const sampleLoadList = (name: string, itemType: string): JsonData => ({
                     loadStatus: "LoadStatusEnum.LOADING_NEXT",
                     error: "null",
                 },
-                content: "final res = await ApiCall();",
+                content: "final res = await ApiCall(count: 5, currentPage: state.currentPage + 1)",
                 nextEvent: eventName.loaded,
                 nextEventPayload: "items: [ ...state.items, ...res.items], meta: res.meta",
             },

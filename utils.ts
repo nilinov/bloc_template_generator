@@ -42,7 +42,9 @@ export function toMap(props: { [name: string]: Prop }) {
 export function getGetters(getters: { [x: string]: BlocGetter }) {
     return Object.keys(getters).map((key) => {
         const getter = getters[key];
-        return `${getter.returnType ?? ''} ${key}(${getter.params ?? ''}) => ${getter.content};`
+        if (getter.params)
+            return `${getter.returnType ?? ''} ${key}(${getter.params ?? ''}) => ${getter.content};`
+        return `${getter.returnType ?? ''} get ${key} => ${getter.content};`
     }).join(' \n');
 }
 

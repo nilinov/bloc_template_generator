@@ -49,9 +49,11 @@ export function toMap(props) {
 }
 export function getGetters(getters) {
     return Object.keys(getters).map((key) => {
-        var _a, _b;
+        var _a, _b, _c;
         const getter = getters[key];
-        return `${(_a = getter.returnType) !== null && _a !== void 0 ? _a : ''} ${key}(${(_b = getter.params) !== null && _b !== void 0 ? _b : ''}) => ${getter.content};`;
+        if (getter.params)
+            return `${(_a = getter.returnType) !== null && _a !== void 0 ? _a : ''} ${key}(${(_b = getter.params) !== null && _b !== void 0 ? _b : ''}) => ${getter.content};`;
+        return `${(_c = getter.returnType) !== null && _c !== void 0 ? _c : ''} get ${key} => ${getter.content};`;
     }).join(' \n');
 }
 export function getFinalVariable(variable, type) {

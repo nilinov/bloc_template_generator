@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" data-name="vs/editor/editor.main"
+          href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.0/min/vs/editor/editor.main.min.css">
+    <style>
+        html, body, #container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div id="container" style="height:100%;"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.0/min/vs/loader.min.js"></script>
+<script>
+    require.config({paths: {'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.0/min/vs'}});
+    window.MonacoEnvironment = {getWorkerUrl: () => proxy};
+    let proxy = URL.createObjectURL(new Blob([`self.MonacoEnvironment = { baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.0/min' }; importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.0/min/vs/base/worker/workerMain.min.js');`], {type: 'text/javascript'}));
+
+    const defaultJSON = `{
+   "getters": [
+       {
+           "name": "byId",
+           "content": "sadsdfsdf",
+           "params": [],
+           "returnType": "__"
+       }
+   ]
+}`
+
+    require(["vs/editor/editor.main"], function () {
+        const jsonCode = localStorage.json ?? defaultJSON;
+
+
+        const modelUri = monaco.Uri.parse("a://b/foo.json"); // a made up unique URI for our model
+        const model = monaco.editor.createModel(jsonCode, "json", modelUri);
+
+        // configure the JSON language support with schemas and schema associations
+        monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+            validate: true,
+            schemas: [{
+                uri: "http://myserver/foo-schema.json", // id of the first schema
+                fileMatch: [modelUri.toString()], // associate with our model
+                schema: {
+                    "description": "Шаблон BLoC для загрузки списка с фичами перезагрузки и пагинации",
+                    "type": "object",
+                    "properties": {
+                        "getters": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        $ref: "http://myserver/gettersNames.json"
+                                    },
+                                    "returnType": {
+                                        $ref: "http://myserver/returnTypes.json"
+                                    },
+                                    "params": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "type": {
+                                                    $ref: "http://myserver/returnTypes.json"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }, {
+                uri: "http://myserver/gettersNames.json", // id of the second schema
+                schema: {
+                    "type": "string",
+                    "enum": [
+                        "byId",
+                        "currentPage",
+                        "canLoadNext",
+                        "loading",
+                        "loadingNext",
+                        "processLoading",
+                        "showList"
+                    ]
+                }
+            }, {
+                uri: "http://myserver/returnTypes.json", // id of the second schema
+                schema: {
+                    "type": "string",
+                    "enum": [
+                        "__ITEM_TYPE__",
+                        "int",
+                        "String",
+                        "double"
+                    ]
+                }
+            }]
+        });
+
+        const editor = monaco.editor.create(document.getElementById("container"), {
+            model: model
+        });
+
+        editor.onDidChangeModelContent((e) => {
+            localStorage.json = editor.getValue();
+        });
+    });
+
+</script>
+</body>
+</html>

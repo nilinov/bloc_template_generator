@@ -1,6 +1,6 @@
 import {BlocGetter, JsonData, Prop} from "./interfaces.js";
 
-export const props = (itemType: string): { [x: string]: Prop } => ({
+export const defaultState = (itemType: string): { [x: string]: Prop } => ({
     items: {
         name: 'items',
         typeName: itemType,
@@ -23,7 +23,7 @@ export const props = (itemType: string): { [x: string]: Prop } => ({
 const getters = (itemType: string): { [x: string]: BlocGetter } => ({
     byId: {
         name: 'byId',
-        returnType: props(itemType)?.items?.type?.array,
+        returnType: itemType,
         params: "int id",
         content: "items.firstWhere((element) => element.id == id)"
     },
@@ -70,7 +70,7 @@ const sampleLoadList = (name: string, itemType: string): JsonData => ({
     name: `${name}`,
     states: [
         {
-            props: props(itemType),
+            props: defaultState(itemType),
             getters: getters(itemType)
         }
     ],
@@ -78,12 +78,12 @@ const sampleLoadList = (name: string, itemType: string): JsonData => ({
         {name: eventName.loading},
         {
             name: eventName.loaded,
-            props: {"items": props(itemType).items, "meta": props(itemType).meta}
+            props: {"items": defaultState(itemType).items, "meta": defaultState(itemType).meta}
         },
         {name: eventName.loadingNext},
         {
             name: eventName.loadFail,
-            props: {"error": props(itemType).error},
+            props: {"error": defaultState(itemType).error},
             isDefaultError: true
         }
     ],

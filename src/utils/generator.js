@@ -3,7 +3,6 @@ import stateDefaultTemplate from "./state.default.template.js";
 import { eventTemplate } from "./event.template.js";
 import { blocDefaultTemplate } from "./bloc.default.tempalte.js";
 function init() {
-    var _a, _b;
     const spans = document.querySelectorAll("pre");
     spans.forEach((span) => {
         span.onclick = function () {
@@ -24,8 +23,8 @@ function init() {
     document.querySelector('input#blocItemType').addEventListener('change', () => {
         updateAll();
     });
-    const name = document.querySelector('input#blocName').value || ((_a = localStorage.name) !== null && _a !== void 0 ? _a : 'Coupon');
-    const itemType = document.querySelector('input#blocItemType').value || ((_b = localStorage.itemType) !== null && _b !== void 0 ? _b : 'Coupon');
+    const name = document.querySelector('input#blocName').value || (localStorage.name ?? 'Coupon');
+    const itemType = document.querySelector('input#blocItemType').value || (localStorage.itemType ?? 'Coupon');
     document.querySelector('input#blocName').value = name;
     document.querySelector('input#blocItemType').value = itemType;
     updateAll();
@@ -42,3 +41,4 @@ function updateAll() {
     document.getElementById('sample_bloc').innerText = blocDefaultTemplate(sampleLoadList(name, itemType));
 }
 init();
+//# sourceMappingURL=generator.js.map

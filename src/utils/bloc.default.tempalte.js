@@ -4,23 +4,21 @@ export function getFullEventName(blocName, eventName) {
 }
 function getVariablesAndDefault(bloc) {
     const defaultState = bloc.states[0];
-    return Object.keys(defaultState.props).map((variable) => { var _a; return `${variable}: ${(_a = defaultState.props[variable].default) !== null && _a !== void 0 ? _a : 'null'}`; }).join(', \n');
+    return Object.keys(defaultState.props).map((variable) => `${variable}: ${defaultState.props[variable].default ?? 'null'}`).join(', \n');
 }
 function getVariablesEvent(caseEvent) {
     const props = Object.keys(caseEvent.stateUpdate);
     return props.map(prop => `\t\t\t${prop}: ${caseEvent.stateUpdate[prop]},`).join(`\n`);
 }
 const getEventNext = (blocName, caseEvent) => {
-    var _a;
     if (caseEvent.nextEvent) {
-        return `add(${getFullEventName(blocName, caseEvent.nextEvent)}(${(_a = caseEvent.nextEventPayload) !== null && _a !== void 0 ? _a : ''}));`;
+        return `add(${getFullEventName(blocName, caseEvent.nextEvent)}(${caseEvent.nextEventPayload ?? ''}));`;
     }
     return '';
 };
 const getEventsSwitch = (bloc) => {
     const events = bloc.events;
     return events.map((event) => {
-        var _a;
         const eventName = event.name;
         const caseEvent = bloc.bloc.case_event[eventName];
         return `
@@ -28,7 +26,7 @@ const getEventsSwitch = (bloc) => {
                 yield state.copyWith(
 ${getVariablesEvent(caseEvent)}
                 );
-              ${(_a = caseEvent.content) !== null && _a !== void 0 ? _a : ''}
+              ${caseEvent.content ?? ''}
               ${getEventNext(bloc.name, caseEvent)}
             }
     `;
@@ -67,3 +65,4 @@ class ${bloc.name}Bloc extends Bloc<${bloc.name}Event, ${bloc.name}State> {
 
 `;
 export { blocDefaultTemplate };
+//# sourceMappingURL=bloc.default.tempalte.js.map

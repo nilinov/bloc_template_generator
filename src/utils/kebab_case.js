@@ -11,4 +11,3 @@ export default function (str) {
     });
 }
 ;
-//# sourceMappingURL=kebab_case.js.map

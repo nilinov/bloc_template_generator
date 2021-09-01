@@ -9,7 +9,7 @@ function getEvents(blocName: string, event: BlocEvent) {
     if (event.props) {
         const props = getAllFinalVariables(event.props);
         const constructor = `${name}( ${getVariables(event.props, {required: true})} );`;
-        const toString = `@override \n String toString() => "${Object.keys(event.props).map((name) => `${name}=\$${name}.toString()`).join(', ')}";\n`;
+        const toString = `@override \n String toString() => "${Object.keys(event.props).map((name) => `${name}=${'$'}{${name}.toString()}`).join(', ')}";\n`;
 
         return `class ${name} extends ${blocName}Event {
         ${props}

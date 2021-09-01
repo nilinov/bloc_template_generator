@@ -1,56 +1,59 @@
 export function getFullType(prop) {
-    if (prop.type?.array) {
+    var _a, _b, _c, _d, _e, _f, _g;
+    if ((_a = prop.type) === null || _a === void 0 ? void 0 : _a.array) {
         return `List<${prop.typeName}>`;
     }
-    else if (prop.type?.enum) {
+    else if ((_b = prop.type) === null || _b === void 0 ? void 0 : _b.enum) {
         return `${prop.typeName}`;
     }
-    else if (prop.type?.double) {
+    else if ((_c = prop.type) === null || _c === void 0 ? void 0 : _c.double) {
         return `double`;
     }
-    else if (prop.type?.int) {
+    else if ((_d = prop.type) === null || _d === void 0 ? void 0 : _d.int) {
         return `int`;
     }
-    else if (prop.type?.string) {
+    else if ((_e = prop.type) === null || _e === void 0 ? void 0 : _e.string) {
         return `String`;
     }
-    else if (prop.type?.map) {
+    else if ((_f = prop.type) === null || _f === void 0 ? void 0 : _f.map) {
         return `Map<${prop.type.map.key}, ${prop.type.map.value}>`;
     }
-    else if (prop.type?.dynamic) {
+    else if ((_g = prop.type) === null || _g === void 0 ? void 0 : _g.dynamic) {
         return `dynamic`;
     }
     return `${prop.typeName}`;
 }
 export function toMap(props) {
     return '{\n' + Object.keys(props).map((key) => {
+        var _a, _b, _c, _d, _e, _f;
         const prop = props[key];
-        if (prop.type?.array) {
+        if ((_a = prop.type) === null || _a === void 0 ? void 0 : _a.array) {
             return `${key}.toString()`;
         }
-        else if (prop.type?.enum) {
+        else if ((_b = prop.type) === null || _b === void 0 ? void 0 : _b.enum) {
             return `${key}.toString()`;
         }
-        else if (prop.type?.double) {
+        else if ((_c = prop.type) === null || _c === void 0 ? void 0 : _c.double) {
             return `${key}`;
         }
-        else if (prop.type?.int) {
+        else if ((_d = prop.type) === null || _d === void 0 ? void 0 : _d.int) {
             return `${key}`;
         }
-        else if (prop.type?.string) {
+        else if ((_e = prop.type) === null || _e === void 0 ? void 0 : _e.string) {
             return `${key}`;
         }
-        else if (prop.type?.map) {
+        else if ((_f = prop.type) === null || _f === void 0 ? void 0 : _f.map) {
             return `${key}.toString()`;
         }
     }).filter(e => e).join(', \n') + '\n}';
 }
 export function getGetters(getters) {
     return Object.keys(getters).map((key) => {
+        var _a, _b, _c;
         const getter = getters[key];
         if (getter.params)
-            return `${getter.returnType ?? ''} ${key}(${getter.params ?? ''}) => ${getter.content};`;
-        return `${getter.returnType ?? ''} get ${key} => ${getter.content};`;
+            return `${(_a = getter.returnType) !== null && _a !== void 0 ? _a : ''} ${key}(${(_b = getter.params) !== null && _b !== void 0 ? _b : ''}) => ${getter.content};`;
+        return `${(_c = getter.returnType) !== null && _c !== void 0 ? _c : ''} get ${key} => ${getter.content};`;
     }).join(' \n');
 }
 export function getFinalVariable(variable, type) {
@@ -65,11 +68,10 @@ export function getAllFinalVariables(variables) {
 export const camelToSnakeCase = str => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
 export const UpperFirstLetter = str => str[0].toUpperCase() + str.slice(1);
 export function getVariables(props, params) {
-    if (params?.required) {
+    if (params === null || params === void 0 ? void 0 : params.required) {
         return `{ \n${Object.keys(props).map(name => `\t@required this.${name},\n`).join('')} }`;
     }
     else {
         return `{ \n${Object.keys(props).map(name => `\tthis.${name},\n`).join('')} }`;
     }
 }
-//# sourceMappingURL=utils.js.map

@@ -22,4 +22,3 @@ class ${bloc.name}State {
 }
 `;
 export default stateDefaultTemplate;
-//# sourceMappingURL=state.default.template.js.map

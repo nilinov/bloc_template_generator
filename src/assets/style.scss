@@ -1,0 +1,28 @@
+// This is the project stylesheet
+
+// Colors
+$color-gray-100: rgba(245, 245, 245, 1);
+$color-gray-600: rgba(142, 142, 142, 1);
+$color-gray-900: rgba(44, 44, 44, 1);
+$color-white: rgba(255, 255, 255, 1);
+$transparent-black: rgba(0, 0, 0, 0.1);
+
+// Typographies
+@mixin roboto-12-regular {
+  font-family: "Roboto";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+}
+@mixin roboto-14-regular {
+  font-family: "Roboto";
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+}
+@mixin roboto-18-bold {
+  font-family: "Roboto";
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 21px;
+}

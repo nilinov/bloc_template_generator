@@ -60,9 +60,9 @@ export function getAllFinalVariables(variables: { [x: string]: Prop }) {
     return Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable])).join('\n');
 }
 
-export const camelToSnakeCase = str => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
+export const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
 
-export const UpperFirstLetter = str => str[0].toUpperCase() + str.slice(1);
+export const UpperFirstLetter = (str: string) => str[0].toUpperCase() + str.slice(1);
 
 export function getVariables(props: { [x: string]: Prop }, params?: { required: boolean }) {
     if (params?.required) {

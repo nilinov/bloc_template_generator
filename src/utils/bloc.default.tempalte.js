@@ -3,12 +3,14 @@ export function getFullEventName(blocName, eventName) {
     return `${blocName}${UpperFirstLetter(eventName)}Event`;
 }
 function getVariablesAndDefault(bloc) {
-    const defaultState = bloc.states[0];
-    return Object.keys(defaultState.props).map((variable) => { var _a; return `${variable}: ${(_a = defaultState.props[variable].default) !== null && _a !== void 0 ? _a : 'null'}`; }).join(', \n');
+    var _a;
+    const defaultState = bloc.state;
+    return Object.keys((_a = defaultState.props) !== null && _a !== void 0 ? _a : []).map((variable) => { var _a, _b; return `${variable}: ${(_b = (_a = defaultState === null || defaultState === void 0 ? void 0 : defaultState.props[variable]) === null || _a === void 0 ? void 0 : _a.default) !== null && _b !== void 0 ? _b : 'null'}`; }).join(', \n');
 }
 function getVariablesEvent(caseEvent) {
-    const props = Object.keys(caseEvent.stateUpdate);
-    return props.map(prop => `\t\t\t${prop}: ${caseEvent.stateUpdate[prop]},`).join(`\n`);
+    var _a;
+    const props = Object.keys((_a = caseEvent.stateUpdate) !== null && _a !== void 0 ? _a : []);
+    return props.map(prop => { var _a; return `\t\t\t${prop}: ${(_a = caseEvent === null || caseEvent === void 0 ? void 0 : caseEvent.stateUpdate[prop]) !== null && _a !== void 0 ? _a : ''},`; }).join(`\n`);
 }
 const getEventNext = (blocName, caseEvent) => {
     var _a;

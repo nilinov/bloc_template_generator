@@ -4,21 +4,21 @@ part of '${camelToSnakeCase(bloc.name)}_bloc.dart';
 
 @immutable
 class ${bloc.name}State {
-  ${getAllFinalVariables(bloc.states[0].props)}
+  ${getAllFinalVariables(bloc.state.props)}
 
-  ${bloc.name}State(${getVariables(bloc.states[0].props, { required: true })});
+  ${bloc.name}State(${getVariables(bloc.state.props, { required: true })});
 
   @override
   ${bloc.name}State copyWith({
-    ${getVariableAndType(bloc.states[0].props)}}) {
+    ${getVariableAndType(bloc.state.props)}}) {
     return new ${bloc.name}State(
-      ${Object.keys(bloc.states[0].props).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`).join('')});
+      ${Object.keys(bloc.state.props).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`).join('')});
   }
 
   @override
-  toMap() => ${toMap(bloc.states[0].props)};
+  toMap() => ${toMap(bloc.state.props)};
 
-  ${getGetters(bloc.states[0].getters)}
+  ${getGetters(bloc.state.getters)}
 }
 `;
 export default stateDefaultTemplate;

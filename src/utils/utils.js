@@ -65,8 +65,8 @@ export function getVariableAndType(variables) {
 export function getAllFinalVariables(variables) {
     return Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable])).join('\n');
 }
-export const camelToSnakeCase = str => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
-export const UpperFirstLetter = str => str[0].toUpperCase() + str.slice(1);
+export const camelToSnakeCase = (str) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
+export const UpperFirstLetter = (str) => str[0].toUpperCase() + str.slice(1);
 export function getVariables(props, params) {
     if (params === null || params === void 0 ? void 0 : params.required) {
         return `{ \n${Object.keys(props).map(name => `\t@required this.${name},\n`).join('')} }`;

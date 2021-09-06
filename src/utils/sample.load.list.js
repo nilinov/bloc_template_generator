@@ -66,12 +66,10 @@ const eventName = {
 };
 const sampleLoadList = (name, itemType) => ({
     name: `${name}`,
-    states: [
-        {
-            props: props(itemType),
-            getters: getters(itemType)
-        }
-    ],
+    state: {
+        props: props(itemType),
+        getters: getters(itemType)
+    },
     events: [
         { name: eventName.loading },
         {

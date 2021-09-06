@@ -49,7 +49,7 @@ export interface Bloc {
 
 export interface JsonData {
     name: string,
-    states: BlocState[],
+    state: BlocState,
     events: BlocEvent[],
     bloc: Bloc,
 }

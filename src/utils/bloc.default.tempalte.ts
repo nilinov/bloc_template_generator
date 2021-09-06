@@ -6,13 +6,13 @@ export function getFullEventName(blocName: string, eventName: string) {
 }
 
 function getVariablesAndDefault(bloc: JsonData) {
-    const defaultState = bloc.states[0]
-    return Object.keys(defaultState.props).map((variable) => `${variable}: ${defaultState.props[variable].default ?? 'null'}`).join(', \n')
+    const defaultState = bloc.state
+    return Object.keys(defaultState.props ?? []).map((variable) => `${variable}: ${defaultState?.props[variable]?.default ?? 'null'}`).join(', \n')
 }
 
 function getVariablesEvent(caseEvent: CaseEvent) {
-    const props = Object.keys(caseEvent.stateUpdate)
-    return props.map(prop => `\t\t\t${prop}: ${caseEvent.stateUpdate[prop]},`).join(`\n`);
+    const props = Object.keys(caseEvent.stateUpdate ?? [])
+    return props.map(prop => `\t\t\t${prop}: ${caseEvent?.stateUpdate[prop] ?? ''},`).join(`\n`);
 }
 
 const getEventNext = (blocName: string, caseEvent: CaseEvent) => {

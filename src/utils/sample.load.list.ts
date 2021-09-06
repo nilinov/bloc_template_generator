@@ -121,6 +121,10 @@ const sampleLoadList = (name: string, itemType: string): JsonData => ({
             }
         },
         onError: true,
-    }
+    },
+    actionProp: actionProps,
 })
+
+const actionProps: Prop = {name: 'action', default: '"INIT"', typeTemplate: {string: true}};
+
 export {sampleLoadList};

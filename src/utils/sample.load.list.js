@@ -119,6 +119,8 @@ const sampleLoadList = (name, itemType) => ({
             }
         },
         onError: true,
-    }
+    },
+    actionProp: actionProps,
 });
+const actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
 export { sampleLoadList };

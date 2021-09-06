@@ -57,30 +57,54 @@ export function getGetters(getters) {
         return `${(_c = getter.returnType) !== null && _c !== void 0 ? _c : ''} get ${key} => ${getter.content};`;
     }).join(' \n');
 }
-export function getFinalVariable(variable, type) {
+export function getFinalVariable(variable, type, params) {
     return `final ${getFullType(type)} ${variable};`;
 }
 export function getVariableAndType(variables, params) {
+    var _a;
+    let res = [];
     if (params === null || params === void 0 ? void 0 : params.required) {
-        return Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`).join('');
+        res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`);
     }
     else if (params === null || params === void 0 ? void 0 : params.noRequired) {
-        return Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], { noRequired: true })} ${variable},\n`).join('');
+        res = Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], { noRequired: true })} ${variable},\n`);
     }
     else {
-        return Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`).join('');
+        res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`);
     }
+    if (params === null || params === void 0 ? void 0 : params.addAction) {
+        res.push(`\t required ${getFullType(params === null || params === void 0 ? void 0 : params.addAction)} ${(_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name},\n`);
+    }
+    return res.join('');
 }
-export function getAllFinalVariables(variables) {
-    return Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable])).join('\n');
+export function getAllFinalVariables(variables, params) {
+    var _a;
+    const res = Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable]));
+    if (params === null || params === void 0 ? void 0 : params.addAction) {
+        res.push('\t' + getFinalVariable((_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name, params === null || params === void 0 ? void 0 : params.addAction));
+    }
+    return res.join('\n');
 }
 export const camelToSnakeCase = (str) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
 export const UpperFirstLetter = (str) => str[0].toUpperCase() + str.slice(1);
 export function getVariables(props, params) {
+    let res = [];
     if (params === null || params === void 0 ? void 0 : params.required) {
-        return `{ \n${Object.keys(props).map(name => `\t required this.${name},\n`).join('')} }`;
+        res = Object.keys(props).map(name => `\t required this.${name},\n`);
     }
     else {
-        return `{ \n${Object.keys(props).map(name => `\tthis.${name},\n`).join('')} }`;
+        res = Object.keys(props).map(name => `\tthis.${name},\n`);
     }
+    if (params === null || params === void 0 ? void 0 : params.addAction) {
+        res.push(`\t required this.${params.addAction.name},\n`);
+    }
+    return `{ \n${res.join('')} }`;
+}
+export function getCopyWithParams(bloc, params) {
+    var _a, _b, _c;
+    const res = Object.keys((_a = bloc.state.props) !== null && _a !== void 0 ? _a : {}).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`);
+    if (params === null || params === void 0 ? void 0 : params.addAction) {
+        res.push(`\t ${(_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name}: ${(_c = params === null || params === void 0 ? void 0 : params.addAction) === null || _c === void 0 ? void 0 : _c.name},\n`);
+    }
+    return res.join('');
 }

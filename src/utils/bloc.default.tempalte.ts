@@ -1,18 +1,30 @@
-import {CaseEvent, JsonData} from "./interfaces.js";
+import {CaseEvent, JsonData, Prop} from "./interfaces.js";
 import {camelToSnakeCase, UpperFirstLetter} from "./utils.js";
 
 export function getFullEventName(blocName: string, eventName: string) {
     return `${blocName}${UpperFirstLetter(eventName)}Event`;
 }
 
-export function getVariablesAndDefault(bloc: JsonData) {
+export function getVariablesAndDefault(bloc: JsonData, params?: { addAction?: Prop }) {
     const defaultState = bloc.state
-    return Object.keys(defaultState.props ?? []).map((variable) => `${variable}: ${defaultState.props[variable]?.default ?? 'null'}`).join(', \n')
+    const res = Object.keys(defaultState.props ?? []).map((variable) => `${variable}: ${defaultState.props[variable]?.default ?? 'null'}`)
+
+    if (params?.addAction) {
+        res.push(`${params.addAction.name}: ${params.addAction.default ?? 'null'}`)
+    }
+
+    return res.join(', \n');
 }
 
-export function getVariablesEvent(caseEvent: CaseEvent) {
+export function getVariablesEvent(caseEvent: CaseEvent, params?: { addAction?: Prop, eventName?: string }) {
     const props = Object.keys(caseEvent.stateUpdate ?? [])
-    return props.map(prop => `\t\t\t${prop}: ${(caseEvent?.stateUpdate ?? {})[prop] ?? ''},`).join(`\n`);
+    const res = props.map(prop => `\t\t\t${prop}: ${(caseEvent?.stateUpdate ?? {})[prop] ?? ''},`);
+
+    if (params?.addAction) {
+        res.push(`\t\t\t${params.addAction.name ?? ''}: "${params?.eventName ?? ''}",`)
+    }
+
+    return res.join(`\n`);
 }
 
 export const getEventNext = (blocName: string, caseEvent: CaseEvent) => {

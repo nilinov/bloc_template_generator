@@ -42,7 +42,7 @@ function getEvents(blocName: string, event: BlocEvent, bloc: JsonData) {
     const caseEvent = bloc.bloc.case_event ? bloc.bloc.case_event[event.name] ?? {} : {};
 
     return ` ${nameFunction} {
-        emit(state.copyWith(\n${getVariablesEvent(caseEvent)}));
+        emit(state.copyWith(\n${getVariablesEvent(caseEvent, { addAction: bloc.actionProp, eventName: name })}));
         ${caseEvent.content ?? ''}
         ${caseEvent.nextEvent ? `${caseEvent.nextEvent}( ${caseEvent.nextEventPayload} );` : ''}
       }

@@ -1,7 +1,7 @@
-import {BlocGetter, Prop} from "./interfaces.js";
+import {BlocGetter, JsonData, Prop} from "./interfaces.js";
 
-export function getFullType(prop: Prop, params?: { noRequired?: boolean } ): string {
-    const afterNoRequired =  params?.noRequired ? '?' : '';
+export function getFullType(prop: Prop, params?: { noRequired?: boolean }): string {
+    const afterNoRequired = params?.noRequired ? '?' : '';
 
     if (prop.typeTemplate?.array) {
         return `List<${prop.typeName}>${afterNoRequired}`;
@@ -50,32 +50,63 @@ export function getGetters(getters: { [x: string]: BlocGetter }) {
     }).join(' \n');
 }
 
-export function getFinalVariable(variable: string, type: Prop) {
+export function getFinalVariable(variable: string, type: Prop, params?: {}) {
     return `final ${getFullType(type)} ${variable};`
 }
 
-export function getVariableAndType(variables: { [x: string]: Prop }, params?: { required?: boolean, noRequired?: boolean }) {
+export function getVariableAndType(variables: { [x: string]: Prop }, params?: { required?: boolean, noRequired?: boolean, addAction?: Prop }) {
+    let res = [];
+
     if (params?.required) {
-        return Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`).join('')
+        res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`)
     } else if (params?.noRequired) {
-        return Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], { noRequired: true })} ${variable},\n`).join('')
+        res = Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], {noRequired: true})} ${variable},\n`)
     } else {
-        return Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`).join('')
+        res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`);
     }
+
+    if (params?.addAction) {
+        res.push(`\t required ${getFullType(params?.addAction)} ${params?.addAction?.name},\n`);
+    }
+
+    return res.join('');
 }
 
-export function getAllFinalVariables(variables: { [x: string]: Prop }) {
-    return Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable])).join('\n');
+export function getAllFinalVariables(variables: { [x: string]: Prop }, params?: { addAction?: Prop }) {
+    const res = Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable]));
+
+    if (params?.addAction) {
+        res.push('\t' + getFinalVariable(params?.addAction?.name, params?.addAction))
+    }
+
+    return res.join('\n');
 }
 
 export const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
 
 export const UpperFirstLetter = (str: string) => str[0].toUpperCase() + str.slice(1);
 
-export function getVariables(props: { [x: string]: Prop }, params?: { required: boolean }) {
+export function getVariables(props: { [x: string]: Prop }, params?: { required: boolean, addAction?: Prop }) {
+    let res = [];
     if (params?.required) {
-        return `{ \n${Object.keys(props).map(name => `\t required this.${name},\n`).join('')} }`;
+        res = Object.keys(props).map(name => `\t required this.${name},\n`);
     } else {
-        return `{ \n${Object.keys(props).map(name => `\tthis.${name},\n`).join('')} }`;
+        res = Object.keys(props).map(name => `\tthis.${name},\n`);
     }
+
+    if (params?.addAction) {
+        res.push(`\t required this.${params.addAction.name},\n`)
+    }
+
+    return `{ \n${res.join('')} }`;
+}
+
+export function getCopyWithParams(bloc: JsonData, params?: { addAction?: Prop }) {
+    const res = Object.keys(bloc.state.props ?? {}).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`);
+
+    if (params?.addAction) {
+        res.push(`\t ${params?.addAction?.name}: ${params?.addAction?.name},\n`)
+    }
+
+    return res.join('');
 }

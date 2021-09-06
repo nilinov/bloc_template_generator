@@ -52,5 +52,6 @@ export interface JsonData {
     state: BlocState,
     events: BlocEvent[],
     bloc: Bloc,
+    actionProp: Prop,
 }
 

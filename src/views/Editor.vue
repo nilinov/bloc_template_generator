@@ -1,8 +1,8 @@
 <template>
   <div class="generate-screen">
     <div class="props">
-      <TextBox class="text-box" placeholder="Name bloc" v-model="nameBloc"/>
-      <TextBox class="text-box" placeholder="Name class entity" v-model="nameClassEntity"/>
+      <TextBox class="text-box" placeholder="Name bloc" v-model="nameBloc" @input="updateCode"/>
+      <TextBox class="text-box" placeholder="Name class entity" v-model="nameClassEntity" @input="updateCode"/>
       <div class="space"></div>
       <SelectBox class="select-box"/>
     </div>
@@ -45,9 +45,14 @@ export default {
     }
   }),
   mounted() {
-    this.code.bloc = blocDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
-    this.code.state = stateDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
-    this.code.event = eventTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+    this.updateCode();
+  },
+  methods: {
+    updateCode() {
+      this.code.bloc = blocDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+      this.code.state = stateDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+      this.code.event = eventTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+    }
   }
 };
 </script>

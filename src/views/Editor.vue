@@ -4,7 +4,7 @@
       <TextBox class="text-box" placeholder="Name bloc" v-model="nameBloc" @input="updateCode"/>
       <TextBox class="text-box" placeholder="Name class entity" v-model="nameClassEntity" @input="updateCode"/>
       <div class="space"></div>
-      <SelectBox class="select-box" v-model="cubit-list" @input="updateCode"/>
+      <SelectBox class="select-box" v-model="typeTemplate" @input="updateCode"/>
     </div>
     <div class="areas">
       <div class="area-event">
@@ -29,6 +29,7 @@ import stateDefaultTemplate from "@/utils/state.default.template";
 import {sampleLoadList} from "@/utils/sample.load.list";
 import {blocDefaultTemplate} from "@/utils/bloc.default.tempalte";
 import {eventTemplate} from "@/utils/event.template";
+import {blocCubitListTemplate} from "@/utils/bloc.cubit-list.tempalte";
 
 export default {
   name: "GenerateScreen",
@@ -38,6 +39,7 @@ export default {
   data: () => ({
     nameBloc: 'Coupon',
     nameClassEntity: 'Coupon',
+    typeTemplate: 'cubit-list',
     code: {
       bloc: '',
       state: '',
@@ -52,6 +54,10 @@ export default {
       this.code.bloc = blocDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
       this.code.state = stateDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
       this.code.event = eventTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+
+      if (this.typeTemplate === 'cubit-list') {
+        this.code.bloc = blocCubitListTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+      }
     }
   }
 };

@@ -1,19 +1,19 @@
 import {BlocGetter, Prop} from "./interfaces.js";
 
 export function getFullType(prop: Prop): string {
-    if (prop.type?.array) {
+    if (prop.typeTemplate?.array) {
         return `List<${prop.typeName}>`;
-    } else if (prop.type?.enum) {
+    } else if (prop.typeTemplate?.enum) {
         return `${prop.typeName}`;
-    } else if (prop.type?.double) {
+    } else if (prop.typeTemplate?.double) {
         return `double`;
-    } else if (prop.type?.int) {
+    } else if (prop.typeTemplate?.int) {
         return `int`;
-    } else if (prop.type?.string) {
+    } else if (prop.typeTemplate?.string) {
         return `String`;
-    } else if (prop.type?.map) {
-        return `Map<${prop.type.map.key}, ${prop.type.map.value}>`;
-    } else if (prop.type?.dynamic) {
+    } else if (prop.typeTemplate?.map) {
+        return `Map<${prop.typeTemplate.map.key}, ${prop.typeTemplate.map.value}>`;
+    } else if (prop.typeTemplate?.dynamic) {
         return `dynamic`;
     }
 
@@ -23,17 +23,17 @@ export function getFullType(prop: Prop): string {
 export function toMap(props: { [name: string]: Prop }) {
     return '{\n' + Object.keys(props).map((key) => {
         const prop = props[key];
-        if (prop.type?.array) {
+        if (prop.typeTemplate?.array) {
             return `${key}.toString()`;
-        } else if (prop.type?.enum) {
+        } else if (prop.typeTemplate?.enum) {
             return `${key}.toString()`;
-        } else if (prop.type?.double) {
+        } else if (prop.typeTemplate?.double) {
             return `${key}`;
-        } else if (prop.type?.int) {
+        } else if (prop.typeTemplate?.int) {
             return `${key}`;
-        } else if (prop.type?.string) {
+        } else if (prop.typeTemplate?.string) {
             return `${key}`;
-        } else if (prop.type?.map) {
+        } else if (prop.typeTemplate?.map) {
             return `${key}.toString()`;
         }
     }).filter(e => e).join(', \n') + '\n}';
@@ -54,6 +54,10 @@ export function getFinalVariable(variable: string, type: Prop) {
 
 export function getVariableAndType(variables: { [x: string]: Prop }) {
     return Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`).join('')
+}
+
+export function getVariableAndTypeFunction(variables: { [x: string]: Prop }) {
+    return Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`).join('')
 }
 
 export function getAllFinalVariables(variables: { [x: string]: Prop }) {

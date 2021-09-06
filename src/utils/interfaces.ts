@@ -1,7 +1,7 @@
 export interface Prop {
     name: string
     typeName?: string
-    type?: {
+    typeTemplate?: {
         array?: string
         map?: {
             key: string

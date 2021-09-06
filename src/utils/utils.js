@@ -1,24 +1,24 @@
 export function getFullType(prop) {
     var _a, _b, _c, _d, _e, _f, _g;
-    if ((_a = prop.type) === null || _a === void 0 ? void 0 : _a.array) {
+    if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.array) {
         return `List<${prop.typeName}>`;
     }
-    else if ((_b = prop.type) === null || _b === void 0 ? void 0 : _b.enum) {
+    else if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.enum) {
         return `${prop.typeName}`;
     }
-    else if ((_c = prop.type) === null || _c === void 0 ? void 0 : _c.double) {
+    else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.double) {
         return `double`;
     }
-    else if ((_d = prop.type) === null || _d === void 0 ? void 0 : _d.int) {
+    else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.int) {
         return `int`;
     }
-    else if ((_e = prop.type) === null || _e === void 0 ? void 0 : _e.string) {
+    else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.string) {
         return `String`;
     }
-    else if ((_f = prop.type) === null || _f === void 0 ? void 0 : _f.map) {
-        return `Map<${prop.type.map.key}, ${prop.type.map.value}>`;
+    else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.map) {
+        return `Map<${prop.typeTemplate.map.key}, ${prop.typeTemplate.map.value}>`;
     }
-    else if ((_g = prop.type) === null || _g === void 0 ? void 0 : _g.dynamic) {
+    else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.dynamic) {
         return `dynamic`;
     }
     return `${prop.typeName}`;
@@ -27,22 +27,22 @@ export function toMap(props) {
     return '{\n' + Object.keys(props).map((key) => {
         var _a, _b, _c, _d, _e, _f;
         const prop = props[key];
-        if ((_a = prop.type) === null || _a === void 0 ? void 0 : _a.array) {
+        if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.array) {
             return `${key}.toString()`;
         }
-        else if ((_b = prop.type) === null || _b === void 0 ? void 0 : _b.enum) {
+        else if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.enum) {
             return `${key}.toString()`;
         }
-        else if ((_c = prop.type) === null || _c === void 0 ? void 0 : _c.double) {
+        else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.double) {
             return `${key}`;
         }
-        else if ((_d = prop.type) === null || _d === void 0 ? void 0 : _d.int) {
+        else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.int) {
             return `${key}`;
         }
-        else if ((_e = prop.type) === null || _e === void 0 ? void 0 : _e.string) {
+        else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.string) {
             return `${key}`;
         }
-        else if ((_f = prop.type) === null || _f === void 0 ? void 0 : _f.map) {
+        else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.map) {
             return `${key}.toString()`;
         }
     }).filter(e => e).join(', \n') + '\n}';
@@ -61,6 +61,9 @@ export function getFinalVariable(variable, type) {
 }
 export function getVariableAndType(variables) {
     return Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`).join('');
+}
+export function getVariableAndTypeFunction(variables) {
+    return Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`).join('');
 }
 export function getAllFinalVariables(variables) {
     return Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable])).join('\n');

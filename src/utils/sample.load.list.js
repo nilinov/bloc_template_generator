@@ -2,19 +2,19 @@ export const props = (itemType) => ({
     items: {
         name: 'items',
         typeName: itemType,
-        type: { array: itemType },
+        typeTemplate: { array: itemType },
         default: "[]"
     },
     meta: { typeName: "MetaPage", name: 'meta', },
     loadStatus: {
         name: 'loadStatus',
         typeName: "LoadStatusEnum",
-        type: { enum: true },
+        typeTemplate: { enum: true },
         default: "LoadStatusEnum.INIT"
     },
     error: {
         name: 'error',
-        type: { dynamic: true },
+        typeTemplate: { dynamic: true },
     },
 });
 const getters = (itemType) => {
@@ -98,8 +98,8 @@ const sampleLoadList = (name, itemType) => ({
             [eventName.loaded]: {
                 stateUpdate: {
                     loadStatus: "LoadStatusEnum.DONE",
-                    items: "event.items",
-                    meta: "event.meta"
+                    items: "items",
+                    meta: "meta"
                 }
             },
             [eventName.loadingNext]: {
@@ -107,7 +107,7 @@ const sampleLoadList = (name, itemType) => ({
                     loadStatus: "LoadStatusEnum.LOADING_NEXT",
                     error: "null",
                 },
-                content: "final res = await ApiCall(count: 5, currentPage: state.currentPage + 1)",
+                content: "final res = await ApiCall(count: 5, currentPage: state.currentPage + 1);",
                 nextEvent: eventName.loaded,
                 nextEventPayload: "items: [ ...state.items, ...res.items], meta: res.meta",
             },

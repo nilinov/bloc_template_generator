@@ -7,7 +7,7 @@ export const props = (itemType: string): { [x: string]: Prop } => ({
         typeTemplate: {array: itemType},
         default: "[]"
     },
-    meta: {typeName: "MetaPage", name: 'meta',},
+    meta: {typeName: "MetaPage", name: 'meta', default: 'MetaPage.empty()'},
     loadStatus: {
         name: 'loadStatus',
         typeName: "LoadStatusEnum",
@@ -23,19 +23,19 @@ export const props = (itemType: string): { [x: string]: Prop } => ({
 const getters = (itemType: string): { [x: string]: BlocGetter } => ({
     byId: {
         name: 'byId',
-        returnType: props(itemType)?.items?.type?.array,
+        returnType: props(itemType)?.items?.typeTemplate?.array,
         params: "int id",
         content: "items.firstWhere((element) => element.id == id)"
     },
     currentPage: {
         name: 'currentPage',
         returnType: "int",
-        content: "meta?.currentPage ?? 1"
+        content: "meta.currentPage"
     },
     canLoadNext: {
         name: 'canLoadNext',
         returnType: "bool",
-        content: "(meta != null ? meta.lastPage > meta.currentPage : false) && !processLoading"
+        content: "meta.lastPage > meta.currentPage && !processLoading"
     },
     loading: {
         name: 'loading',

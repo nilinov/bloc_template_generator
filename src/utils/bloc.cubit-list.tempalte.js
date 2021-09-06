@@ -1,4 +1,4 @@
-import { camelToSnakeCase, getVariableAndTypeFunction, UpperFirstLetter } from "./utils.js";
+import { camelToSnakeCase, getVariableAndType, UpperFirstLetter } from "./utils.js";
 import { getVariablesEvent } from "./bloc.default.tempalte";
 const blocCubitListTemplate = (bloc) => `
 const key${UpperFirstLetter(bloc.name)}State = '${UpperFirstLetter(bloc.name)}';
@@ -17,7 +17,7 @@ function getEvents(blocName, event, bloc) {
     const name = event.name;
     let nameFunction = '';
     if (event.props) {
-        const props = getVariableAndTypeFunction(event.props);
+        const props = getVariableAndType(event.props, { required: true });
         nameFunction = `Future<void> ${name}({${props}}) async`;
     }
     else {

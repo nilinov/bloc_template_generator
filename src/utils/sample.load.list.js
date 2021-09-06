@@ -5,7 +5,7 @@ export const props = (itemType) => ({
         typeTemplate: { array: itemType },
         default: "[]"
     },
-    meta: { typeName: "MetaPage", name: 'meta', },
+    meta: { typeName: "MetaPage", name: 'meta', default: 'MetaPage.empty()' },
     loadStatus: {
         name: 'loadStatus',
         typeName: "LoadStatusEnum",
@@ -22,19 +22,19 @@ const getters = (itemType) => {
     return ({
         byId: {
             name: 'byId',
-            returnType: (_c = (_b = (_a = props(itemType)) === null || _a === void 0 ? void 0 : _a.items) === null || _b === void 0 ? void 0 : _b.type) === null || _c === void 0 ? void 0 : _c.array,
+            returnType: (_c = (_b = (_a = props(itemType)) === null || _a === void 0 ? void 0 : _a.items) === null || _b === void 0 ? void 0 : _b.typeTemplate) === null || _c === void 0 ? void 0 : _c.array,
             params: "int id",
             content: "items.firstWhere((element) => element.id == id)"
         },
         currentPage: {
             name: 'currentPage',
             returnType: "int",
-            content: "meta?.currentPage ?? 1"
+            content: "meta.currentPage"
         },
         canLoadNext: {
             name: 'canLoadNext',
             returnType: "bool",
-            content: "(meta != null ? meta.lastPage > meta.currentPage : false) && !processLoading"
+            content: "meta.lastPage > meta.currentPage && !processLoading"
         },
         loading: {
             name: 'loading',

@@ -1,19 +1,20 @@
-export function getFullType(prop) {
+export function getFullType(prop, params) {
     var _a, _b, _c, _d, _e, _f, _g;
+    const afterNoRequired = (params === null || params === void 0 ? void 0 : params.noRequired) ? '?' : '';
     if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.array) {
-        return `List<${prop.typeName}>`;
+        return `List<${prop.typeName}>${afterNoRequired}`;
     }
     else if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.enum) {
-        return `${prop.typeName}`;
+        return `${prop.typeName}${afterNoRequired}`;
     }
     else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.double) {
-        return `double`;
+        return `double${afterNoRequired}`;
     }
     else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.int) {
-        return `int`;
+        return `int${afterNoRequired}`;
     }
     else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.string) {
-        return `String`;
+        return `String${afterNoRequired}`;
     }
     else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.map) {
         return `Map<${prop.typeTemplate.map.key}, ${prop.typeTemplate.map.value}>`;
@@ -21,7 +22,7 @@ export function getFullType(prop) {
     else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.dynamic) {
         return `dynamic`;
     }
-    return `${prop.typeName}`;
+    return `${prop.typeName}${afterNoRequired}`;
 }
 export function toMap(props) {
     return '{\n' + Object.keys(props).map((key) => {
@@ -59,11 +60,16 @@ export function getGetters(getters) {
 export function getFinalVariable(variable, type) {
     return `final ${getFullType(type)} ${variable};`;
 }
-export function getVariableAndType(variables) {
-    return Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`).join('');
-}
-export function getVariableAndTypeFunction(variables) {
-    return Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`).join('');
+export function getVariableAndType(variables, params) {
+    if (params === null || params === void 0 ? void 0 : params.required) {
+        return Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`).join('');
+    }
+    else if (params === null || params === void 0 ? void 0 : params.noRequired) {
+        return Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], { noRequired: true })} ${variable},\n`).join('');
+    }
+    else {
+        return Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`).join('');
+    }
 }
 export function getAllFinalVariables(variables) {
     return Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable])).join('\n');
@@ -72,7 +78,7 @@ export const camelToSnakeCase = (str) => str.replace(/[A-Z]/g, letter => `_${let
 export const UpperFirstLetter = (str) => str[0].toUpperCase() + str.slice(1);
 export function getVariables(props, params) {
     if (params === null || params === void 0 ? void 0 : params.required) {
-        return `{ \n${Object.keys(props).map(name => `\t@required this.${name},\n`).join('')} }`;
+        return `{ \n${Object.keys(props).map(name => `\t required this.${name},\n`).join('')} }`;
     }
     else {
         return `{ \n${Object.keys(props).map(name => `\tthis.${name},\n`).join('')} }`;

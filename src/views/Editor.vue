@@ -30,6 +30,7 @@ import {sampleLoadList} from "@/utils/sample.load.list";
 import {blocDefaultTemplate} from "@/utils/bloc.default.tempalte";
 import {eventTemplate} from "@/utils/event.template";
 import {blocCubitListTemplate} from "@/utils/bloc.cubit-list.tempalte";
+import stateCubitListTemplate from "@/utils/state.cubit-list.template";
 
 export default {
   name: "GenerateScreen",
@@ -57,6 +58,7 @@ export default {
 
       if (this.typeTemplate === 'cubit-list') {
         this.code.bloc = blocCubitListTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+        this.code.state = stateCubitListTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
       }
     }
   }

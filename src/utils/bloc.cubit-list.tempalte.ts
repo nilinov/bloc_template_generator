@@ -1,18 +1,17 @@
 import {Bloc, BlocEvent, CaseEvent, JsonData} from "./interfaces.js";
 import {
-  camelToSnakeCase,
-  getAllFinalVariables,
-  getVariableAndType,
-  getVariableAndTypeFunction,
-  getVariables,
-  UpperFirstLetter
+    camelToSnakeCase,
+    getAllFinalVariables,
+    getVariableAndType,
+    getVariables,
+    UpperFirstLetter
 } from "./utils.js";
 import {
-  getEventNext,
-  getEventsSwitch,
-  getFullEventName,
-  getVariablesAndDefault,
-  getVariablesEvent
+    getEventNext,
+    getEventsSwitch,
+    getFullEventName,
+    getVariablesAndDefault,
+    getVariablesEvent
 } from "./bloc.default.tempalte";
 
 const blocCubitListTemplate = (bloc: JsonData) => `
@@ -29,28 +28,27 @@ class ${bloc.name}Cubit extends Cubit<${bloc.name}State> {
 `
 
 function getEvents(blocName: string, event: BlocEvent, bloc: JsonData) {
-  const name = event.name;
+    const name = event.name;
 
-  let nameFunction = '';
+    let nameFunction = '';
 
-  if (event.props) {
-    const props = getVariableAndTypeFunction(event.props);
-    nameFunction = `Future<void> ${name}({${props}}) async`
-  } else {
-    nameFunction = `Future<void> ${name}() async `;
-  }
+    if (event.props) {
+        const props = getVariableAndType(event.props, {required: true});
+        nameFunction = `Future<void> ${name}({${props}}) async`
+    } else {
+        nameFunction = `Future<void> ${name}() async `;
+    }
 
-  const caseEvent = bloc.bloc.case_event ? bloc.bloc.case_event[event.name] ?? {} : {};
+    const caseEvent = bloc.bloc.case_event ? bloc.bloc.case_event[event.name] ?? {} : {};
 
-  return ` ${nameFunction} {
+    return ` ${nameFunction} {
         emit(state.copyWith(\n${getVariablesEvent(caseEvent)}));
         ${caseEvent.content ?? ''}
-        ${caseEvent.nextEvent ?  `${caseEvent.nextEvent}( ${caseEvent.nextEventPayload} );` : ''}
+        ${caseEvent.nextEvent ? `${caseEvent.nextEvent}( ${caseEvent.nextEventPayload} );` : ''}
       }
     `;
 
 }
-
 
 
 export {blocCubitListTemplate}

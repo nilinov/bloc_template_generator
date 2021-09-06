@@ -5,12 +5,12 @@ export function getFullEventName(blocName, eventName) {
 function getVariablesAndDefault(bloc) {
     var _a;
     const defaultState = bloc.state;
-    return Object.keys((_a = defaultState.props) !== null && _a !== void 0 ? _a : []).map((variable) => { var _a, _b; return `${variable}: ${(_b = (_a = defaultState === null || defaultState === void 0 ? void 0 : defaultState.props[variable]) === null || _a === void 0 ? void 0 : _a.default) !== null && _b !== void 0 ? _b : 'null'}`; }).join(', \n');
+    return Object.keys((_a = defaultState.props) !== null && _a !== void 0 ? _a : []).map((variable) => { var _a, _b; return `${variable}: ${(_b = (_a = defaultState.props[variable]) === null || _a === void 0 ? void 0 : _a.default) !== null && _b !== void 0 ? _b : 'null'}`; }).join(', \n');
 }
 function getVariablesEvent(caseEvent) {
     var _a;
     const props = Object.keys((_a = caseEvent.stateUpdate) !== null && _a !== void 0 ? _a : []);
-    return props.map(prop => { var _a; return `\t\t\t${prop}: ${(_a = caseEvent === null || caseEvent === void 0 ? void 0 : caseEvent.stateUpdate[prop]) !== null && _a !== void 0 ? _a : ''},`; }).join(`\n`);
+    return props.map(prop => { var _a, _b; return `\t\t\t${prop}: ${(_b = ((_a = caseEvent === null || caseEvent === void 0 ? void 0 : caseEvent.stateUpdate) !== null && _a !== void 0 ? _a : {})[prop]) !== null && _b !== void 0 ? _b : ''},`; }).join(`\n`);
 }
 const getEventNext = (blocName, caseEvent) => {
     var _a;
@@ -22,21 +22,23 @@ const getEventNext = (blocName, caseEvent) => {
 const getEventsSwitch = (bloc) => {
     const events = bloc.events;
     return events.map((event) => {
-        var _a;
+        var _a, _b;
         const eventName = event.name;
-        const caseEvent = bloc.bloc.case_event[eventName];
+        const caseEvent = bloc.bloc.case_event ? (_a = bloc.bloc.case_event[eventName]) !== null && _a !== void 0 ? _a : {} : {};
         return `
             if (event is ${getFullEventName(bloc.name, eventName)}) {
                 yield state.copyWith(
 ${getVariablesEvent(caseEvent)}
                 );
-              ${(_a = caseEvent.content) !== null && _a !== void 0 ? _a : ''}
+              ${(_b = caseEvent.content) !== null && _b !== void 0 ? _b : ''}
               ${getEventNext(bloc.name, caseEvent)}
             }
     `;
     }).join('\n');
 };
-const blocDefaultTemplate = (bloc) => `
+const blocDefaultTemplate = (bloc) => {
+    var _a, _b;
+    return `
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
@@ -60,7 +62,7 @@ class ${bloc.name}Bloc extends Bloc<${bloc.name}Event, ${bloc.name}State> {
   
     ${bloc.bloc.onError ? `@override
   void onError(Object error, StackTrace stackTrace) {
-    add(${getFullEventName(bloc.name, bloc.events.find(event => event.isDefaultError).name)}(error: error.toString()));
+    add(${getFullEventName(bloc.name, (_b = (_a = bloc.events.find(event => event.isDefaultError)) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : '')}(error: error.toString()));
     super.onError(error, stackTrace);
   }
 ` : ''}
@@ -68,4 +70,5 @@ class ${bloc.name}Bloc extends Bloc<${bloc.name}Event, ${bloc.name}State> {
 
 
 `;
+};
 export { blocDefaultTemplate };

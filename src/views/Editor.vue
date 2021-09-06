@@ -4,7 +4,7 @@
       <TextBox class="text-box" placeholder="Name bloc" v-model="nameBloc" @input="updateCode"/>
       <TextBox class="text-box" placeholder="Name class entity" v-model="nameClassEntity" @input="updateCode"/>
       <div class="space"></div>
-      <SelectBox class="select-box"/>
+      <SelectBox class="select-box" v-model="cubit-list" @input="updateCode"/>
     </div>
     <div class="areas">
       <div class="area-event">

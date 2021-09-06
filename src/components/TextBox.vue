@@ -1,5 +1,5 @@
 <template>
-  <input :value="value" class="text-box text" :placeholder="placeholder" @change="e => $emit('input', e.target.value)">
+  <input class="text-box text" :placeholder="placeholder" @change="e => $emit('input', e.target.value)" :value="value">
 </template>
 
 <script>

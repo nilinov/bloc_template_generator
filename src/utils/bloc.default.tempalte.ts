@@ -7,12 +7,12 @@ export function getFullEventName(blocName: string, eventName: string) {
 
 function getVariablesAndDefault(bloc: JsonData) {
     const defaultState = bloc.state
-    return Object.keys(defaultState.props ?? []).map((variable) => `${variable}: ${defaultState?.props[variable]?.default ?? 'null'}`).join(', \n')
+    return Object.keys(defaultState.props ?? []).map((variable) => `${variable}: ${defaultState.props[variable]?.default ?? 'null'}`).join(', \n')
 }
 
 function getVariablesEvent(caseEvent: CaseEvent) {
     const props = Object.keys(caseEvent.stateUpdate ?? [])
-    return props.map(prop => `\t\t\t${prop}: ${caseEvent?.stateUpdate[prop] ?? ''},`).join(`\n`);
+    return props.map(prop => `\t\t\t${prop}: ${(caseEvent?.stateUpdate ?? {})[prop] ?? ''},`).join(`\n`);
 }
 
 const getEventNext = (blocName: string, caseEvent: CaseEvent) => {
@@ -26,7 +26,7 @@ const getEventsSwitch = (bloc: JsonData) => {
     const events = bloc.events;
     return events.map((event) => {
         const eventName = event.name;
-        const caseEvent = bloc.bloc.case_event[eventName];
+        const caseEvent = bloc.bloc.case_event ? bloc.bloc.case_event[eventName] ?? {} : {};
 
         return `
             if (event is ${getFullEventName(bloc.name, eventName)}) {
@@ -64,7 +64,7 @@ class ${bloc.name}Bloc extends Bloc<${bloc.name}Event, ${bloc.name}State> {
   
     ${bloc.bloc.onError ? `@override
   void onError(Object error, StackTrace stackTrace) {
-    add(${getFullEventName(bloc.name, bloc.events.find(event => event.isDefaultError).name)}(error: error.toString()));
+    add(${getFullEventName(bloc.name, bloc.events.find(event => event.isDefaultError)?.name ?? '')}(error: error.toString()));
     super.onError(error, stackTrace);
   }
 ` : ''}

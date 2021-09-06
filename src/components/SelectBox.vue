@@ -1,5 +1,5 @@
 <template>
-  <select class="select select-box">
+  <select class="select select-box"  @change="e => $emit('input', e.target.value)" :value="value">
     <option disabled>Выбрать шаблон</option>
     <option value="bloc">BLoC</option>
     <option value="cubit-list">Cubit list</option>
@@ -10,7 +10,7 @@
 export default {
   name: "SelectBox",
   props: {
-    select: { type: String, default: "Template select" }
+    value: { type: String, default: "Template select" }
   }
 };
 </script>

@@ -15,7 +15,7 @@
         <p class="area-title">State</p>
         <pre class="code" v-text="code.state"></pre>
       </div>
-      <div class="area-event">
+      <div class="area-event" v-if="code.event">
         <p class="area-title">Events</p>
         <pre class="code" v-text="code.event"></pre>
       </div>
@@ -52,13 +52,16 @@ export default {
   },
   methods: {
     updateCode() {
-      this.code.bloc = blocDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
-      this.code.state = stateDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
-      this.code.event = eventTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+      if (this.typeTemplate === 'bloc') {
+        this.code.bloc = blocDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+        this.code.state = stateDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+        this.code.event = eventTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+      }
 
       if (this.typeTemplate === 'cubit-list') {
         this.code.bloc = blocCubitListTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
         this.code.state = stateCubitListTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+        this.code.event = '';
       }
     }
   }

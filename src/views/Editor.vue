@@ -43,7 +43,7 @@ export default {
     nameBloc: 'Coupon',
     nameClassEntity: 'Coupon',
     typeTemplate: 'cubit-list',
-    dataTemplate: 'sample-list',
+    dataTemplate: 'sample-view',
     code: {
       bloc: '',
       state: '',

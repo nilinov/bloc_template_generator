@@ -8,7 +8,7 @@ import {
   getVariables,
   toMap
 } from "../../utils.js";
-import {getVariablesAndDefault} from "../bloc-default/bloc.default.tempalte";
+import {getDefaultValue, getVariablesAndDefault} from "../bloc-default/bloc.default.tempalte";
 
 const stateCubitListTemplate = (bloc: JsonData) => `
 part of '${camelToSnakeCase(bloc.name)}_cubit.dart';
@@ -20,8 +20,14 @@ class ${bloc.name}State {
 
   ${bloc.name}State copyWith({
     ${getVariableAndType(bloc.state.props ?? {}, {noRequired: true, addAction: bloc.actionProp})}}) {
-    return new ${bloc.name}State(
+    return ${bloc.name}State(
       ${getCopyWithParams(bloc, {addAction: bloc.actionProp})});
+  }
+
+  ${bloc.name}State clearValue({
+    ${Object.keys(bloc.state.props).map(name => `\tbool ${name} = false,\n`).join('')}) {
+    return ${bloc.name}State(
+      ${Object.keys(bloc.state.props).map(name => `\t ${name}: ${name} ? ${getDefaultValue(bloc, name)} : this.${name}, \n`).join('')});
   }
 
   toMap() => ${toMap(bloc.state.props ?? {})};

@@ -2,6 +2,28 @@ import { camelToSnakeCase, UpperFirstLetter } from "../../utils.js";
 export function getFullEventName(blocName, eventName) {
     return `${blocName}${UpperFirstLetter(eventName)}Event`;
 }
+export function getDefaultValue(bloc, name) {
+    var _a;
+    const prop = bloc.state.props[name];
+    if (prop.default)
+        return prop.default;
+    if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) {
+        return 'null';
+    }
+    if (prop.typeTemplate.map)
+        return '{}';
+    if (prop.typeTemplate.int)
+        return '0';
+    if (prop.typeTemplate.string)
+        return '""';
+    if (prop.typeTemplate.array)
+        return '[]';
+    if (prop.typeTemplate.double)
+        return '0.0';
+    if (prop.typeTemplate.dynamic)
+        return 'null';
+    return 'null';
+}
 export function getVariablesAndDefault(bloc, params) {
     var _a, _b;
     const defaultState = bloc.state;

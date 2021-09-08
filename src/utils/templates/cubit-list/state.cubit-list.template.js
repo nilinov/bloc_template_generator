@@ -1,5 +1,5 @@
 import { camelToSnakeCase, getAllFinalVariables, getCopyWithParams, getGetters, getVariableAndType, getVariables, toMap } from "../../utils.js";
-import { getVariablesAndDefault } from "../bloc-default/bloc.default.tempalte";
+import { getDefaultValue, getVariablesAndDefault } from "../bloc-default/bloc.default.tempalte";
 const stateCubitListTemplate = (bloc) => {
     var _a, _b, _c, _d, _e;
     return `
@@ -12,8 +12,14 @@ class ${bloc.name}State {
 
   ${bloc.name}State copyWith({
     ${getVariableAndType((_c = bloc.state.props) !== null && _c !== void 0 ? _c : {}, { noRequired: true, addAction: bloc.actionProp })}}) {
-    return new ${bloc.name}State(
+    return ${bloc.name}State(
       ${getCopyWithParams(bloc, { addAction: bloc.actionProp })});
+  }
+
+  ${bloc.name}State clearValue({
+    ${Object.keys(bloc.state.props).map(name => `\tbool ${name} = false,\n`).join('')}) {
+    return ${bloc.name}State(
+      ${Object.keys(bloc.state.props).map(name => `\t ${name}: ${name} ? ${getDefaultValue(bloc, name)} : this.${name}, \n`).join('')});
   }
 
   toMap() => ${toMap((_d = bloc.state.props) !== null && _d !== void 0 ? _d : {})};

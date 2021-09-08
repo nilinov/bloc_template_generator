@@ -1,4 +1,4 @@
-import {JsonData} from "./interfaces.js";
+import {JsonData} from "../../interfaces.js";
 import {
   camelToSnakeCase,
   getAllFinalVariables,
@@ -7,8 +7,8 @@ import {
   getVariableAndType,
   getVariables,
   toMap
-} from "./utils.js";
-import {getVariablesAndDefault} from "./bloc.default.tempalte";
+} from "../../utils.js";
+import {getVariablesAndDefault} from "../bloc-default/bloc.default.tempalte";
 
 const stateCubitListTemplate = (bloc: JsonData) => `
 part of '${camelToSnakeCase(bloc.name)}_cubit.dart';

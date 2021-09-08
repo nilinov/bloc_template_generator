@@ -1,4 +1,4 @@
-import {JsonData} from "./interfaces.js";
+import {JsonData} from "../../interfaces.js";
 import {
   camelToSnakeCase,
   getAllFinalVariables,
@@ -7,7 +7,7 @@ import {
   getVariableAndType,
   getVariables,
   toMap
-} from "./utils.js";
+} from "../../utils.js";
 
 const stateDefaultTemplate = (bloc: JsonData) => `
 part of '${camelToSnakeCase(bloc.name)}_bloc.dart';

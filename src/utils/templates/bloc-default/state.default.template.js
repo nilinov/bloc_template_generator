@@ -1,4 +1,4 @@
-import { camelToSnakeCase, getAllFinalVariables, getGetters, getVariableAndType, getVariables, toMap } from "./utils.js";
+import { camelToSnakeCase, getAllFinalVariables, getGetters, getVariableAndType, getVariables, toMap } from "../../utils.js";
 const stateDefaultTemplate = (bloc) => {
     var _a, _b, _c, _d, _e, _f;
     return `

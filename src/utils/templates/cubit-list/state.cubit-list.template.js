@@ -1,5 +1,5 @@
-import { camelToSnakeCase, getAllFinalVariables, getCopyWithParams, getGetters, getVariableAndType, getVariables, toMap } from "./utils.js";
-import { getVariablesAndDefault } from "./bloc.default.tempalte";
+import { camelToSnakeCase, getAllFinalVariables, getCopyWithParams, getGetters, getVariableAndType, getVariables, toMap } from "../../utils.js";
+import { getVariablesAndDefault } from "../bloc-default/bloc.default.tempalte";
 const stateCubitListTemplate = (bloc) => {
     var _a, _b, _c, _d, _e;
     return `

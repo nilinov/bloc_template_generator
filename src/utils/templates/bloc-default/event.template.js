@@ -1,4 +1,4 @@
-import { camelToSnakeCase, getAllFinalVariables, getVariables } from "./utils.js";
+import { camelToSnakeCase, getAllFinalVariables, getVariables } from "../../utils.js";
 import { getFullEventName } from "./bloc.default.tempalte.js";
 function getEvents(blocName, event) {
     const name = getFullEventName(blocName, event.name);

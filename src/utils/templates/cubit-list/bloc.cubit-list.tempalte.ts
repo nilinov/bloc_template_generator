@@ -1,18 +1,18 @@
-import {Bloc, BlocEvent, CaseEvent, JsonData} from "./interfaces.js";
+import {Bloc, BlocEvent, CaseEvent, JsonData} from "../../interfaces.js";
 import {
     camelToSnakeCase,
     getAllFinalVariables,
     getVariableAndType,
     getVariables,
     UpperFirstLetter
-} from "./utils.js";
+} from "../../utils.js";
 import {
     getEventNext,
     getEventsSwitch,
     getFullEventName,
     getVariablesAndDefault,
     getVariablesEvent
-} from "./bloc.default.tempalte";
+} from "../bloc-default/bloc.default.tempalte";
 
 const blocCubitListTemplate = (bloc: JsonData) => `
 const key${UpperFirstLetter(bloc.name)}State = '${UpperFirstLetter(bloc.name)}';

@@ -25,12 +25,12 @@
 
 <script>
 import {TextBox, SelectBox} from "@/components";
-import stateDefaultTemplate from "@/utils/state.default.template";
+import stateDefaultTemplate from "@/utils/templates/bloc-default/state.default.template";
 import {sampleLoadList} from "@/utils/sample.load.list";
-import {blocDefaultTemplate} from "@/utils/bloc.default.tempalte";
-import {eventTemplate} from "@/utils/event.template";
-import {blocCubitListTemplate} from "@/utils/bloc.cubit-list.tempalte";
-import stateCubitListTemplate from "@/utils/state.cubit-list.template";
+import {blocDefaultTemplate} from "@/utils/templates/bloc-default/bloc.default.tempalte";
+import {eventTemplate} from "@/utils/templates/bloc-default/event.template";
+import {blocCubitListTemplate} from "@/utils/templates/cubit-list/bloc.cubit-list.tempalte";
+import stateCubitListTemplate from "@/utils/templates/cubit-list/state.cubit-list.template";
 
 export default {
   name: "GenerateScreen",

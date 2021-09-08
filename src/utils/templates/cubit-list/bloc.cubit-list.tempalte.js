@@ -1,5 +1,5 @@
-import { camelToSnakeCase, getVariableAndType, UpperFirstLetter } from "./utils.js";
-import { getVariablesEvent } from "./bloc.default.tempalte";
+import { camelToSnakeCase, getVariableAndType, UpperFirstLetter } from "../../utils.js";
+import { getVariablesEvent } from "../bloc-default/bloc.default.tempalte";
 const blocCubitListTemplate = (bloc) => `
 const key${UpperFirstLetter(bloc.name)}State = '${UpperFirstLetter(bloc.name)}';
 

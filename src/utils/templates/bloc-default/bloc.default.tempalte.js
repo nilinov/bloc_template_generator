@@ -1,4 +1,4 @@
-import { camelToSnakeCase, UpperFirstLetter } from "./utils.js";
+import { camelToSnakeCase, UpperFirstLetter } from "../../utils.js";
 export function getFullEventName(blocName, eventName) {
     return `${blocName}${UpperFirstLetter(eventName)}Event`;
 }

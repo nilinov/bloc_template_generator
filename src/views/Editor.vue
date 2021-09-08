@@ -4,7 +4,8 @@
       <TextBox class="text-box" placeholder="Name bloc" v-model="nameBloc" @input="updateCode"/>
       <TextBox class="text-box" placeholder="Name class entity" v-model="nameClassEntity" @input="updateCode"/>
       <div class="space"></div>
-      <SelectBox class="select-box" v-model="typeTemplate" @input="updateCode"/>
+      <SelectBox class="select-box" v-model="typeTemplate" :options="templates" @input="updateCode"/>
+      <SelectBox class="select-box" v-model="dataTemplate" :options="templatesData" @input="updateCode"/>
     </div>
     <div class="areas">
       <div class="area-event">
@@ -31,6 +32,7 @@ import {blocDefaultTemplate} from "@/utils/templates/bloc-default/bloc.default.t
 import {eventTemplate} from "@/utils/templates/bloc-default/event.template";
 import {blocCubitListTemplate} from "@/utils/templates/cubit-list/bloc.cubit-list.tempalte";
 import stateCubitListTemplate from "@/utils/templates/cubit-list/state.cubit-list.template";
+import {sampleLoadView} from "@/utils/sample.load.view";
 
 export default {
   name: "GenerateScreen",
@@ -41,26 +43,61 @@ export default {
     nameBloc: 'Coupon',
     nameClassEntity: 'Coupon',
     typeTemplate: 'cubit-list',
+    dataTemplate: 'sample-list',
     code: {
       bloc: '',
       state: '',
       event: '',
-    }
+    },
+    templates: [
+      {
+        key: 'bloc',
+        value: 'BLoC list',
+      },
+      {
+        key: 'cubit-list',
+        value: 'Cubit list'
+      },
+      {
+        key: 'cubit-view',
+        value: 'Cubit view',
+      }
+    ],
+    templatesData: [
+      {
+        key: 'sample-list',
+        value: 'Sample list',
+      },
+      {
+        key: 'sample-view',
+        value: 'Sample view',
+      },
+    ],
   }),
   mounted() {
     this.updateCode();
   },
   methods: {
     updateCode() {
+      let data = sampleLoadList(this.nameBloc, this.nameClassEntity);
+      switch (this.dataTemplate) {
+        case "sample-list":
+          data = sampleLoadList(this.nameBloc, this.nameClassEntity);
+          break;
+        case "sample-view":
+          data = sampleLoadView(this.nameBloc, this.nameClassEntity);
+          break;
+      }
+
       if (this.typeTemplate === 'bloc') {
-        this.code.bloc = blocDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
-        this.code.state = stateDefaultTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
-        this.code.event = eventTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+        this.code.bloc = blocDefaultTemplate(data)
+        this.code.state = stateDefaultTemplate(data)
+        this.code.event = eventTemplate(data)
       }
 
       if (this.typeTemplate === 'cubit-list') {
-        this.code.bloc = blocCubitListTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
-        this.code.state = stateCubitListTemplate(sampleLoadList(this.nameBloc, this.nameClassEntity))
+        this.code.bloc = blocCubitListTemplate(data)
+        this.code.state = stateCubitListTemplate(data)
         this.code.event = '';
       }
     }

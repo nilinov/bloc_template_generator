@@ -89,7 +89,7 @@ const sampleLoadView = (name: string, itemType: string): JsonData => ({
                 }
             },
         },
-        onError: true,
+        onError: false,
     },
     actionProp: actionProps,
 })

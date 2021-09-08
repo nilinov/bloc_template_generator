@@ -90,8 +90,8 @@ export function getAllFinalVariables(variables, params) {
     }
     return res.join('\n');
 }
-export const camelToSnakeCase = (str) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
-export const UpperFirstLetter = (str) => str[0].toUpperCase() + str.slice(1);
+export const camelToSnakeCase = (str = '  ') => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
+export const UpperFirstLetter = (str = '  ') => str[0].toUpperCase() + str.slice(1);
 function getParamFunction(name = '', nullable = false) {
     if (nullable)
         return `\tthis.${name},\n`;

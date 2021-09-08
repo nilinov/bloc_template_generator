@@ -84,7 +84,7 @@ const sampleLoadView = (name, itemType) => ({
                 }
             },
         },
-        onError: true,
+        onError: false,
     },
     actionProp: actionProps,
 });

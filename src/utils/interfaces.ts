@@ -12,6 +12,7 @@ export interface Prop {
         double?: boolean
         enum?: boolean
         dynamic?: boolean
+        nullable?: boolean
     }
     default?: string
 }

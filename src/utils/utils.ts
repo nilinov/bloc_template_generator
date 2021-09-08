@@ -51,7 +51,11 @@ export function getGetters(getters: { [x: string]: BlocGetter }) {
 }
 
 export function getFinalVariable(variable: string, type: Prop, params?: {}) {
-    return `final ${getFullType(type)} ${variable};`
+    let nullable = '';
+    if (type.typeTemplate?.nullable) {
+        nullable = '?'
+    }
+    return `final ${getFullType(type)}${nullable} ${variable};`
 }
 
 export function getVariableAndType(variables: { [x: string]: Prop }, params?: { required?: boolean, noRequired?: boolean, addAction?: Prop }) {
@@ -86,16 +90,25 @@ export const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, letter =>
 
 export const UpperFirstLetter = (str: string) => str[0].toUpperCase() + str.slice(1);
 
+function getParamFunction(name = '', nullable = false ) {
+    if (nullable)
+        return `\tthis.${name},\n`
+    return `\t required this.${name},\n`;
+}
+
 export function getVariables(props: { [x: string]: Prop }, params?: { required: boolean, addAction?: Prop }) {
     let res = [];
     if (params?.required) {
-        res = Object.keys(props).map(name => `\t required this.${name},\n`);
+        res = Object.keys(props).map(name => getParamFunction(name, props[name]?.typeTemplate?.nullable ?? false));
     } else {
-        res = Object.keys(props).map(name => `\tthis.${name},\n`);
+        res = Object.keys(props).map(name => {
+            console.log(`${name}`)
+            return getParamFunction(name, props[name]?.typeTemplate?.nullable ?? true);
+        });
     }
 
     if (params?.addAction) {
-        res.push(`\t required this.${params.addAction.name},\n`)
+        res.push(getParamFunction(params.addAction.name, false))
     }
 
     return `{ \n${res.join('')} }`;

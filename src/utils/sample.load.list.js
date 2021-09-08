@@ -12,6 +12,11 @@ export const props = (itemType) => ({
         typeTemplate: { enum: true },
         default: "LoadStatusEnum.INIT"
     },
+    search: {
+        name: 'search',
+        typeTemplate: { string: true, nullable: true },
+        default: 'null',
+    },
     error: {
         name: 'error',
         typeTemplate: { dynamic: true },
@@ -63,6 +68,7 @@ const eventName = {
     loadingNext: 'loadingNext',
     loaded: 'loaded',
     loadFail: 'loadFail',
+    searching: 'searching',
 };
 const sampleLoadList = (name, itemType) => ({
     name: `${name}`,
@@ -81,7 +87,11 @@ const sampleLoadList = (name, itemType) => ({
             name: eventName.loadFail,
             props: { "error": props(itemType).error },
             isDefaultError: true
-        }
+        },
+        {
+            name: eventName.searching,
+            props: { "search": props(itemType).search },
+        },
     ],
     bloc: {
         case_event: {
@@ -92,6 +102,17 @@ const sampleLoadList = (name, itemType) => ({
                     error: "null",
                 },
                 content: "final res = await ApiCall();",
+                nextEvent: eventName.loaded,
+                nextEventPayload: "items: res.items, meta: res.meta",
+            },
+            [eventName.searching]: {
+                stateUpdate: {
+                    loadStatus: "LoadStatusEnum.SEARCH",
+                    items: "[]",
+                    error: "null",
+                    search: "search"
+                },
+                content: "final res = await ApiCall(search: search);",
                 nextEvent: eventName.loaded,
                 nextEventPayload: "items: res.items, meta: res.meta",
             },
@@ -107,7 +128,7 @@ const sampleLoadList = (name, itemType) => ({
                     loadStatus: "LoadStatusEnum.LOADING_NEXT",
                     error: "null",
                 },
-                content: "final res = await ApiCall(count: 5, currentPage: state.currentPage + 1);",
+                content: "final res = await ApiCall(count: 5, currentPage: state.currentPage + 1, search: state.search);",
                 nextEvent: eventName.loaded,
                 nextEventPayload: "items: [ ...state.items, ...res.items], meta: res.meta",
             },

@@ -7,7 +7,14 @@ export function getFullEventName(blocName: string, eventName: string) {
 
 export function getVariablesAndDefault(bloc: JsonData, params?: { addAction?: Prop }) {
     const defaultState = bloc.state
-    const res = Object.keys(defaultState.props ?? []).map((variable) => `${variable}: ${defaultState.props[variable]?.default ?? 'null'}`)
+    const res = Object.keys(defaultState.props ?? []).map((variable) => {
+        const props = defaultState.props;
+        let defaultValue = 'null';
+        if (props && props[variable]?.default) {
+            defaultValue = props[variable]?.default;
+        }
+        return `${variable}: ${defaultValue}`;
+    })
 
     if (params?.addAction) {
         res.push(`${params.addAction.name}: ${params.addAction.default ?? 'null'}`)

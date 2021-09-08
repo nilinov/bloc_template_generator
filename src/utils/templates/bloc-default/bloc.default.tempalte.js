@@ -5,7 +5,15 @@ export function getFullEventName(blocName, eventName) {
 export function getVariablesAndDefault(bloc, params) {
     var _a, _b;
     const defaultState = bloc.state;
-    const res = Object.keys((_a = defaultState.props) !== null && _a !== void 0 ? _a : []).map((variable) => { var _a, _b; return `${variable}: ${(_b = (_a = defaultState.props[variable]) === null || _a === void 0 ? void 0 : _a.default) !== null && _b !== void 0 ? _b : 'null'}`; });
+    const res = Object.keys((_a = defaultState.props) !== null && _a !== void 0 ? _a : []).map((variable) => {
+        var _a, _b;
+        const props = defaultState.props;
+        let defaultValue = 'null';
+        if (props && ((_a = props[variable]) === null || _a === void 0 ? void 0 : _a.default)) {
+            defaultValue = (_b = props[variable]) === null || _b === void 0 ? void 0 : _b.default;
+        }
+        return `${variable}: ${defaultValue}`;
+    });
     if (params === null || params === void 0 ? void 0 : params.addAction) {
         res.push(`${params.addAction.name}: ${(_b = params.addAction.default) !== null && _b !== void 0 ? _b : 'null'}`);
     }

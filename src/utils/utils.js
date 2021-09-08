@@ -58,7 +58,12 @@ export function getGetters(getters) {
     }).join(' \n');
 }
 export function getFinalVariable(variable, type, params) {
-    return `final ${getFullType(type)} ${variable};`;
+    var _a;
+    let nullable = '';
+    if ((_a = type.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) {
+        nullable = '?';
+    }
+    return `final ${getFullType(type)}${nullable} ${variable};`;
 }
 export function getVariableAndType(variables, params) {
     var _a;
@@ -87,16 +92,25 @@ export function getAllFinalVariables(variables, params) {
 }
 export const camelToSnakeCase = (str) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
 export const UpperFirstLetter = (str) => str[0].toUpperCase() + str.slice(1);
+function getParamFunction(name = '', nullable = false) {
+    if (nullable)
+        return `\tthis.${name},\n`;
+    return `\t required this.${name},\n`;
+}
 export function getVariables(props, params) {
     let res = [];
     if (params === null || params === void 0 ? void 0 : params.required) {
-        res = Object.keys(props).map(name => `\t required this.${name},\n`);
+        res = Object.keys(props).map(name => { var _a, _b, _c; return getParamFunction(name, (_c = (_b = (_a = props[name]) === null || _a === void 0 ? void 0 : _a.typeTemplate) === null || _b === void 0 ? void 0 : _b.nullable) !== null && _c !== void 0 ? _c : false); });
     }
     else {
-        res = Object.keys(props).map(name => `\tthis.${name},\n`);
+        res = Object.keys(props).map(name => {
+            var _a, _b, _c;
+            console.log(`${name}`);
+            return getParamFunction(name, (_c = (_b = (_a = props[name]) === null || _a === void 0 ? void 0 : _a.typeTemplate) === null || _b === void 0 ? void 0 : _b.nullable) !== null && _c !== void 0 ? _c : true);
+        });
     }
     if (params === null || params === void 0 ? void 0 : params.addAction) {
-        res.push(`\t required this.${params.addAction.name},\n`);
+        res.push(getParamFunction(params.addAction.name, false));
     }
     return `{ \n${res.join('')} }`;
 }

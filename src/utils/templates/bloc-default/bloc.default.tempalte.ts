@@ -6,18 +6,22 @@ export function getFullEventName(blocName: string, eventName: string) {
 }
 
 export function getDefaultValue(bloc: JsonData, name: string) {
+    // @ts-ignore
     const prop = bloc.state.props[name];
-    if (prop.default) return prop.default;
-    if (prop.typeTemplate?.nullable) {
-        return 'null';
-    }
 
-    if (prop.typeTemplate.map) return '{}';
-    if (prop.typeTemplate.int) return '0';
-    if (prop.typeTemplate.string) return '""';
-    if (prop.typeTemplate.array) return '[]';
-    if (prop.typeTemplate.double) return '0.0';
-    if (prop.typeTemplate.dynamic) return 'null';
+    if (prop) {
+        if (prop.default) return prop.default;
+        if (prop.typeTemplate?.nullable) {
+            return 'null';
+        }
+
+        if (prop.typeTemplate?.map) return '{}';
+        if (prop.typeTemplate?.int) return '0';
+        if (prop.typeTemplate?.string) return '""';
+        if (prop.typeTemplate?.array) return '[]';
+        if (prop.typeTemplate?.double) return '0.0';
+        if (prop.typeTemplate?.dynamic) return 'null';
+    }
 
     return 'null'
 }
@@ -28,7 +32,7 @@ export function getVariablesAndDefault(bloc: JsonData, params?: { addAction?: Pr
         const props = defaultState.props;
         let defaultValue = 'null';
         if (props && props[variable]?.default) {
-            defaultValue = props[variable]?.default;
+            defaultValue = props[variable]?.default ?? 'null';
         }
         return `${variable}: ${defaultValue}`;
     })

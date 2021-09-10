@@ -3,36 +3,39 @@ export function getFullEventName(blocName, eventName) {
     return `${blocName}${UpperFirstLetter(eventName)}Event`;
 }
 export function getDefaultValue(bloc, name) {
-    var _a;
+    var _a, _b, _c, _d, _e, _f, _g;
+    // @ts-ignore
     const prop = bloc.state.props[name];
-    if (prop.default)
-        return prop.default;
-    if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) {
-        return 'null';
+    if (prop) {
+        if (prop.default)
+            return prop.default;
+        if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) {
+            return 'null';
+        }
+        if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.map)
+            return '{}';
+        if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.int)
+            return '0';
+        if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.string)
+            return '""';
+        if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.array)
+            return '[]';
+        if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.double)
+            return '0.0';
+        if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.dynamic)
+            return 'null';
     }
-    if (prop.typeTemplate.map)
-        return '{}';
-    if (prop.typeTemplate.int)
-        return '0';
-    if (prop.typeTemplate.string)
-        return '""';
-    if (prop.typeTemplate.array)
-        return '[]';
-    if (prop.typeTemplate.double)
-        return '0.0';
-    if (prop.typeTemplate.dynamic)
-        return 'null';
     return 'null';
 }
 export function getVariablesAndDefault(bloc, params) {
     var _a, _b;
     const defaultState = bloc.state;
     const res = Object.keys((_a = defaultState.props) !== null && _a !== void 0 ? _a : []).map((variable) => {
-        var _a, _b;
+        var _a, _b, _c;
         const props = defaultState.props;
         let defaultValue = 'null';
         if (props && ((_a = props[variable]) === null || _a === void 0 ? void 0 : _a.default)) {
-            defaultValue = (_b = props[variable]) === null || _b === void 0 ? void 0 : _b.default;
+            defaultValue = (_c = (_b = props[variable]) === null || _b === void 0 ? void 0 : _b.default) !== null && _c !== void 0 ? _c : 'null';
         }
         return `${variable}: ${defaultValue}`;
     });

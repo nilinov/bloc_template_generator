@@ -1,5 +1,7 @@
 # bloc_template_generator
 
+[![Deploy to Firebase Hosting on PR](https://github.com/nilinov/bloc_template_generator/actions/workflows/firebase-hosting-pull-request.yml/badge.svg)](https://github.com/nilinov/bloc_template_generator/actions/workflows/firebase-hosting-pull-request.yml)
+
 ## Project setup
 ```
 yarn install

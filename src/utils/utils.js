@@ -1,92 +1,86 @@
 export function getFullType(prop, params) {
-    var _a, _b, _c, _d, _e, _f, _g;
-    const afterNoRequired = (params === null || params === void 0 ? void 0 : params.noRequired) ? '?' : '';
-    if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.array) {
+    const afterNoRequired = params?.noRequired ? '?' : '';
+    if (prop.typeTemplate?.array) {
         return `List<${prop.typeName}>${afterNoRequired}`;
     }
-    else if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.enum) {
+    else if (prop.typeTemplate?.enum) {
         return `${prop.typeName}${afterNoRequired}`;
     }
-    else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.double) {
+    else if (prop.typeTemplate?.double) {
         return `double${afterNoRequired}`;
     }
-    else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.int) {
+    else if (prop.typeTemplate?.int) {
         return `int${afterNoRequired}`;
     }
-    else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.string) {
+    else if (prop.typeTemplate?.string) {
         return `String${afterNoRequired}`;
     }
-    else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.map) {
+    else if (prop.typeTemplate?.map) {
         return `Map<${prop.typeTemplate.map.key}, ${prop.typeTemplate.map.value}>`;
     }
-    else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.dynamic) {
+    else if (prop.typeTemplate?.dynamic) {
         return `dynamic`;
     }
     return `${prop.typeName}${afterNoRequired}`;
 }
 export function toMap(props) {
     return '{\n' + Object.keys(props).map((key) => {
-        var _a, _b, _c, _d, _e, _f;
         const prop = props[key];
-        if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.array) {
+        if (prop.typeTemplate?.array) {
             return `${key}.toString()`;
         }
-        else if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.enum) {
+        else if (prop.typeTemplate?.enum) {
             return `${key}.toString()`;
         }
-        else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.double) {
+        else if (prop.typeTemplate?.double) {
             return `${key}`;
         }
-        else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.int) {
+        else if (prop.typeTemplate?.int) {
             return `${key}`;
         }
-        else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.string) {
+        else if (prop.typeTemplate?.string) {
             return `${key}`;
         }
-        else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.map) {
+        else if (prop.typeTemplate?.map) {
             return `${key}.toString()`;
         }
     }).filter(e => e).join(', \n') + '\n}';
 }
 export function getGetters(getters) {
     return Object.keys(getters).map((key) => {
-        var _a, _b, _c;
         const getter = getters[key];
         if (getter.params)
-            return `${(_a = getter.returnType) !== null && _a !== void 0 ? _a : ''} ${key}(${(_b = getter.params) !== null && _b !== void 0 ? _b : ''}) => ${getter.content};`;
-        return `${(_c = getter.returnType) !== null && _c !== void 0 ? _c : ''} get ${key} => ${getter.content};`;
+            return `${getter.returnType ?? ''} ${key}(${getter.params ?? ''}) => ${getter.content};`;
+        return `${getter.returnType ?? ''} get ${key} => ${getter.content};`;
     }).join(' \n');
 }
 export function getFinalVariable(variable, type, params) {
-    var _a;
     let nullable = '';
-    if ((_a = type.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) {
+    if (type.typeTemplate?.nullable) {
         nullable = '?';
     }
     return `final ${getFullType(type)}${nullable} ${variable};`;
 }
 export function getVariableAndType(variables, params) {
-    var _a;
     let res = [];
-    if (params === null || params === void 0 ? void 0 : params.required) {
+    if (params?.required) {
         res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`);
     }
-    else if (params === null || params === void 0 ? void 0 : params.noRequired) {
+    else if (params?.noRequired) {
         res = Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], { noRequired: true })} ${variable},\n`);
     }
     else {
         res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`);
     }
-    if (params === null || params === void 0 ? void 0 : params.addAction) {
-        res.push(`\t required ${getFullType(params === null || params === void 0 ? void 0 : params.addAction)} ${(_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name},\n`);
+    if (params?.addAction) {
+        res.push(`\t required ${getFullType(params?.addAction)} ${params?.addAction?.name},\n`);
     }
     return res.join('');
 }
 export function getAllFinalVariables(variables, params) {
-    var _a;
     const res = Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable]));
-    if (params === null || params === void 0 ? void 0 : params.addAction) {
-        res.push('\t' + getFinalVariable((_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name, params === null || params === void 0 ? void 0 : params.addAction));
+    if (params?.addAction) {
+        res.push('\t' + getFinalVariable(params?.addAction?.name, params?.addAction));
     }
     return res.join('\n');
 }
@@ -99,26 +93,25 @@ function getParamFunction(name = '', nullable = false) {
 }
 export function getVariables(props, params) {
     let res = [];
-    if (params === null || params === void 0 ? void 0 : params.required) {
-        res = Object.keys(props).map(name => { var _a, _b, _c; return getParamFunction(name, (_c = (_b = (_a = props[name]) === null || _a === void 0 ? void 0 : _a.typeTemplate) === null || _b === void 0 ? void 0 : _b.nullable) !== null && _c !== void 0 ? _c : false); });
+    if (params?.required) {
+        res = Object.keys(props).map(name => getParamFunction(name, props[name]?.typeTemplate?.nullable ?? false));
     }
     else {
         res = Object.keys(props).map(name => {
-            var _a, _b, _c;
             console.log(`${name}`);
-            return getParamFunction(name, (_c = (_b = (_a = props[name]) === null || _a === void 0 ? void 0 : _a.typeTemplate) === null || _b === void 0 ? void 0 : _b.nullable) !== null && _c !== void 0 ? _c : true);
+            return getParamFunction(name, props[name]?.typeTemplate?.nullable ?? true);
         });
     }
-    if (params === null || params === void 0 ? void 0 : params.addAction) {
+    if (params?.addAction) {
         res.push(getParamFunction(params.addAction.name, false));
     }
     return `{ \n${res.join('')} }`;
 }
 export function getCopyWithParams(bloc, params) {
-    var _a, _b, _c;
-    const res = Object.keys((_a = bloc.state.props) !== null && _a !== void 0 ? _a : {}).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`);
-    if (params === null || params === void 0 ? void 0 : params.addAction) {
-        res.push(`\t ${(_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name}: ${(_c = params === null || params === void 0 ? void 0 : params.addAction) === null || _c === void 0 ? void 0 : _c.name},\n`);
+    const res = Object.keys(bloc.state.props ?? {}).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`);
+    if (params?.addAction) {
+        res.push(`\t ${params?.addAction?.name}: ${params?.addAction?.name},\n`);
     }
     return res.join('');
 }
+//# sourceMappingURL=utils.js.map

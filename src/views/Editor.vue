@@ -7,7 +7,7 @@
       <SelectBox class="select-box" v-model="typeTemplate" :options="templates" @input="updateCode"/>
       <SelectBox class="select-box" v-model="dataTemplate" :options="templatesData" @input="updateCode"/>
       <button @click="auth" v-if="!user">Auth</button>
-      <span v-if="user">{{user.displayName}}</span>
+      <button v-if="user">{{user.displayName}}</button>
     </div>
     <div class="areas">
       <div class="area-event">

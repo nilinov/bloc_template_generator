@@ -6,7 +6,8 @@
       <div class="space"></div>
       <SelectBox class="select-box" v-model="typeTemplate" :options="templates" @input="updateCode"/>
       <SelectBox class="select-box" v-model="dataTemplate" :options="templatesData" @input="updateCode"/>
-      <button @click="auth">Auth</button>
+      <button @click="auth" v-if="!user">Auth</button>
+      <span v-if="user">{{user.displayName}}</span>
     </div>
     <div class="areas">
       <div class="area-event">
@@ -35,7 +36,8 @@ import {blocCubitListTemplate} from "@/utils/templates/cubit-list/bloc.cubit-lis
 import stateCubitListTemplate from "@/utils/templates/cubit-list/state.cubit-list.template";
 import {sampleLoadView} from "@/utils/sample.load.view";
 
-import firebase from "firebase/auth";
+import * as firebase from "firebase/auth";
+import {authInApp, firebaseApp} from "@/main";
 
 export default {
   name: "GenerateScreen",
@@ -75,6 +77,7 @@ export default {
         value: 'Sample view',
       },
     ],
+    user: null
   }),
   mounted() {
     this.updateCode();
@@ -103,32 +106,9 @@ export default {
         this.code.event = '';
       }
     },
-    auth() {
-      var provider = new firebase.auth.GoogleAuthProvider();
-
-      firebase.auth()
-          .signInWithPopup(provider)
-          .then((result) => {
-            /** @type {firebase.auth.OAuthCredential} */
-            var credential = result.credential;
-
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            var token = credential.accessToken;
-            // The signed-in user info.
-            var user = result.user;
-            // ...
-          }).catch((error) => {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-        // ...
-      });
-
-
+    async auth() {
+      this.user = await authInApp()
+      console.log(this.user)
     }
   }
 };

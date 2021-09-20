@@ -27,3 +27,4 @@ abstract class ${bloc.name}Event {
 ${bloc.events.map(event => getEvents(bloc.name, event)).filter((e) => e).join('\n')}
 `;
 export { eventTemplate };
+//# sourceMappingURL=event.template.js.map

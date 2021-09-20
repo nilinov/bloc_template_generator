@@ -35,14 +35,12 @@ import {blocCubitListTemplate} from "@/utils/templates/cubit-list/bloc.cubit-lis
 import stateCubitListTemplate from "@/utils/templates/cubit-list/state.cubit-list.template";
 import {sampleLoadView} from "@/utils/sample.load.view";
 
-import firebase from "firebase";
-
+import firebase from "firebase/auth";
 
 export default {
   name: "GenerateScreen",
   components: {TextBox, SelectBox},
-  props: {
-  },
+  props: {},
   data: () => ({
     nameBloc: 'Coupon',
     nameClassEntity: 'Coupon',

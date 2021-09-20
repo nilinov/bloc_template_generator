@@ -1,25 +1,27 @@
 import { camelToSnakeCase, getAllFinalVariables, getCopyWithParams, getGetters, getVariableAndType, getVariables, toMap } from "../../utils.js";
 import { getVariablesAndDefault } from "../bloc-default/bloc.default.tempalte";
-const stateCubitListTemplate = (bloc) => `
+const stateCubitListTemplate = (bloc) => {
+    var _a, _b, _c, _d, _e;
+    return `
 part of '${camelToSnakeCase(bloc.name)}_cubit.dart';
 
 class ${bloc.name}State {
-  ${getAllFinalVariables(bloc.state.props ?? {}, { addAction: bloc.actionProp })}
+  ${getAllFinalVariables((_a = bloc.state.props) !== null && _a !== void 0 ? _a : {}, { addAction: bloc.actionProp })}
 
-  ${bloc.name}State(${getVariables(bloc.state.props ?? {}, { required: true, addAction: bloc.actionProp })});
+  ${bloc.name}State(${getVariables((_b = bloc.state.props) !== null && _b !== void 0 ? _b : {}, { required: true, addAction: bloc.actionProp })});
 
   ${bloc.name}State copyWith({
-    ${getVariableAndType(bloc.state.props ?? {}, { noRequired: true, addAction: bloc.actionProp })}}) {
+    ${getVariableAndType((_c = bloc.state.props) !== null && _c !== void 0 ? _c : {}, { noRequired: true, addAction: bloc.actionProp })}}) {
     return new ${bloc.name}State(
       ${getCopyWithParams(bloc, { addAction: bloc.actionProp })});
   }
 
-  toMap() => ${toMap(bloc.state.props ?? {})};
+  toMap() => ${toMap((_d = bloc.state.props) !== null && _d !== void 0 ? _d : {})};
   
   static empty() => ${bloc.name}State(${getVariablesAndDefault(bloc, { addAction: bloc.actionProp })});
 
-  ${getGetters(bloc.state.getters ?? {})}
+  ${getGetters((_e = bloc.state.getters) !== null && _e !== void 0 ? _e : {})}
 }
 `;
+};
 export default stateCubitListTemplate;
-//# sourceMappingURL=state.cubit-list.template.js.map

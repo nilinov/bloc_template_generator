@@ -26,19 +26,38 @@ export function toMap(props: { [name: string]: Prop }) {
     return '{\n' + Object.keys(props).map((key) => {
         const prop = props[key];
         if (prop.typeTemplate?.array) {
-            return `${key}.toString()`;
+            return `"${key}": '[' + ${key}.map(e => e.toMap().join(', ') + ']'`;
         } else if (prop.typeTemplate?.enum) {
-            return `${key}.toString()`;
+            return `"${key}": ${key}.toString()`;
         } else if (prop.typeTemplate?.double) {
-            return `${key}`;
+            return `"${key}": ${key}`;
         } else if (prop.typeTemplate?.int) {
-            return `${key}`;
+            return `"${key}": ${key}`;
         } else if (prop.typeTemplate?.string) {
-            return `${key}`;
+            return `"${key}": ${key}`;
         } else if (prop.typeTemplate?.map) {
-            return `${key}.toString()`;
+            return `"${key}": ${key}`;
         }
     }).filter(e => e).join(', \n') + '\n}';
+}
+
+export function fromMap(props: { [name: string]: Prop }) {
+    return Object.keys(props).map((key) => {
+        const prop = props[key];
+        if (prop.typeTemplate?.array) {
+            return `${key}: json["${key}"].map(e => ${key}.fromJson(e)) ?? [] as List<${key}>`;
+        } else if (prop.typeTemplate?.enum) {
+            return `${key}: ${key}FromJson(json["${key}"])`;
+        } else if (prop.typeTemplate?.double) {
+            return `${key}: json["${key}"] as double`;
+        } else if (prop.typeTemplate?.int) {
+            return `${key}: json["${key}"] as int`;
+        } else if (prop.typeTemplate?.string) {
+            return `${key}: json["${key}"] as String`;
+        } else if (prop.typeTemplate?.map) {
+            return `${key}: ${key}FromJson(json["${key}"])`;
+        }
+    }).filter(e => e).join(', \n');
 }
 
 export function getGetters(getters: { [x: string]: BlocGetter }) {
@@ -90,7 +109,7 @@ export const camelToSnakeCase = (str: string = '  ') => str.replace(/[A-Z]/g, le
 
 export const UpperFirstLetter = (str: string = '  ') => str[0].toUpperCase() + str.slice(1);
 
-function getParamFunction(name = '', nullable = false ) {
+export function getParamFunction(name = '', nullable = false ) {
     if (nullable)
         return `\tthis.${name},\n`
     return `\t required this.${name},\n`;

@@ -1,6 +1,6 @@
 <template>
   <select class="select select-box"  @change="e => $emit('input', e.target.value)" :value="value">
-    <option disabled>Выбрать шаблон</option>
+    <option disabled>{{ placeholder }}</option>
     <option v-for="item in options" :value="item.key">{{ item.value }}</option>
   </select>
 </template>
@@ -9,6 +9,7 @@
 export default {
   name: "SelectBox",
   props: {
+    placeholder: { type: String, default: "Выбрать шаблон" },
     value: { type: String, default: "Template select" },
     options: {
       type: Array,

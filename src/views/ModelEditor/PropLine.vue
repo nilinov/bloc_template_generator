@@ -1,9 +1,10 @@
 <template>
-  <div class="ModelEditor">
+  <div class="ModelEditor" :class="{isEnum}">
     <TextBox class="text-box" placeholder="Name property" v-model="item.name"/>
-    <SelectBox class="select-box" placeholder="Select type" :options="options" v-model="item.type"/>
-    <TextBox class="text-box" placeholder="Default value" v-model="item.defaultValue" :disabled="item.nullable"/>
-    <input type="checkbox" v-model="item.nullable">
+    <SelectBox v-if="!isEnum" class="select-box" placeholder="Select type" :options="options" v-model="item.type"/>
+    <TextBox v-if="!isEnum" class="text-box" placeholder="Default value" v-model="item.defaultValue"
+             :disabled="item.nullable"/>
+    <input v-if="!isEnum" type="checkbox" v-model="item.nullable">
     <button :disabled="disabled" v-if="action" @click="AddItem">Добавить</button>
     <button v-else @click="$emit('remove')">Удалить</button>
   </div>
@@ -26,6 +27,7 @@ export default {
       }),
     },
     allTypes: Array,
+    isEnum: Boolean,
     action: {
       type: Boolean,
       default: false,
@@ -36,6 +38,9 @@ export default {
       return ['String', 'int', 'double', 'DateTime', ...(this.allTypes ?? [])].map(e => ({key: e, value: e}))
     },
     disabled() {
+      if (this.isEnum) {
+        return !this.item.name
+      }
       return !this.item.name || !this.item.type;
     },
   },
@@ -58,5 +63,9 @@ export default {
   grid-gap: 1rem;
   grid-template-columns: auto auto auto 20px 150px;
   align-items: center;
+
+  &.isEnum {
+    grid-template-columns: 1fr 150px;
+  }
 }
 </style>

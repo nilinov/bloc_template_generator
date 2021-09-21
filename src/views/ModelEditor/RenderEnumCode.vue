@@ -17,7 +17,7 @@
 <span v-for="item of items">&nbsp;&nbsp; case '{{ nameExamplar }}.{{ item.name }}': return {{ nameClass }}.{{ item.name }};<br></span>
   }
 
-  return Format.onePerson;
+  return {{ nameClass }}.{{ items[0].name }};
 }
     </pre>
   </div>

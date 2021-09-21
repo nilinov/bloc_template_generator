@@ -14,9 +14,15 @@
         <SelectBox :options="[{ key: 'enum', value: 'enum' }]" placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
       </div>
 
-      <PropLine v-for="(item, index) of items" :item="item" :key="`item-${item.name}-${item.type}`"
+      <PropLine
+          v-for="(item, index) of items" :item="item" :key="`item-${item.name}-${item.type}`"
+          :is-enum="isEnum"
                 @remove="handleRemoveItem(index)"/>
-      <PropLine :item="emptyItem" @add="handleAddItem" action/>
+      <PropLine
+          :is-enum="isEnum"
+          :item="emptyItem" @add="handleAddItem"
+          action
+      />
 
       <render-code v-if="!isEnum" :items="items" :name-class="name"/>
       <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>

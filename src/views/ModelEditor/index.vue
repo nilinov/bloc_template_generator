@@ -1,7 +1,9 @@
 <template>
   <div class="index">
     <div class="all-models">
-      <div class="model" v-for="item of allModels" :class="{active: uuid === item.uuid}" @click="$router.push(`/Model/${item.uuid}`)">{{item.name}}</div>
+      <div class="model" v-for="item of allModels" :class="{active: uuid === item.uuid}"
+           @click="$router.push(`/Model/${item.uuid}`)">{{ item.name }}
+      </div>
       <div class="model" @click="$router.push(`/Model`)">Добавить</div>
     </div>
     <div class="content">
@@ -11,16 +13,19 @@
 
       <div class="inline">
         <TextBox placeholder="Name class" v-model="name"/>
-        <SelectBox :options="[{ key: 'enum', value: 'enum' }]" placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
+        <SelectBox :options="[{ key: 'class', value: 'class' }, { key: 'enum', value: 'enum' }]" placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
       </div>
 
       <PropLine
           v-for="(item, index) of items" :item="item" :key="`item-${item.name}-${item.type}`"
           :is-enum="isEnum"
-                @remove="handleRemoveItem(index)"/>
+          :all-types="allModelsNames"
+          @remove="handleRemoveItem(index)"
+      />
       <PropLine
           :is-enum="isEnum"
           :item="emptyItem" @add="handleAddItem"
+          :all-types="allModelsNames"
           action
       />
 
@@ -94,6 +99,10 @@ export default class ModelEditor extends Vue {
     return this.$store.state.models;
   }
 
+  get allModelsNames(): Model[] {
+    return this.$store.getters.allModels;
+  }
+
   get route() {
     return this.$route.fullPath
   }
@@ -128,6 +137,7 @@ export default class ModelEditor extends Vue {
       this.items = item.props;
       this.isEnum = item.isEnum;
       if (this.isEnum) this.AdditionalInfo = 'enum'
+      else  this.AdditionalInfo = 'class'
     }
   }
 

@@ -22,44 +22,47 @@ export const props = (itemType) => ({
         typeTemplate: { dynamic: true },
     },
 });
-const getters = (itemType) => ({
-    byId: {
-        name: 'byId',
-        returnType: props(itemType)?.items?.typeTemplate?.array,
-        params: "int id",
-        content: "items.firstWhere((element) => element.id == id)"
-    },
-    currentPage: {
-        name: 'currentPage',
-        returnType: "int",
-        content: "meta.currentPage"
-    },
-    canLoadNext: {
-        name: 'canLoadNext',
-        returnType: "bool",
-        content: "meta.lastPage > meta.currentPage && !processLoading"
-    },
-    loading: {
-        name: 'loading',
-        returnType: "bool",
-        content: "loadStatus == LoadStatusEnum.LOADING"
-    },
-    loadingNext: {
-        name: 'loadingNext',
-        returnType: "bool",
-        content: "loadStatus == LoadStatusEnum.LOADING_NEXT"
-    },
-    processLoading: {
-        name: 'processLoading',
-        returnType: "bool",
-        content: "[LoadStatusEnum.LOADING, LoadStatusEnum.LOADING_NEXT, LoadStatusEnum.REFRESH, LoadStatusEnum.SEARCH].contains(loadStatus)"
-    },
-    showList: {
-        name: 'showList',
-        returnType: "bool",
-        content: "[LoadStatusEnum.DONE, LoadStatusEnum.REFRESH, LoadStatusEnum.LOADING_NEXT].contains(loadStatus)"
-    }
-});
+const getters = (itemType) => {
+    var _a, _b, _c;
+    return ({
+        byId: {
+            name: 'byId',
+            returnType: (_c = (_b = (_a = props(itemType)) === null || _a === void 0 ? void 0 : _a.items) === null || _b === void 0 ? void 0 : _b.typeTemplate) === null || _c === void 0 ? void 0 : _c.array,
+            params: "int id",
+            content: "items.firstWhere((element) => element.id == id)"
+        },
+        currentPage: {
+            name: 'currentPage',
+            returnType: "int",
+            content: "meta.currentPage"
+        },
+        canLoadNext: {
+            name: 'canLoadNext',
+            returnType: "bool",
+            content: "meta.lastPage > meta.currentPage && !processLoading"
+        },
+        loading: {
+            name: 'loading',
+            returnType: "bool",
+            content: "loadStatus == LoadStatusEnum.LOADING"
+        },
+        loadingNext: {
+            name: 'loadingNext',
+            returnType: "bool",
+            content: "loadStatus == LoadStatusEnum.LOADING_NEXT"
+        },
+        processLoading: {
+            name: 'processLoading',
+            returnType: "bool",
+            content: "[LoadStatusEnum.LOADING, LoadStatusEnum.LOADING_NEXT, LoadStatusEnum.REFRESH, LoadStatusEnum.SEARCH].contains(loadStatus)"
+        },
+        showList: {
+            name: 'showList',
+            returnType: "bool",
+            content: "[LoadStatusEnum.DONE, LoadStatusEnum.REFRESH, LoadStatusEnum.LOADING_NEXT].contains(loadStatus)"
+        }
+    });
+};
 const eventName = {
     loading: 'loading',
     loadingNext: 'loadingNext',
@@ -142,4 +145,3 @@ const sampleLoadList = (name, itemType) => ({
 });
 const actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
 export { sampleLoadList };
-//# sourceMappingURL=sample.load.list.js.map

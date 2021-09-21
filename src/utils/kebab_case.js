@@ -10,4 +10,3 @@ export default function (str) {
         return match.slice(1).toUpperCase();
     });
 }
-//# sourceMappingURL=kebab_case.js.map

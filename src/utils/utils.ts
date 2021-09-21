@@ -1,4 +1,5 @@
 import {BlocGetter, JsonData, Prop} from "./interfaces.js";
+import * as _ from 'lodash';
 
 export function getFullType(prop: Prop, params?: { noRequired?: boolean }): string {
     const afterNoRequired = params?.noRequired ? '?' : '';
@@ -41,7 +42,12 @@ export function toMap(props: { [name: string]: Prop }) {
     }).filter(e => e).join(', \n') + '\n}';
 }
 
+function getPropNameFromList(prop: Prop) {
+    return prop.typeName.substr(5, prop.typeName.length - 6);
+}
+
 export function fromMap(props: { [name: string]: Prop }) {
+    console.log({props})
     return Object.keys(props).map((key) => {
         const prop = props[key];
         if (prop.typeTemplate?.array) {
@@ -56,6 +62,18 @@ export function fromMap(props: { [name: string]: Prop }) {
             return `${key}: json["${key}"] as String`;
         } else if (prop.typeTemplate?.map) {
             return `${key}: ${key}FromJson(json["${key}"])`;
+        } else if (prop.typeTemplate?.class) {
+            return `${key}: ${prop.typeName}.fromJson(json["${key}"]) as ${prop.typeName}`;
+        } else if (prop.typeName) {
+            if (prop.typeName == 'DateTime') {
+                return `${key}: DateTime.parse(json["${key}"])`;
+            } else if (prop.typeName == 'bool') {
+                return `${key}: json["${key}"] as bool`;
+            } else if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') != -1) {
+                return `${key}: json["${key}"].map((e) => ${getPropNameFromList(prop)}.fromJson(e)) ?? [] as List<${getPropNameFromList(prop)}>`;
+            } else {
+                return `${key}: ${_.camelCase(prop.typeName)}FromJson(json["${key}"])`;
+            }
         }
     }).filter(e => e).join(', \n');
 }

@@ -14,6 +14,14 @@ export var ACTIONS;
 })(ACTIONS || (ACTIONS = {}));
 const STORE_MODELS = 'STORE_MODELS';
 export default new Vuex.Store({
+    getters: {
+        allModels(state) {
+            return [...state.models.map(e => e.name), ...state.models.map(e => `List<${e.name}>`)];
+        },
+        allModelsClasses(state) {
+            return [...state.models.filter(e => e.isEnum == false).map(e => e.name)];
+        }
+    },
     state: {
         user: null,
         models: [],

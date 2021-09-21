@@ -2,7 +2,7 @@
   <div class="RenderCode">
     <span> class {{ nameClass }} { </span>
 
-    <pre v-text="stateCode(bloc)"></pre>
+    <pre v-text="stateCode(bloc, {postfix: ''})"></pre>
 
     <span><br> }</span>
   </div>
@@ -35,9 +35,13 @@ export default class RenderCode extends Vue {
   get stateProps() {
     const res = {};
     this.items.map(e => {
+      const isClass = (this.$store.getters.allModelsClasses as string[]).includes(e.type);
+
       res[e.name] = {
         name: e.name,
+        typeName: e.type,
         typeTemplate: {
+          class: isClass,
           [e.type.toLowerCase()]: true,
         },
         default: e.defaultValue,

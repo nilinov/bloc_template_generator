@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     options() {
-      return ['String', 'int', 'double', 'DateTime', ...(this.allTypes ?? [])].map(e => ({key: e, value: e}))
+      return ['String', 'int', 'double', 'DateTime', 'bool', ...(this.allTypes ?? [])].map(e => ({key: e, value: e}))
     },
     disabled() {
       if (this.isEnum) {

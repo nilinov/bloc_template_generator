@@ -7,6 +7,7 @@ export var MUTATIONS;
     MUTATIONS["SET_USER"] = "SET_USER";
     MUTATIONS["RESTORE_MODELS"] = "RESTORE_MODELS";
     MUTATIONS["SET_MODEL"] = "SET_MODEL";
+    MUTATIONS["REMOVE_MODEL"] = "REMOVE_MODEL";
 })(MUTATIONS || (MUTATIONS = {}));
 export var ACTIONS;
 (function (ACTIONS) {
@@ -42,6 +43,13 @@ export default new Vuex.Store({
             }
             else {
                 state.models.push(model);
+            }
+            localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
+        },
+        [MUTATIONS.REMOVE_MODEL](state, uuid) {
+            const index = state.models.findIndex(e => e.uuid == uuid);
+            if (index != -1) {
+                state.models.splice(index, 1);
             }
             localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
         },

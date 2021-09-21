@@ -9,6 +9,7 @@
     <div class="content">
       <h4>Edit model {{ name }}
         <button @click="auth">Auth</button>
+        <button @click="handleRemove">Удалить</button>
       </h4>
 
       <div class="inline">
@@ -162,6 +163,11 @@ export default class ModelEditor extends Vue {
   auth() {
     this.$store.dispatch(ACTIONS.LOGIN)
   };
+
+  handleRemove() {
+    this.$store.commit(MUTATIONS.REMOVE_MODEL, this.uuid)
+
+  }
 }
 
 </script>

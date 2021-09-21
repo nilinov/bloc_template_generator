@@ -88,12 +88,4 @@ export default class RenderCode extends Vue {
 </script>
 
 <style scoped lang="scss">
-.RenderCode {
-  padding: 1rem;
-  background-color: $color-gray-100;
-}
-
-pre {
-  margin: 0;
-}
 </style>

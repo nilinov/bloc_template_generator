@@ -9,6 +9,7 @@ export enum MUTATIONS {
     SET_USER = 'SET_USER',
     RESTORE_MODELS = 'RESTORE_MODELS',
     SET_MODEL = 'SET_MODEL',
+    REMOVE_MODEL = 'REMOVE_MODEL',
 }
 
 export enum ACTIONS {
@@ -50,6 +51,13 @@ export default new Vuex.Store<State>({
                 state.models.splice(index, 1, model);
             } else {
                 state.models.push(model);
+            }
+            localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
+        },
+        [MUTATIONS.REMOVE_MODEL](state, uuid: string) {
+            const index = state.models.findIndex(e => e.uuid == uuid);
+            if (index != -1) {
+                state.models.splice(index, 1);
             }
             localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
         },

@@ -103,12 +103,5 @@ export default class RenderEnumCode extends Vue {
 </script>
 
 <style scoped lang="scss">
-.RenderEnumCode {
-  padding: 1rem;
-  background-color: $color-gray-100;
-}
 
-pre {
-  margin: 0;
-}
 </style>

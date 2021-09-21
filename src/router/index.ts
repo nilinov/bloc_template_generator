@@ -12,6 +12,11 @@ const routes: Array<RouteConfig> = [
     component: Editor
   },
   {
+    path: '/Model',
+    name: 'Model',
+    component: ModelEditor
+  },
+  {
     path: '/Model/:uuid',
     name: 'Model',
     component: ModelEditor

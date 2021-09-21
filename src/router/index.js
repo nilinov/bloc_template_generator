@@ -10,6 +10,11 @@ const routes = [
         component: Editor
     },
     {
+        path: '/Model',
+        name: 'Model',
+        component: ModelEditor
+    },
+    {
         path: '/Model/:uuid',
         name: 'Model',
         component: ModelEditor

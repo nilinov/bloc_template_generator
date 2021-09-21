@@ -90,3 +90,4 @@ const sampleLoadView = (name, itemType) => ({
 });
 const actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
 export { sampleLoadView };
+//# sourceMappingURL=sample.load.view.js.map

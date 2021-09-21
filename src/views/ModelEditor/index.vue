@@ -2,6 +2,7 @@
   <div class="index">
     <div class="all-models">
       <div class="model" v-for="item of allModels" :class="{active: uuid === item.uuid}" @click="$router.push(`/Model/${item.uuid}`)">{{item.name}}</div>
+      <div class="model" @click="$router.push(`/Model`)">Добавить</div>
     </div>
     <div class="content">
       <h4>Edit model {{ name }}

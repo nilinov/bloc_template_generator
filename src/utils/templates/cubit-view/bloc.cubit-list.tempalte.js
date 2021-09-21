@@ -13,7 +13,6 @@ class ${bloc.name}Cubit extends Cubit<${bloc.name}State> {
 
 `;
 function getEvents(blocName, event, bloc) {
-    var _a, _b;
     const name = event.name;
     let nameFunction = '';
     if (event.props) {
@@ -23,12 +22,13 @@ function getEvents(blocName, event, bloc) {
     else {
         nameFunction = `Future<void> ${name}() async `;
     }
-    const caseEvent = bloc.bloc.case_event ? (_a = bloc.bloc.case_event[event.name]) !== null && _a !== void 0 ? _a : {} : {};
+    const caseEvent = bloc.bloc.case_event ? bloc.bloc.case_event[event.name] ?? {} : {};
     return ` ${nameFunction} {
         emit(state.copyWith(\n${getVariablesEvent(caseEvent, { addAction: bloc.actionProp, eventName: name })}));
-        ${(_b = caseEvent.content) !== null && _b !== void 0 ? _b : ''}
+        ${caseEvent.content ?? ''}
         ${caseEvent.nextEvent ? `${caseEvent.nextEvent}( ${caseEvent.nextEventPayload} );` : ''}
       }
     `;
 }
 export { blocCubitListTemplate };
+//# sourceMappingURL=bloc.cubit-list.tempalte.js.map

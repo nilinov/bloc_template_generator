@@ -66,7 +66,7 @@ document.onkeyup = function (e) {
 document.onkeydown = function (e) {
     if (e.keyCode == 17) isCtrl = true;
     if (e.keyCode == 83 && isCtrl == true) {
-        const text = document.querySelector('.codeForSave')?.textContent ?? '';
+        const text = (document.querySelector('.codeForSave')?.textContent ?? '');
         const fileName = document.querySelector('.fileName')?.textContent ?? '';
         downloadURI(fileName, text)
         return false;

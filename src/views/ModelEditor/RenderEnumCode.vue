@@ -1,6 +1,6 @@
 <template>
   <div class="RenderCode">
-    <span class="fileName">{{ nameClass }}.dart</span>
+    <span class="fileName">{{ fileName }}</span>
     <div class="codeForSave">
       <span>import '../_imports.dart';</span><br><br>
       <span> enum {{ nameClass }} { </span>
@@ -9,7 +9,7 @@
       <br><br>
       <span>{{ nameExamplar }}ToJson({{ nameClass }} {{ nameExamplar }}) {</span>
       <br>
-      <span>&nbsp;&nbsp; return {{ nameExamplar }}.toString();</span>
+      <pre>       return {{ nameExamplar }}.toString();</pre>
       <br>
       <span>}</span>
       <br>
@@ -17,9 +17,9 @@
       <pre>
 {{ nameExamplar }}FromJson(String {{ nameExamplar }}) {
   switch ({{ nameExamplar }}) {
-<span v-for="item of items">&nbsp;&nbsp; case '{{ nameExamplar }}.{{ item.name }}': return {{ nameClass }}.{{
+<pre v-for="item of items">     case '{{ nameExamplar }}.{{ item.name }}': return {{ nameClass }}.{{
     item.name
-  }};<br></span>
+  }};<br></pre>
   }
 
   return {{ nameClass }}.{{ items[0].name }};
@@ -91,6 +91,10 @@ export default class RenderEnumCode extends Vue {
 
   get nameExamplar() {
     return _.camelCase(this.nameClass);
+  }
+
+  get fileName() {
+    return _.snakeCase(this.nameClass) + '.dart'
   }
 
   renderCodeLineType = renderCodeLineType;

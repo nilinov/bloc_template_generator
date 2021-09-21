@@ -13,7 +13,9 @@
               @remove="handleRemoveItem(index)"/>
     <PropLine :item="emptyItem" @add="handleAddItem" action/>
 
-    <render-code :items="items" :name-class="name"/>
+    <render-code v-if="!isEnum" :items="items" :name-class="name"/>
+    <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>
+
   </div>
 </template>
 
@@ -26,6 +28,7 @@ import {ACTIONS, MUTATIONS} from "@/store";
 import Vue from "vue";
 import Component from "vue-class-component";
 import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
+import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
 
 @Component({
   watch: {
@@ -33,6 +36,9 @@ import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
       this.isEnum = val === 'enum';
     },
     name(val) {
+      this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+    },
+    isEnum(val) {
       this.$store.commit(MUTATIONS.SET_MODEL, this.model);
     },
     items: {
@@ -43,6 +49,7 @@ import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
     }
   },
   components: {
+    RenderEnumCode,
     SelectBox,
     TextBox,
     RenderCode,
@@ -57,6 +64,8 @@ import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
     if (item) {
       this.name = item.name;
       this.items = item.props;
+      this.isEnum = item.isEnum;
+      if (this.isEnum) this.AdditionalInfo = 'enum'
     }
   },
 })

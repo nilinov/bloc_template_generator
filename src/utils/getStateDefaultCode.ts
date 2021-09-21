@@ -34,3 +34,9 @@ export default (bloc: JsonData) => `
   
   static empty() => ${bloc.name}State(${getVariablesAndDefault(bloc, {addAction: bloc.actionProp})});
 `
+
+const getEnumContent = (bloc: JsonData) => `${Object.keys(bloc.state.props ?? EmptyProps).map(name => `\t${name},`).join('\n')}`
+
+export {
+  getEnumContent
+};

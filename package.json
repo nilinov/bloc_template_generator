@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "firebase": "^9.0.2",
+    "lodash": "^4.17.21",
     "register-service-worker": "^1.7.1",
     "sass": "^1.38.2",
     "sass-loader": "^10",
@@ -20,6 +21,7 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.173",
     "@vue/cli-plugin-babel": "^4.5.13",
     "@vue/cli-plugin-pwa": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",

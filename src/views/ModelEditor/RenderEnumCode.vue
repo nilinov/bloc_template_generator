@@ -1,10 +1,25 @@
 <template>
-  <div class="RenderCode">
-    <span> class {{ nameClass }} { </span>
+  <div class="RenderEnumCode">
+    <span> enum {{ nameClass }} { </span>
+    <pre v-text="getEnumContent(bloc)"></pre>
+    <span><br> } </span>
+    <br><br>
+    <span>{{ nameExamplar }}ToJson({{ nameClass }} {{ nameExamplar }}) {</span>
+    <br>
+    <span>&nbsp;&nbsp; return {{ nameExamplar }}.toString();</span>
+    <br>
+    <span>}</span>
+    <br>
+    <br>
+    <pre>
+{{ nameExamplar }}FromJson(String {{ nameExamplar }}) {
+  switch ({{ nameExamplar }}) {
+<span v-for="item of items">&nbsp;&nbsp; case '{{ nameExamplar }}.{{ item.name }}': return {{ nameClass }}.{{ item.name }};<br></span>
+  }
 
-    <pre v-text="stateCode(bloc)"></pre>
-
-    <span><br> }</span>
+  return Format.onePerson;
+}
+    </pre>
   </div>
 </template>
 
@@ -19,6 +34,8 @@ import getStateDefaultCode from "@/utils/getStateDefaultCode";
 import Vue from "vue";
 import Component from "vue-class-component";
 import {JsonData} from "@/utils/interfaces";
+import {getEnumContent} from '@/utils/getStateDefaultCode';
+import _ from "lodash";
 
 @Component({
   props: {
@@ -31,7 +48,7 @@ import {JsonData} from "@/utils/interfaces";
     },
   },
 })
-export default class RenderCode extends Vue {
+export default class RenderEnumCode extends Vue {
   get stateProps() {
     const res = {};
     this.items.map(e => {
@@ -66,16 +83,21 @@ export default class RenderCode extends Vue {
     }
   }
 
+  get nameExamplar() {
+    return _.camelCase(this.nameClass);
+  }
+
   renderCodeLineType = renderCodeLineType;
   renderCodeLinePropConstr = renderCodeLinePropConstr;
   renderCodeCopyWithParams = renderCodeCopyWithParams;
   renderCodeCopyWithContent = renderCodeCopyWithContent;
   stateCode = getStateDefaultCode;
+  getEnumContent = getEnumContent;
 }
 </script>
 
 <style scoped lang="scss">
-.RenderCode {
+.RenderEnumCode {
   padding: 1rem;
   background-color: $color-gray-100;
 }

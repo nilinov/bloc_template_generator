@@ -22,15 +22,24 @@ import PropLine from "./PropLine";
 import RenderCode from "@/views/ModelEditor/RenderCode";
 import TextBox from "@/components/TextBox";
 import SelectBox from "@/components/SelectBox";
-import {ACTIONS} from "@/store";
+import {ACTIONS, MUTATIONS} from "@/store";
 import Vue from "vue";
 import Component from "vue-class-component";
-import {PropItem} from "@/views/ModelEditor/RenderCodeLineType";
+import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 
 @Component({
   watch: {
     AdditionalInfo(val) {
       this.isEnum = val === 'enum';
+    },
+    name(val) {
+      this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+    },
+    items: {
+      deep: true,
+      handler(val) {
+        this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+      }
     }
   },
   components: {
@@ -44,6 +53,14 @@ export default class ModelEditor extends Vue {
   name = 'Item';
   AdditionalInfo = '';
   isEnum: boolean = false;
+
+  get model(): Model {
+    return {
+      name: this.name,
+      props: this.items,
+      isEnum: this.isEnum,
+    }
+  }
 
   items: PropItem[] = [
     {

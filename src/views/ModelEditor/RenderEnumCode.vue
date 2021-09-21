@@ -1,5 +1,6 @@
 <template>
   <div class="RenderEnumCode">
+    <span>import '../_imports.dart';</span><br><br>
     <span> enum {{ nameClass }} { </span>
     <pre v-text="getEnumContent(bloc)"></pre>
     <span><br> } </span>

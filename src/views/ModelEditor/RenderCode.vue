@@ -1,5 +1,6 @@
 <template>
   <div class="RenderCode">
+    <span>import '../_imports.dart';</span><br><br>
     <span> class {{ nameClass }} { </span>
 
     <pre v-text="stateCode(bloc, {postfix: ''})"></pre>

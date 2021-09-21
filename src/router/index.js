@@ -15,6 +15,11 @@ const routes = [
         component: ModelEditor
     },
     {
+        path: '/Model/:uuid',
+        name: 'Model',
+        component: ModelEditor
+    },
+    {
         path: '/about',
         name: 'About',
         // route level utils-splitting

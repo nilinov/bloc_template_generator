@@ -1,10 +1,17 @@
 /** @type PropItem */
 import {getParamFunction} from "@/utils/utils";
 
-interface PropItem {
+export interface Model {
+    uuid: string,
     name: string,
-    type: string,
-    defaultValue: string,
+    props: PropItem[],
+    isEnum: boolean,
+}
+
+export interface PropItem {
+    name: string,
+    type: 'String' | 'int' | 'double' | 'DateTime' | string,
+    defaultValue: '' | '0' | 'false' | 'true' | string,
     nullable: boolean,
 }
 
@@ -24,3 +31,8 @@ const renderCodeCopyWithContent = (items: PropItem[]) => {
 }
 
 export {renderCodeLineType, renderCodeLinePropConstr, renderCodeCopyWithParams, renderCodeCopyWithContent};
+
+export interface User {
+    displayName: string,
+    email: string,
+}

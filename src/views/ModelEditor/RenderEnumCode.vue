@@ -3,11 +3,28 @@
     <span class="fileName">{{ fileName }}</span>
     <div class="codeForSave">
       <span>import '../_imports.dart';</span><br><br>
-      <span> class {{ nameClass }} { </span>
+      <span> enum {{ nameClass }} { </span>
+      <pre v-text="getEnumContent(bloc)"></pre>
+      <span><br> } </span>
+      <br><br>
+      <span>{{ nameExamplar }}ToJson({{ nameClass }} {{ nameExamplar }}) {</span>
+      <br>
+      <pre>       return {{ nameExamplar }}.toString();</pre>
+      <br>
+      <span>}</span>
+      <br>
+      <br>
+      <pre>
+{{ nameExamplar }}FromJson(String {{ nameExamplar }}) {
+  switch ({{ nameExamplar }}) {
+<pre v-for="item of items">     case '{{ nameExamplar }}.{{ item.name }}': return {{ nameClass }}.{{
+    item.name
+  }};<br></pre>
+  }
 
-      <pre v-text="stateCode(bloc, {postfix: ''})"></pre>
-
-      <span><br> }</span>
+  return {{ nameClass }}.{{ items[0].name }};
+}
+    </pre>
     </div>
   </div>
 </template>
@@ -23,6 +40,7 @@ import getStateDefaultCode from "@/utils/getStateDefaultCode";
 import Vue from "vue";
 import Component from "vue-class-component";
 import {JsonData} from "@/utils/interfaces";
+import {getEnumContent} from '@/utils/getStateDefaultCode';
 import _ from "lodash";
 
 @Component({
@@ -36,17 +54,13 @@ import _ from "lodash";
     },
   },
 })
-export default class RenderCode extends Vue {
+export default class RenderEnumCode extends Vue {
   get stateProps() {
     const res = {};
     this.items.map(e => {
-      const isClass = (this.$store.getters.allModelsClasses as string[]).includes(e.type);
-
       res[e.name] = {
         name: e.name,
-        typeName: e.type,
         typeTemplate: {
-          class: isClass,
           [e.type.toLowerCase()]: true,
         },
         default: e.defaultValue,
@@ -75,6 +89,10 @@ export default class RenderCode extends Vue {
     }
   }
 
+  get nameExamplar() {
+    return _.camelCase(this.nameClass);
+  }
+
   get fileName() {
     return _.snakeCase(this.nameClass) + '.dart'
   }
@@ -84,8 +102,10 @@ export default class RenderCode extends Vue {
   renderCodeCopyWithParams = renderCodeCopyWithParams;
   renderCodeCopyWithContent = renderCodeCopyWithContent;
   stateCode = getStateDefaultCode;
+  getEnumContent = getEnumContent;
 }
 </script>
 
 <style scoped lang="scss">
+
 </style>

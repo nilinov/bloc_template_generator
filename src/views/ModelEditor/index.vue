@@ -2,8 +2,10 @@
   <div class="index">
     <h4>Edit model {{ name }}</h4>
 
-    <TextBox placeholder="Name class" v-model="name"/>
-    <SelectBox :options="[{ key: 'enum', value: 'enum' }]" placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
+    <div class="inline">
+      <TextBox placeholder="Name class" v-model="name"/>
+      <SelectBox :options="[{ key: 'enum', value: 'enum' }]" placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
+    </div>
 
     <PropLine v-for="(item, index) of items" :item="item" :key="`item-${item.name}-${item.type}`"
               @remove="handleRemoveItem(index)"/>
@@ -78,4 +80,16 @@ export default {
   display: grid;
   grid-gap: 1rem;
 }
+
+.inline {
+  input {
+    width: 100%;
+  }
+
+  select {
+    margin-left: 1rem;
+    width: 500px;
+  }
+}
+
 </style>

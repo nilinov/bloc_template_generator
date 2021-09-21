@@ -23,53 +23,14 @@ import RenderCode from "@/views/ModelEditor/RenderCode";
 import TextBox from "@/components/TextBox";
 import SelectBox from "@/components/SelectBox";
 import {ACTIONS} from "@/store";
+import Vue from "vue";
+import Component from "vue-class-component";
+import {PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 
-export default {
-  name: "index",
-  data: () => ({
-    name: 'Item',
-    AdditionalInfo: '',
-    isEnum: false,
-
-    /** @type PropItem[] */
-    items: [
-      {
-        name: 'id',
-        type: 'int',
-        defaultValue: '0',
-        nullable: false,
-      }
-    ],
-    /** @type PropItem */
-    emptyItem: {
-      name: '',
-      type: 'String',
-      nullable: false,
-      defaultValue: '',
-    }
-  }),
+@Component({
   watch: {
     AdditionalInfo(val) {
       this.isEnum = val === 'enum';
-    }
-  },
-  methods: {
-    /** @returns PropItem */
-    getEmptyItem: () => ({
-      name: '',
-      type: 'String',
-      nullable: false,
-      defaultValue: '',
-    }),
-    handleRemoveItem(index = 0) {
-      this.items.splice(index, 1)
-    },
-    handleAddItem() {
-      this.items.push({...this.emptyItem});
-      this.emptyItem = this.getEmptyItem();
-    },
-    auth() {
-      this.$store.dispatch(ACTIONS.LOGIN)
     }
   },
   components: {
@@ -78,7 +39,57 @@ export default {
     RenderCode,
     PropLine,
   }
+})
+export default class ModelEditor extends Vue {
+  name = 'Item';
+  AdditionalInfo = '';
+  isEnum: boolean = false;
+
+  items: PropItem[] = [
+    {
+      name: 'id',
+      type: 'int',
+      defaultValue: '0',
+      nullable: false,
+    },
+    {
+      name: 'title',
+      type: 'String',
+      defaultValue: '0',
+      nullable: false,
+    }
+  ];
+
+  emptyItem: PropItem = {
+    name: '',
+    type: 'String',
+    nullable: false,
+    defaultValue: '',
+  }
+
+  getEmptyItem(): PropItem {
+    return {
+      name: '',
+      type: 'String',
+      nullable: false,
+      defaultValue: '',
+    }
+  };
+
+  handleRemoveItem(index = 0) {
+    this.items.splice(index, 1)
+  };
+
+  handleAddItem() {
+    this.items.push({...this.emptyItem});
+    this.emptyItem = this.getEmptyItem();
+  };
+
+  auth() {
+    this.$store.dispatch(ACTIONS.LOGIN)
+  };
 }
+
 </script>
 
 <style scoped lang="scss">

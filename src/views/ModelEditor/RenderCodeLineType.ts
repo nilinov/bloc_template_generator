@@ -7,10 +7,10 @@ export interface Model {
     isEnum: boolean,
 }
 
-interface PropItem {
+export interface PropItem {
     name: string,
-    type: string,
-    defaultValue: string,
+    type: 'String' | 'int' | 'double' | 'DateTime' | string,
+    defaultValue: '' | '0' | 'false' | 'true' | string,
     nullable: boolean,
 }
 

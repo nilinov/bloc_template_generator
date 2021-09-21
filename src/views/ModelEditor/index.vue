@@ -47,15 +47,28 @@ import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
     TextBox,
     RenderCode,
     PropLine,
-  }
+  },
+  mounted() {
+    this.$store.commit(MUTATIONS.RESTORE_MODELS);
+
+    this.uuid = this.$route.params.uuid;
+
+    const item: Model = this.$store.state.models.find(e => e.uuid == this.uuid);
+    if (item) {
+      this.name = item.name;
+      this.items = item.props;
+    }
+  },
 })
 export default class ModelEditor extends Vue {
+  uuid = Math.random();
   name = 'Item';
   AdditionalInfo = '';
   isEnum: boolean = false;
 
   get model(): Model {
     return {
+      uuid: this.uuid,
       name: this.name,
       props: this.items,
       isEnum: this.isEnum,

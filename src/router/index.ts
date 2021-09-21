@@ -12,7 +12,7 @@ const routes: Array<RouteConfig> = [
     component: Editor
   },
   {
-    path: '/Model',
+    path: '/Model/:uuid',
     name: 'Model',
     component: ModelEditor
   },

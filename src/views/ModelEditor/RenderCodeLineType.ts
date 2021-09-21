@@ -2,6 +2,7 @@
 import {getParamFunction} from "@/utils/utils";
 
 export interface Model {
+    uuid: string,
     name: string,
     props: PropItem[],
     isEnum: boolean,

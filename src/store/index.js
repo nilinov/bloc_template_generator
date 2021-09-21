@@ -16,7 +16,7 @@ const STORE_MODELS = 'STORE_MODELS';
 export default new Vuex.Store({
     state: {
         user: null,
-        models: {},
+        models: [],
     },
     mutations: {
         [MUTATIONS.SET_USER](state, user) {
@@ -28,7 +28,13 @@ export default new Vuex.Store({
             }
         },
         [MUTATIONS.SET_MODEL](state, model) {
-            state.models[model.name] = model;
+            const index = state.models.findIndex(e => e.uuid == model.uuid);
+            if (index != -1) {
+                state.models.splice(index, 1, model);
+            }
+            else {
+                state.models.push(model);
+            }
             localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
         },
     },

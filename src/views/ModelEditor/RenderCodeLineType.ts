@@ -1,6 +1,12 @@
 /** @type PropItem */
 import {getParamFunction} from "@/utils/utils";
 
+export interface Model {
+    name: string,
+    props: PropItem[],
+    isEnum: boolean,
+}
+
 interface PropItem {
     name: string,
     type: string,
@@ -24,3 +30,8 @@ const renderCodeCopyWithContent = (items: PropItem[]) => {
 }
 
 export {renderCodeLineType, renderCodeLinePropConstr, renderCodeCopyWithParams, renderCodeCopyWithContent};
+
+export interface User {
+    displayName: string,
+    email: string,
+}

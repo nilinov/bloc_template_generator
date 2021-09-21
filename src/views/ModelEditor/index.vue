@@ -1,6 +1,8 @@
 <template>
   <div class="index">
-    <h4>Edit model {{ name }}</h4>
+    <h4>Edit model {{ name }}
+      <button @click="auth">Auth</button>
+    </h4>
 
     <div class="inline">
       <TextBox placeholder="Name class" v-model="name"/>
@@ -15,11 +17,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import PropLine from "./PropLine";
 import RenderCode from "@/views/ModelEditor/RenderCode";
 import TextBox from "@/components/TextBox";
 import SelectBox from "@/components/SelectBox";
+import {ACTIONS} from "@/store";
 
 export default {
   name: "index",
@@ -65,6 +68,9 @@ export default {
       this.items.push({...this.emptyItem});
       this.emptyItem = this.getEmptyItem();
     },
+    auth() {
+      this.$store.dispatch(ACTIONS.LOGIN)
+    }
   },
   components: {
     SelectBox,
@@ -79,16 +85,26 @@ export default {
 .index {
   display: grid;
   grid-gap: 1rem;
-}
 
-.inline {
-  input {
-    width: 100%;
+  h4 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+      margin-left: auto;
+    }
   }
 
-  select {
-    margin-left: 1rem;
-    width: 500px;
+  .inline {
+    input {
+      width: 100%;
+    }
+
+    select {
+      margin-left: 1rem;
+      width: 500px;
+    }
   }
 }
 

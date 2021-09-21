@@ -1,21 +1,25 @@
 <template>
   <div class="index">
-    <h4>Edit model {{ name }}
-      <button @click="auth">Auth</button>
-    </h4>
-
-    <div class="inline">
-      <TextBox placeholder="Name class" v-model="name"/>
-      <SelectBox :options="[{ key: 'enum', value: 'enum' }]" placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
+    <div class="all-models">
+      <div class="model" v-for="item of allModels" :class="{active: uuid === item.uuid}" @click="$router.push(`/Model/${item.uuid}`)">{{item.name}}</div>
     </div>
+    <div class="content">
+      <h4>Edit model {{ name }}
+        <button @click="auth">Auth</button>
+      </h4>
 
-    <PropLine v-for="(item, index) of items" :item="item" :key="`item-${item.name}-${item.type}`"
-              @remove="handleRemoveItem(index)"/>
-    <PropLine :item="emptyItem" @add="handleAddItem" action/>
+      <div class="inline">
+        <TextBox placeholder="Name class" v-model="name"/>
+        <SelectBox :options="[{ key: 'enum', value: 'enum' }]" placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
+      </div>
 
-    <render-code v-if="!isEnum" :items="items" :name-class="name"/>
-    <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>
+      <PropLine v-for="(item, index) of items" :item="item" :key="`item-${item.name}-${item.type}`"
+                @remove="handleRemoveItem(index)"/>
+      <PropLine :item="emptyItem" @add="handleAddItem" action/>
 
+      <render-code v-if="!isEnum" :items="items" :name-class="name"/>
+      <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>
+    </div>
   </div>
 </template>
 
@@ -46,6 +50,9 @@ import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
       handler(val) {
         this.$store.commit(MUTATIONS.SET_MODEL, this.model);
       }
+    },
+    route() {
+      this.restoreFormState(this.$route.params.uuid)
     }
   },
   components: {
@@ -58,15 +65,7 @@ import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
   mounted() {
     this.$store.commit(MUTATIONS.RESTORE_MODELS);
 
-    this.uuid = this.$route.params.uuid;
-
-    const item: Model = this.$store.state.models.find(e => e.uuid == this.uuid);
-    if (item) {
-      this.name = item.name;
-      this.items = item.props;
-      this.isEnum = item.isEnum;
-      if (this.isEnum) this.AdditionalInfo = 'enum'
-    }
+    this.restoreFormState(this.$route.params.uuid)
   },
 })
 export default class ModelEditor extends Vue {
@@ -82,6 +81,14 @@ export default class ModelEditor extends Vue {
       props: this.items,
       isEnum: this.isEnum,
     }
+  }
+
+  get allModels(): Model[] {
+    return this.$store.state.models;
+  }
+
+  get route() {
+    return this.$route.fullPath
   }
 
   items: PropItem[] = [
@@ -104,6 +111,17 @@ export default class ModelEditor extends Vue {
     type: 'String',
     nullable: false,
     defaultValue: '',
+  }
+
+  restoreFormState(uuid) {
+    const item: Model = this.$store.state.models.find(e => e.uuid == uuid);
+    if (item) {
+      this.uuid = item.uuid;
+      this.name = item.name;
+      this.items = item.props;
+      this.isEnum = item.isEnum;
+      if (this.isEnum) this.AdditionalInfo = 'enum'
+    }
   }
 
   getEmptyItem(): PropItem {
@@ -134,26 +152,48 @@ export default class ModelEditor extends Vue {
 <style scoped lang="scss">
 .index {
   display: grid;
+  grid-template-columns: auto 1fr;
   grid-gap: 1rem;
 
-  h4 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .content {
+    display: grid;
+    grid-gap: 1rem;
 
-    button {
-      margin-left: auto;
+
+    h4 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0;
+
+      button {
+        margin-left: auto;
+      }
+    }
+
+    .inline {
+      input {
+        width: 100%;
+      }
+
+      select {
+        margin-left: 1rem;
+        width: 500px;
+      }
     }
   }
 
-  .inline {
-    input {
-      width: 100%;
-    }
+  .all-models {
+    .model {
+      border: 2px solid $color-gray-100;
+      background-color: $color-gray-100;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      cursor: pointer;
 
-    select {
-      margin-left: 1rem;
-      width: 500px;
+      &.active {
+        background-color: #fff;
+      }
     }
   }
 }

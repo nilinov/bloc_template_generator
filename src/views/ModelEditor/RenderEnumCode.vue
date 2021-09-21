@@ -1,26 +1,31 @@
 <template>
-  <div class="RenderEnumCode">
-    <span>import '../_imports.dart';</span><br><br>
-    <span> enum {{ nameClass }} { </span>
-    <pre v-text="getEnumContent(bloc)"></pre>
-    <span><br> } </span>
-    <br><br>
-    <span>{{ nameExamplar }}ToJson({{ nameClass }} {{ nameExamplar }}) {</span>
-    <br>
-    <span>&nbsp;&nbsp; return {{ nameExamplar }}.toString();</span>
-    <br>
-    <span>}</span>
-    <br>
-    <br>
-    <pre>
+  <div class="RenderCode">
+    <span class="fileName">{{ nameClass }}.dart</span>
+    <div class="codeForSave">
+      <span>import '../_imports.dart';</span><br><br>
+      <span> enum {{ nameClass }} { </span>
+      <pre v-text="getEnumContent(bloc)"></pre>
+      <span><br> } </span>
+      <br><br>
+      <span>{{ nameExamplar }}ToJson({{ nameClass }} {{ nameExamplar }}) {</span>
+      <br>
+      <span>&nbsp;&nbsp; return {{ nameExamplar }}.toString();</span>
+      <br>
+      <span>}</span>
+      <br>
+      <br>
+      <pre>
 {{ nameExamplar }}FromJson(String {{ nameExamplar }}) {
   switch ({{ nameExamplar }}) {
-<span v-for="item of items">&nbsp;&nbsp; case '{{ nameExamplar }}.{{ item.name }}': return {{ nameClass }}.{{ item.name }};<br></span>
+<span v-for="item of items">&nbsp;&nbsp; case '{{ nameExamplar }}.{{ item.name }}': return {{ nameClass }}.{{
+    item.name
+  }};<br></span>
   }
 
   return {{ nameClass }}.{{ items[0].name }};
 }
     </pre>
+    </div>
   </div>
 </template>
 

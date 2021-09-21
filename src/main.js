@@ -3,15 +3,15 @@ import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
 import store from './store';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 Vue.config.productionTip = false;
 new Vue({
     router,
     store,
     render: h => h(App)
 }).$mount('#app');
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 // Your web app's Firebase configuration
@@ -48,5 +48,29 @@ export async function authInApp() {
         const credential = GoogleAuthProvider.credentialFromError(error);
         // ...
     });
+}
+var isCtrl = false;
+document.onkeyup = function (e) {
+    if (e.keyCode == 17)
+        isCtrl = false;
+};
+document.onkeydown = function (e) {
+    if (e.keyCode == 17)
+        isCtrl = true;
+    if (e.keyCode == 83 && isCtrl == true) {
+        const text = document.querySelector('.codeForSave')?.textContent ?? '';
+        const fileName = document.querySelector('.fileName')?.textContent ?? '';
+        downloadURI(fileName, text);
+        return false;
+    }
+};
+function downloadURI(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
 }
 //# sourceMappingURL=main.js.map

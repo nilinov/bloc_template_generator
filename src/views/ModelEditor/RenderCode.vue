@@ -1,11 +1,14 @@
 <template>
   <div class="RenderCode">
-    <span>import '../_imports.dart';</span><br><br>
-    <span> class {{ nameClass }} { </span>
+    <span class="fileName">{{ fileName }}</span>
+    <div class="codeForSave">
+      <span>import '../_imports.dart';</span><br><br>
+      <span> class {{ nameClass }} { </span>
 
-    <pre v-text="stateCode(bloc, {postfix: ''})"></pre>
+      <pre v-text="stateCode(bloc, {postfix: ''})"></pre>
 
-    <span><br> }</span>
+      <span><br> }</span>
+    </div>
   </div>
 </template>
 
@@ -20,6 +23,7 @@ import getStateDefaultCode from "@/utils/getStateDefaultCode";
 import Vue from "vue";
 import Component from "vue-class-component";
 import {JsonData} from "@/utils/interfaces";
+import _ from "lodash";
 
 @Component({
   props: {
@@ -69,6 +73,10 @@ export default class RenderCode extends Vue {
       },
       actionProp: false
     }
+  }
+
+  get fileName() {
+    return _.snakeCase(this.nameClass) + '.dart'
   }
 
   renderCodeLineType = renderCodeLineType;

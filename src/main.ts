@@ -3,6 +3,9 @@ import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
+// Import the functions you need from the SDKs you need
+import {initializeApp} from "firebase/app";
+import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 
 Vue.config.productionTip = false
 
@@ -12,10 +15,6 @@ new Vue({
     render: h => h(App)
 }).$mount('#app')
 
-// Import the functions you need from the SDKs you need
-import {initializeApp} from "firebase/app";
-import {getAuth, signInWithPopup, GoogleAuthProvider} from "firebase/auth";
-import firebase from "firebase/compat";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -47,14 +46,43 @@ export async function authInApp() {
             const user = result.user;
             return user;
         }).catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-    });
+            // Handle Errors here.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.email;
+            // The AuthCredential type that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            // ...
+        });
+}
+
+
+var isCtrl = false;
+document.onkeyup = function (e) {
+    if (e.keyCode == 17) isCtrl = false;
+}
+
+document.onkeydown = function (e) {
+    if (e.keyCode == 17) isCtrl = true;
+    if (e.keyCode == 83 && isCtrl == true) {
+        const text = document.querySelector('.codeForSave')?.textContent ?? '';
+        const fileName = document.querySelector('.fileName')?.textContent ?? '';
+        downloadURI(fileName, text)
+        return false;
+    }
+}
+
+function downloadURI(filename: string, text: string,) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
 }
 

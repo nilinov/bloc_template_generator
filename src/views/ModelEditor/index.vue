@@ -42,32 +42,11 @@ import RenderCode from "@/views/ModelEditor/RenderCode.vue";
 import TextBox from "@/components/TextBox.vue";
 import SelectBox from "@/components/SelectBox.vue";
 import {ACTIONS, MUTATIONS} from "@/store";
-import Vue from "vue";
-import Component from "vue-class-component";
+import {Component, Vue, Watch} from 'vue-property-decorator';
 import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
 
 @Component({
-  watch: {
-    AdditionalInfo(val) {
-      this.isEnum = val === 'enum';
-    },
-    name(val) {
-      this.$store.commit(MUTATIONS.SET_MODEL, this.model);
-    },
-    isEnum(val) {
-      this.$store.commit(MUTATIONS.SET_MODEL, this.model);
-    },
-    items: {
-      deep: true,
-      handler(val) {
-        this.$store.commit(MUTATIONS.SET_MODEL, this.model);
-      }
-    },
-    route() {
-      this.restoreFormState(this.$route.params.uuid)
-    }
-  },
   components: {
     RenderEnumCode,
     SelectBox,
@@ -75,17 +54,38 @@ import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
     RenderCode,
     PropLine,
   },
+})
+export default class ModelEditor extends Vue {
+  uuid = Math.random().toString();
+  name = 'Item';
+  AdditionalInfo = '';
+  isEnum: boolean = false;
+
+  @Watch('AdditionalInfo')
+  onChildChanged(val: string, oldVal: string) {
+    this.isEnum = val === 'enum';
+  }
+
+  @Watch('name')
+  onChildChanged2(val: string, oldVal: string) {
+    this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+  }
+
+  @Watch('isEnum')
+  onChildChanged3(val: string, oldVal: string) {
+    this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+  }
+
+  @Watch('items', { immediate: false, deep: true })
+  onChildChanged4(val: any, oldVal: any) {
+    this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+  }
+
   async mounted() {
     await this.$store.dispatch(ACTIONS.RESTORE)
 
     this.restoreFormState(this.$route.params.uuid)
-  },
-})
-export default class ModelEditor extends Vue {
-  uuid = Math.random();
-  name = 'Item';
-  AdditionalInfo = '';
-  isEnum: boolean = false;
+  }
 
   get model(): Model {
     return {
@@ -130,8 +130,8 @@ export default class ModelEditor extends Vue {
     defaultValue: '',
   }
 
-  restoreFormState(uuid) {
-    const item: Model = this.$store.state.models.find(e => e.uuid == uuid);
+  restoreFormState(uuid: string) {
+    const item: Model = this.$store.state.models.find((e: Model) => e.uuid == uuid);
     if (item) {
       this.uuid = item.uuid;
       this.name = item.name;

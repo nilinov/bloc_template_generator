@@ -20,9 +20,8 @@ import {
   renderCodeCopyWithParams, PropItem
 } from "./RenderCodeLineType";
 import getStateDefaultCode from "@/utils/getStateDefaultCode";
-import Vue from "vue";
-import Component from "vue-class-component";
-import {JsonData} from "@/utils/interfaces";
+import { Component, Vue } from 'vue-property-decorator';
+import {JsonData, Prop} from "@/utils/interfaces";
 import _ from "lodash";
 
 const VueBase = Vue.extend({
@@ -35,14 +34,14 @@ const VueBase = Vue.extend({
   },
 })
 
-@Component()
+@Component({})
 export default class RenderCode extends VueBase {
-  nameClass!: string = ''
-  items!: PropItem[] = []
+  nameClass!: string
+  items!: PropItem[]
 
   get stateProps() {
-    const res = {};
-    this.items.map(e => {
+    const res: {[x: string]: Prop} = {};
+    this.items.map((e: PropItem) => {
       const isClass = (this.$store.getters.allModelsClasses as string[]).includes(e.type);
 
       res[e.name] = {
@@ -51,12 +50,9 @@ export default class RenderCode extends VueBase {
         typeTemplate: {
           class: isClass,
           [e.type.toLowerCase()]: true,
+          nullable: e.nullable,
         },
         default: e.defaultValue,
-      }
-
-      if (e.nullable) {
-        res[e.name].typeTemplate.nullable = true;
       }
     })
 
@@ -74,7 +70,10 @@ export default class RenderCode extends VueBase {
         case_event: {},
         onError: false,
       },
-      actionProp: false
+      actionProp: {
+        name: '',
+        typeName: '',
+      }
     }
   }
 

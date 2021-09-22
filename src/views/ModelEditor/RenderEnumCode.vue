@@ -37,8 +37,7 @@ import {
   renderCodeCopyWithParams, PropItem
 } from "./RenderCodeLineType";
 import getStateDefaultCode from "@/utils/getStateDefaultCode";
-import Vue from "vue";
-import Component from "vue-class-component";
+import { Component, Vue } from 'vue-property-decorator';
 import {BlocState, JsonData, Prop} from "@/utils/interfaces";
 import {getEnumContent} from '@/utils/getStateDefaultCode';
 import _ from "lodash";
@@ -55,6 +54,9 @@ import _ from "lodash";
   },
 })
 export default class RenderEnumCode extends Vue {
+  nameClass!: string
+  items!: PropItem[]
+
   get stateProps() {
     const res: { [name: string]: Prop } = {};
     this.items?.map((e: PropItem) => {
@@ -62,12 +64,9 @@ export default class RenderEnumCode extends Vue {
         name: e.name,
         typeTemplate: {
           [e.type.toLowerCase()]: true,
+          nullable: e.nullable,
         },
         default: e.defaultValue,
-      }
-
-      if (e.nullable) {
-        res[e.name].typeTemplate.nullable = true;
       }
     })
 
@@ -85,7 +84,10 @@ export default class RenderEnumCode extends Vue {
         case_event: {},
         onError: false,
       },
-      actionProp: false
+      actionProp: {
+        name: '',
+        typeName: '',
+      }
     }
   }
 

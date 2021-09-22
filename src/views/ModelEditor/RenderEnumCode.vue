@@ -34,12 +34,12 @@ import {
   renderCodeLineType,
   renderCodeLinePropConstr,
   renderCodeCopyWithContent,
-  renderCodeCopyWithParams
+  renderCodeCopyWithParams, PropItem
 } from "./RenderCodeLineType";
 import getStateDefaultCode from "@/utils/getStateDefaultCode";
 import Vue from "vue";
 import Component from "vue-class-component";
-import {JsonData} from "@/utils/interfaces";
+import {BlocState, JsonData, Prop} from "@/utils/interfaces";
 import {getEnumContent} from '@/utils/getStateDefaultCode';
 import _ from "lodash";
 
@@ -56,8 +56,8 @@ import _ from "lodash";
 })
 export default class RenderEnumCode extends Vue {
   get stateProps() {
-    const res = {};
-    this.items.map(e => {
+    const res: { [name: string]: Prop } = {};
+    this.items?.map((e: PropItem) => {
       res[e.name] = {
         name: e.name,
         typeTemplate: {

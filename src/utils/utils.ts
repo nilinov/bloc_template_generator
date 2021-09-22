@@ -43,7 +43,7 @@ export function toMap(props: { [name: string]: Prop }) {
 }
 
 function getPropNameFromList(prop: Prop) {
-    return prop.typeName.substr(5, prop.typeName.length - 6);
+    return prop.typeName?.substr(5, prop.typeName?.length - 6);
 }
 
 export function fromMap(props: { [name: string]: Prop }) {

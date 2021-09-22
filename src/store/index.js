@@ -1,17 +1,21 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { authInApp } from "@/main";
+import { authInApp, unAuthDb } from "@/main";
+import { getAllData } from "@/database";
 Vue.use(Vuex);
 export var MUTATIONS;
 (function (MUTATIONS) {
     MUTATIONS["SET_USER"] = "SET_USER";
+    MUTATIONS["SET_DB"] = "SET_DB";
     MUTATIONS["RESTORE_MODELS"] = "RESTORE_MODELS";
     MUTATIONS["SET_MODEL"] = "SET_MODEL";
     MUTATIONS["REMOVE_MODEL"] = "REMOVE_MODEL";
 })(MUTATIONS || (MUTATIONS = {}));
 export var ACTIONS;
 (function (ACTIONS) {
+    ACTIONS["RESTORE"] = "RESTORE";
     ACTIONS["LOGIN"] = "LOGIN";
+    ACTIONS["LOAD_ALL"] = "LOAD_ALL";
 })(ACTIONS || (ACTIONS = {}));
 const STORE_MODELS = 'STORE_MODELS';
 export default new Vuex.Store({
@@ -25,11 +29,15 @@ export default new Vuex.Store({
     },
     state: {
         user: null,
+        db: null,
         models: [],
     },
     mutations: {
         [MUTATIONS.SET_USER](state, user) {
             state.user = user;
+        },
+        [MUTATIONS.SET_DB](state, db) {
+            state.db = db;
         },
         [MUTATIONS.RESTORE_MODELS](state) {
             if (localStorage.getItem(STORE_MODELS)) {
@@ -55,9 +63,24 @@ export default new Vuex.Store({
         },
     },
     actions: {
+        async [ACTIONS.RESTORE](ctx) {
+            ctx.commit(MUTATIONS.RESTORE_MODELS);
+            const db = await unAuthDb();
+            ctx.commit(MUTATIONS.SET_DB, db);
+            ctx.dispatch(ACTIONS.LOAD_ALL);
+        },
         async [ACTIONS.LOGIN](ctx) {
-            ctx.commit(MUTATIONS.SET_USER, await authInApp());
-        }
+            const res = await authInApp();
+            if (res) {
+                ctx.commit(MUTATIONS.SET_USER, res.user);
+                ctx.commit(MUTATIONS.SET_DB, res.db);
+            }
+            ctx.dispatch(ACTIONS.LOAD_ALL);
+        },
+        async [ACTIONS.LOAD_ALL](ctx) {
+            if (ctx.state.db)
+                getAllData(ctx.state.db);
+        },
     },
     modules: {}
 });

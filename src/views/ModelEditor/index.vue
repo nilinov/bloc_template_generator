@@ -37,10 +37,10 @@
 </template>
 
 <script lang="ts">
-import PropLine from "./PropLine";
-import RenderCode from "@/views/ModelEditor/RenderCode";
-import TextBox from "@/components/TextBox";
-import SelectBox from "@/components/SelectBox";
+import PropLine from "./PropLine.vue";
+import RenderCode from "@/views/ModelEditor/RenderCode.vue";
+import TextBox from "@/components/TextBox.vue";
+import SelectBox from "@/components/SelectBox.vue";
 import {ACTIONS, MUTATIONS} from "@/store";
 import Vue from "vue";
 import Component from "vue-class-component";
@@ -76,7 +76,7 @@ import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
     PropLine,
   },
   mounted() {
-    this.$store.commit(MUTATIONS.RESTORE_MODELS);
+    this.$store.dispatch(ACTIONS.RESTORE)
 
     this.restoreFormState(this.$route.params.uuid)
   },

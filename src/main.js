@@ -4,18 +4,15 @@ import './registerServiceWorker';
 import router from './router';
 import store from './store';
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import firebase from "firebase/compat";
+// import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 Vue.config.productionTip = false;
 new Vue({
     router,
     store,
     render: h => h(App)
 }).$mount('#app');
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-// Your web app's Firebase configuration
-const firebaseConfig = {
+let config = {
     apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
     authDomain: "bloc-template-generator.firebaseapp.com",
     databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
@@ -25,19 +22,24 @@ const firebaseConfig = {
     appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
 };
 // Initialize Firebase
-export const firebaseApp = initializeApp(firebaseConfig);
+let firebaseApp = firebase.initializeApp(config);
+export async function unAuthDb() {
+    const authService = firebase.auth();
+    await authService.signInAnonymously();
+    return firebase.database();
+}
 export async function authInApp() {
-    const provider = new GoogleAuthProvider();
-    const auth = getAuth();
-    return signInWithPopup(auth, provider)
-        .then((result) => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const authService = firebase.auth();
+    return authService.signInWithPopup(provider)
+        .then(async (result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const idToken = await result.user?.getIdToken();
+        const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
         // @ts-ignore
         const token = credential.accessToken;
         // The signed-in user info.
-        const user = result.user;
-        return user;
+        return { user: result.user, result, db: firebase.database() };
     }).catch((error) => {
         // Handle Errors here.
         const errorCode = error.code;
@@ -45,7 +47,7 @@ export async function authInApp() {
         // The email of the user's account used.
         const email = error.email;
         // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
+        // const credential = firebase.auth.GoogleAuthProvider.credentialFromError(error);
         // ...
     });
 }

@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import Editor from '../views/Editor.vue';
 import ModelEditor from '../views/ModelEditor/index.vue';
 Vue.use(VueRouter);
-const routes = [
+var routes = [
     {
         path: '/',
         name: 'Home',
@@ -25,11 +25,11 @@ const routes = [
         // route level utils-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+        component: function () { return import(/* webpackChunkName: "about" */ '../views/About.vue'); }
     }
 ];
-const router = new VueRouter({
-    routes
+var router = new VueRouter({
+    routes: routes
 });
 export default router;
 //# sourceMappingURL=index.js.map

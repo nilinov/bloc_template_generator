@@ -1,3 +1,4 @@
+import { __awaiter, __generator } from "tslib";
 import Vue from 'vue';
 import App from './App.vue';
 import './registerServiceWorker';
@@ -8,57 +9,79 @@ import firebase from "firebase/compat";
 // import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 Vue.config.productionTip = false;
 new Vue({
-    router,
-    store,
-    render: h => h(App)
+    router: router,
+    store: store,
+    render: function (h) { return h(App); }
 }).$mount('#app');
-let firebaseApp;
-export async function unAuthDb() {
-    if (!firebaseApp)
-        firebaseApp = firebase.initializeApp({
-            apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
-            authDomain: "bloc-template-generator.firebaseapp.com",
-            databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
-            projectId: "bloc-template-generator",
-            storageBucket: "bloc-template-generator.appspot.com",
-            messagingSenderId: "63755736889",
-            appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
+var firebaseApp;
+export function unAuthDb() {
+    return __awaiter(this, void 0, void 0, function () {
+        var authService;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!firebaseApp)
+                        firebaseApp = firebase.initializeApp({
+                            apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
+                            authDomain: "bloc-template-generator.firebaseapp.com",
+                            databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
+                            projectId: "bloc-template-generator",
+                            storageBucket: "bloc-template-generator.appspot.com",
+                            messagingSenderId: "63755736889",
+                            appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
+                        });
+                    authService = firebase.auth();
+                    return [4 /*yield*/, authService.signInAnonymously()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, firebase.database()];
+            }
         });
-    const authService = firebase.auth();
-    await authService.signInAnonymously();
-    return firebase.database();
+    });
 }
-export async function authInApp() {
-    if (!firebaseApp)
-        firebaseApp = firebase.initializeApp({
-            apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
-            authDomain: "bloc-template-generator.firebaseapp.com",
-            databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
-            projectId: "bloc-template-generator",
-            storageBucket: "bloc-template-generator.appspot.com",
-            messagingSenderId: "63755736889",
-            appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
+export function authInApp() {
+    return __awaiter(this, void 0, void 0, function () {
+        var provider, authService;
+        var _this = this;
+        return __generator(this, function (_a) {
+            if (!firebaseApp)
+                firebaseApp = firebase.initializeApp({
+                    apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
+                    authDomain: "bloc-template-generator.firebaseapp.com",
+                    databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
+                    projectId: "bloc-template-generator",
+                    storageBucket: "bloc-template-generator.appspot.com",
+                    messagingSenderId: "63755736889",
+                    appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
+                });
+            provider = new firebase.auth.GoogleAuthProvider();
+            authService = firebase.auth();
+            return [2 /*return*/, authService.signInWithPopup(provider)
+                    .then(function (result) { return __awaiter(_this, void 0, void 0, function () {
+                    var idToken, credential, token;
+                    var _a;
+                    return __generator(this, function (_b) {
+                        switch (_b.label) {
+                            case 0: return [4 /*yield*/, ((_a = result.user) === null || _a === void 0 ? void 0 : _a.getIdToken())];
+                            case 1:
+                                idToken = _b.sent();
+                                credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+                                token = credential.accessToken;
+                                // The signed-in user info.
+                                return [2 /*return*/, { user: result.user, result: result, db: firebase.database() }];
+                        }
+                    });
+                }); }).catch(function (error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // The email of the user's account used.
+                    var email = error.email;
+                    // The AuthCredential type that was used.
+                    // const credential = firebase.auth.GoogleAuthProvider.credentialFromError(error);
+                    // ...
+                })];
         });
-    const provider = new firebase.auth.GoogleAuthProvider();
-    const authService = firebase.auth();
-    return authService.signInWithPopup(provider)
-        .then(async (result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const idToken = await result.user?.getIdToken();
-        const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-        // @ts-ignore
-        const token = credential.accessToken;
-        // The signed-in user info.
-        return { user: result.user, result, db: firebase.database() };
-    }).catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.email;
-        // The AuthCredential type that was used.
-        // const credential = firebase.auth.GoogleAuthProvider.credentialFromError(error);
-        // ...
     });
 }
 var isCtrl = false;
@@ -67,11 +90,12 @@ document.onkeyup = function (e) {
         isCtrl = false;
 };
 document.onkeydown = function (e) {
+    var _a, _b, _c, _d;
     if (e.keyCode == 17)
         isCtrl = true;
     if (e.keyCode == 83 && isCtrl == true) {
-        const text = (document.querySelector('.codeForSave')?.textContent ?? '');
-        const fileName = document.querySelector('.fileName')?.textContent ?? '';
+        var text = ((_b = (_a = document.querySelector('.codeForSave')) === null || _a === void 0 ? void 0 : _a.textContent) !== null && _b !== void 0 ? _b : '');
+        var fileName = (_d = (_c = document.querySelector('.fileName')) === null || _c === void 0 ? void 0 : _c.textContent) !== null && _d !== void 0 ? _d : '';
         downloadURI(fileName, text);
         return false;
     }

@@ -1,3 +1,5 @@
+var _a, _b;
+import { __awaiter, __generator, __spreadArrays } from "tslib";
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { authInApp, unAuthDb } from "@/main";
@@ -17,14 +19,14 @@ export var ACTIONS;
     ACTIONS["LOGIN"] = "LOGIN";
     ACTIONS["LOAD_ALL"] = "LOAD_ALL";
 })(ACTIONS || (ACTIONS = {}));
-const STORE_MODELS = 'STORE_MODELS';
+var STORE_MODELS = 'STORE_MODELS';
 export default new Vuex.Store({
     getters: {
-        allModels(state) {
-            return [...state.models.map(e => e.name), ...state.models.map(e => `List<${e.name}>`)];
+        allModels: function (state) {
+            return __spreadArrays(state.models.map(function (e) { return e.name; }), state.models.map(function (e) { return "List<" + e.name + ">"; }));
         },
-        allModelsClasses(state) {
-            return [...state.models.filter(e => e.isEnum == false).map(e => e.name)];
+        allModelsClasses: function (state) {
+            return __spreadArrays(state.models.filter(function (e) { return e.isEnum == false; }).map(function (e) { return e.name; }));
         }
     },
     state: {
@@ -33,18 +35,18 @@ export default new Vuex.Store({
         models: [],
         project: 'mad_team',
     },
-    mutations: {
-        [MUTATIONS.SET_USER](state, user) {
+    mutations: (_a = {},
+        _a[MUTATIONS.SET_USER] = function (state, user) {
             state.user = user;
         },
-        [MUTATIONS.SET_DB](state, db) {
+        _a[MUTATIONS.SET_DB] = function (state, db) {
             Vue.set(state, 'db', db);
         },
-        [MUTATIONS.RESTORE_MODELS](state, models) {
+        _a[MUTATIONS.RESTORE_MODELS] = function (state, models) {
             Vue.set(state, 'models', models);
         },
-        [MUTATIONS.SET_MODEL](state, model) {
-            const index = state.models.findIndex(e => e.uuid == model.uuid);
+        _a[MUTATIONS.SET_MODEL] = function (state, model) {
+            var index = state.models.findIndex(function (e) { return e.uuid == model.uuid; });
             if (index != -1) {
                 state.models.splice(index, 1, model);
             }
@@ -55,8 +57,8 @@ export default new Vuex.Store({
             if (state.db)
                 storeModel(state.db, state.project, state.models);
         },
-        [MUTATIONS.REMOVE_MODEL](state, uuid) {
-            const index = state.models.findIndex(e => e.uuid == uuid);
+        _a[MUTATIONS.REMOVE_MODEL] = function (state, uuid) {
+            var index = state.models.findIndex(function (e) { return e.uuid == uuid; });
             if (index != -1) {
                 state.models.splice(index, 1);
             }
@@ -64,29 +66,61 @@ export default new Vuex.Store({
             if (state.db)
                 storeModel(state.db, state.project, state.models);
         },
-    },
-    actions: {
-        async [ACTIONS.RESTORE](ctx) {
-            // ctx.commit(MUTATIONS.RESTORE_MODELS);
-            const db = await unAuthDb();
-            ctx.commit(MUTATIONS.SET_DB, db);
-            await ctx.dispatch(ACTIONS.LOAD_ALL);
+        _a),
+    actions: (_b = {},
+        _b[ACTIONS.RESTORE] = function (ctx) {
+            return __awaiter(this, void 0, void 0, function () {
+                var db;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, unAuthDb()];
+                        case 1:
+                            db = _a.sent();
+                            ctx.commit(MUTATIONS.SET_DB, db);
+                            return [4 /*yield*/, ctx.dispatch(ACTIONS.LOAD_ALL)];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            });
         },
-        async [ACTIONS.LOGIN](ctx) {
-            const res = await authInApp();
-            if (res) {
-                ctx.commit(MUTATIONS.SET_USER, res.user);
-                ctx.commit(MUTATIONS.SET_DB, res.db);
-            }
-            ctx.dispatch(ACTIONS.LOAD_ALL);
+        _b[ACTIONS.LOGIN] = function (ctx) {
+            return __awaiter(this, void 0, void 0, function () {
+                var res;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, authInApp()];
+                        case 1:
+                            res = _a.sent();
+                            if (res) {
+                                ctx.commit(MUTATIONS.SET_USER, res.user);
+                                ctx.commit(MUTATIONS.SET_DB, res.db);
+                            }
+                            ctx.dispatch(ACTIONS.LOAD_ALL);
+                            return [2 /*return*/];
+                    }
+                });
+            });
         },
-        async [ACTIONS.LOAD_ALL](ctx) {
-            if (ctx.state.db) {
-                const data = await getModels(ctx.state.db, ctx.state.project);
-                ctx.commit(MUTATIONS.RESTORE_MODELS, data);
-            }
+        _b[ACTIONS.LOAD_ALL] = function (ctx) {
+            return __awaiter(this, void 0, void 0, function () {
+                var data;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!ctx.state.db) return [3 /*break*/, 2];
+                            return [4 /*yield*/, getModels(ctx.state.db, ctx.state.project)];
+                        case 1:
+                            data = _a.sent();
+                            ctx.commit(MUTATIONS.RESTORE_MODELS, data);
+                            _a.label = 2;
+                        case 2: return [2 /*return*/];
+                    }
+                });
+            });
         },
-    },
+        _b),
     modules: {}
 });
 //# sourceMappingURL=index.js.map

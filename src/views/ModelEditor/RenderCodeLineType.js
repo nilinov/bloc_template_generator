@@ -1,13 +1,13 @@
 /** @type PropItem */
 import { getParamFunction } from "@/utils/utils";
-const renderCodeLineType = (item) => `final ${item.type}${item.nullable ? '?' : ''} ${item.name};`;
-const renderCodeLinePropConstr = (item) => getParamFunction(item.name, item.nullable);
-const renderCodeCopyWithParams = (items) => {
-    const res = items.map(variable => `\t${variable.type} ${variable.name},\n`);
-    return `{ ${res.join('')} }`;
+var renderCodeLineType = function (item) { return "final " + item.type + (item.nullable ? '?' : '') + " " + item.name + ";"; };
+var renderCodeLinePropConstr = function (item) { return getParamFunction(item.name, item.nullable); };
+var renderCodeCopyWithParams = function (items) {
+    var res = items.map(function (variable) { return "\t" + variable.type + " " + variable.name + ",\n"; });
+    return "{ " + res.join('') + " }";
 };
-const renderCodeCopyWithContent = (items) => {
-    const res = items.map(variable => `\t${variable.name}: ${variable.name} ?? this.${variable.name},\n`);
+var renderCodeCopyWithContent = function (items) {
+    var res = items.map(function (variable) { return "\t" + variable.name + ": " + variable.name + " ?? this." + variable.name + ",\n"; });
     return res.join('');
 };
 export { renderCodeLineType, renderCodeLinePropConstr, renderCodeCopyWithParams, renderCodeCopyWithContent };

@@ -1,21 +1,44 @@
+import { __awaiter, __generator } from "tslib";
 import firebase from "firebase/compat";
 function getDataBaseRef() {
     return firebase.database();
 }
-async function getAllData(database) {
-    return (await database.ref('/').get());
+function getAllData(database) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, database.ref('/').get()];
+                case 1: return [2 /*return*/, (_a.sent())];
+            }
+        });
+    });
 }
-async function getModels(db, project) {
-    return (await db.ref(getProjectModel(project)).get()).val();
+function getModels(db, project) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, db.ref(getProjectModel(project)).get()];
+                case 1: return [2 /*return*/, (_a.sent()).val()];
+            }
+        });
+    });
 }
-async function storeData(db, key, value) {
-    return db.ref(key).set(value);
+function storeData(db, key, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, db.ref(key).set(value)];
+        });
+    });
 }
-async function storeModel(db, project, value) {
-    return db.ref(getProjectModel(project)).set(value);
+function storeModel(db, project, value) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, db.ref(getProjectModel(project)).set(value)];
+        });
+    });
 }
 function getProjectModel(project) {
-    return `/projects/${project}/models`;
+    return "/projects/" + project + "/models";
 }
 export { getDataBaseRef, getAllData, storeData, getModels, storeModel, };
 //# sourceMappingURL=index.js.map

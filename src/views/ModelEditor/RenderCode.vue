@@ -17,7 +17,7 @@ import {
   renderCodeLineType,
   renderCodeLinePropConstr,
   renderCodeCopyWithContent,
-  renderCodeCopyWithParams
+  renderCodeCopyWithParams, PropItem
 } from "./RenderCodeLineType";
 import getStateDefaultCode from "@/utils/getStateDefaultCode";
 import Vue from "vue";
@@ -25,18 +25,21 @@ import Component from "vue-class-component";
 import {JsonData} from "@/utils/interfaces";
 import _ from "lodash";
 
-@Component({
+const VueBase = Vue.extend({
   props: {
-    nameClass: String,
-
-    /** @type PropItem[] */
+    nameClass: {type: String, default: ''},
     items: {
       type: Array,
       default: () => [],
     },
   },
 })
-export default class RenderCode extends Vue {
+
+@Component()
+export default class RenderCode extends VueBase {
+  nameClass!: string = ''
+  items!: PropItem[] = []
+
   get stateProps() {
     const res = {};
     this.items.map(e => {

@@ -75,8 +75,8 @@ import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
     RenderCode,
     PropLine,
   },
-  mounted() {
-    this.$store.dispatch(ACTIONS.RESTORE)
+  async mounted() {
+    await this.$store.dispatch(ACTIONS.RESTORE)
 
     this.restoreFormState(this.$route.params.uuid)
   },

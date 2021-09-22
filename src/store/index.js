@@ -70,7 +70,7 @@ export default new Vuex.Store({
             // ctx.commit(MUTATIONS.RESTORE_MODELS);
             const db = await unAuthDb();
             ctx.commit(MUTATIONS.SET_DB, db);
-            ctx.dispatch(ACTIONS.LOAD_ALL);
+            await ctx.dispatch(ACTIONS.LOAD_ALL);
         },
         async [ACTIONS.LOGIN](ctx) {
             const res = await authInApp();

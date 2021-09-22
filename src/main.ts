@@ -15,20 +15,19 @@ new Vue({
     render: h => h(App)
 }).$mount('#app')
 
-let config = {
-    apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
-    authDomain: "bloc-template-generator.firebaseapp.com",
-    databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
-    projectId: "bloc-template-generator",
-    storageBucket: "bloc-template-generator.appspot.com",
-    messagingSenderId: "63755736889",
-    appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
-};
+let firebaseApp: firebase.app.App;
 
-// Initialize Firebase
-let firebaseApp = firebase.initializeApp(config);
+export async function unAuthDb(): Promise<firebase.database.Database> {
+    if (!firebaseApp) firebaseApp = firebase.initializeApp({
+        apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
+        authDomain: "bloc-template-generator.firebaseapp.com",
+        databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
+        projectId: "bloc-template-generator",
+        storageBucket: "bloc-template-generator.appspot.com",
+        messagingSenderId: "63755736889",
+        appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
+    });
 
-export async function unAuthDb() {
     const authService = firebase.auth();
 
     await authService.signInAnonymously()
@@ -37,6 +36,15 @@ export async function unAuthDb() {
 }
 
 export async function authInApp(): Promise<{ result: firebase.auth.UserCredential; user: firebase.User | null; db: firebase.database.Database } | void> {
+    if (!firebaseApp) firebaseApp = firebase.initializeApp({
+        apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
+        authDomain: "bloc-template-generator.firebaseapp.com",
+        databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
+        projectId: "bloc-template-generator",
+        storageBucket: "bloc-template-generator.appspot.com",
+        messagingSenderId: "63755736889",
+        appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
+    });
 
     const provider = new firebase.auth.GoogleAuthProvider();
     const authService = firebase.auth();

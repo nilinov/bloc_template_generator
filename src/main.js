@@ -12,23 +12,33 @@ new Vue({
     store,
     render: h => h(App)
 }).$mount('#app');
-let config = {
-    apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
-    authDomain: "bloc-template-generator.firebaseapp.com",
-    databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
-    projectId: "bloc-template-generator",
-    storageBucket: "bloc-template-generator.appspot.com",
-    messagingSenderId: "63755736889",
-    appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
-};
-// Initialize Firebase
-let firebaseApp = firebase.initializeApp(config);
+let firebaseApp;
 export async function unAuthDb() {
+    if (!firebaseApp)
+        firebaseApp = firebase.initializeApp({
+            apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
+            authDomain: "bloc-template-generator.firebaseapp.com",
+            databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
+            projectId: "bloc-template-generator",
+            storageBucket: "bloc-template-generator.appspot.com",
+            messagingSenderId: "63755736889",
+            appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
+        });
     const authService = firebase.auth();
     await authService.signInAnonymously();
     return firebase.database();
 }
 export async function authInApp() {
+    if (!firebaseApp)
+        firebaseApp = firebase.initializeApp({
+            apiKey: "AIzaSyCDt4o1A5WvH7i3LVOi-g3C7ltOIa-pyoA",
+            authDomain: "bloc-template-generator.firebaseapp.com",
+            databaseURL: "https://bloc-template-generator-default-rtdb.firebaseio.com",
+            projectId: "bloc-template-generator",
+            storageBucket: "bloc-template-generator.appspot.com",
+            messagingSenderId: "63755736889",
+            appId: "1:63755736889:web:11cfbc7fc531ef04bfbae8"
+        });
     const provider = new firebase.auth.GoogleAuthProvider();
     const authService = firebase.auth();
     return authService.signInWithPopup(provider)

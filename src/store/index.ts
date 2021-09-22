@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {authInApp, unAuthDb} from "@/main";
 import {Model, User} from "@/views/ModelEditor/RenderCodeLineType";
-import {getAllData, getDataBaseRef} from "@/database";
+import {getAllData, getDataBaseRef, getModels, storeData, storeModel} from "@/database";
 import firebase from "firebase/compat";
 
 Vue.use(Vuex)
@@ -24,7 +24,8 @@ export enum ACTIONS {
 interface State {
     user: { user: User } | null,
     db: firebase.database.Database | null,
-    models: Model[]
+    models: Model[],
+    project: string,
 }
 
 const STORE_MODELS = 'STORE_MODELS';
@@ -42,18 +43,17 @@ export default new Vuex.Store<State>({
         user: null,
         db: null,
         models: [],
+        project: 'mad_team',
     },
     mutations: {
         [MUTATIONS.SET_USER](state, user) {
             state.user = user;
         },
         [MUTATIONS.SET_DB](state, db) {
-            state.db = db;
+            Vue.set(state, 'db', db)
         },
-        [MUTATIONS.RESTORE_MODELS](state) {
-            if (localStorage.getItem(STORE_MODELS)) {
-                state.models = JSON.parse(localStorage.getItem(STORE_MODELS) as string);
-            }
+        [MUTATIONS.RESTORE_MODELS](state, models: Model[]) {
+            Vue.set(state, 'models', models)
         },
         [MUTATIONS.SET_MODEL](state, model: Model) {
             const index = state.models.findIndex(e => e.uuid == model.uuid);
@@ -62,19 +62,25 @@ export default new Vuex.Store<State>({
             } else {
                 state.models.push(model);
             }
-            localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
+            //localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
+
+            if (state.db)
+                storeModel(state.db, state.project, state.models);
         },
         [MUTATIONS.REMOVE_MODEL](state, uuid: string) {
             const index = state.models.findIndex(e => e.uuid == uuid);
             if (index != -1) {
                 state.models.splice(index, 1);
             }
-            localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
+            //localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
+
+            if (state.db)
+                storeModel(state.db, state.project, state.models);
         },
     },
     actions: {
         async [ACTIONS.RESTORE](ctx) {
-            ctx.commit(MUTATIONS.RESTORE_MODELS);
+            // ctx.commit(MUTATIONS.RESTORE_MODELS);
 
             const db = await unAuthDb();
 
@@ -92,8 +98,10 @@ export default new Vuex.Store<State>({
             ctx.dispatch(ACTIONS.LOAD_ALL);
         },
         async [ACTIONS.LOAD_ALL](ctx) {
-            if (ctx.state.db)
-                getAllData(ctx.state.db)
+            if (ctx.state.db) {
+                const data = await getModels(ctx.state.db, ctx.state.project)
+                ctx.commit(MUTATIONS.RESTORE_MODELS, data);
+            }
         },
     },
     modules: {}

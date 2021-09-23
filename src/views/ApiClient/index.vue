@@ -28,6 +28,18 @@ import {Component, Vue, Watch} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import FormEdit, {ApiFunction} from "@/views/ApiClient/FormEdit.vue";
 
+function getParamsApiFunction(e: ApiFunction) {
+  const res: string[] = [];
+
+  if (e.isList) {
+    if (e.hasSearch) res.push('String? search,')
+    if (e.hasPaginate) res.push('int page = 1,')
+    if (e.hasFilter) res.push('Map<String, dynamic>? filters,')
+  }
+
+  return res.length ? `{${res.join('')}}` : ''
+}
+
 @Component({
   components: {FormEdit}
 })
@@ -61,29 +73,30 @@ export default class ApiClient extends Vue {
     }
   }
 
+  get allModels(): Model[] {return this.$store.state.models; }
+
   get code() {
     return `import 'package:mad_teams/_imports.dart';
-
 class Api {
-  static Future<ApiResponse<List<ChallengeSmall>>> getListActive({ String? search, Map<String, dynamic>? filters  }) {
-    final Map<String, dynamic> params = {};
+  ${this.allFunctions.map(e => {
+    const model = this.allModels.find(e1 => e1.uuid == e.modelUUID);
+    if (model && e.isList)
+      return `static Future<ApiResponse<List<${model.name}>>> getListActive(${getParamsApiFunction(e)}) {
+        final Map<String, dynamic> params = {};
 
-    if (search != null) {
-      params['search'] = search;
-    }
+        ${e.hasPaginate ? 'params[\'page\'] = page;\n' : ''}
+        ${e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }\n' : ''}
+        ${e.hasFilter ? 'if (filters != null) { params.addAll(params); }\n' : ''}
 
-    if (filters != null) {
-      params.addAll(params);
-    }
-
-    return ApiClient.dio
-        .get('/', queryParameters: {})
-        .then((value) => ApiResponse(
-              ChallengeSmall.listFromJson(value.data['data']),
-              meta: MetaPage.fromJson(value.data['meta']),
-            ))
-        .catchError((error) => ApiResponse(<ChallengeSmall>[], error: error));
-  }
+        return ApiClient.dio
+            .get('/', queryParameters: params)
+            .then((value) => ApiResponse(
+                  ${model.name}.listFromJson(value.data['data']),
+                  meta: MetaPage.fromJson(value.data['meta']),
+                ))
+            .catchError((error) => ApiResponse(<${model.name}>[], error: error));
+      }`;
+    })}
 }
 `
   }

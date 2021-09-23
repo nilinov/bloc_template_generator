@@ -1,61 +1,117 @@
 <template>
   <div>
-    <el-autocomplete
-        class="inline-input"
-        v-model="state1"
-        :fetch-suggestions="querySearch"
-        placeholder="Please Input"
-        @select="handleSelect"
-    ></el-autocomplete>
-
-    <pre>
-
-
-
-    </pre>
-
+    <el-row v-if="!$store.state.isPending">
+      <el-col :span="4" v-if="false">
+        <div class="grid-content bg-purple">
+          <template v-if="allFunctions.length === 0">
+            Нет запросов
+          </template>
+        </div>
+      </el-col>
+      <el-col :span="8">
+        <template v-for="item of allFunctions">
+          <FormEdit :item="item" @remove="handleRemove"/>
+          <br><br>
+        </template>
+        <el-button @click="allFunctions.push(emptyApiFunction)">Добавить</el-button>
+      </el-col>
+      <el-col :span="16" class="code">
+        <span class="fileName">api.dart</span>
+        <pre class="codeForSave" v-text="code"></pre>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script lang="ts">
 import {Component, Vue, Watch} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
+import FormEdit, {ApiFunction} from "@/views/ApiClient/FormEdit.vue";
 
-@Component({})
+@Component({
+  components: {FormEdit}
+})
 export default class ApiClient extends Vue {
-  models: Model[] = [];
-  state1 = '';
-  selectModel?: Model;
 
-  querySearch(queryString: string, cb: Function) {
-    var model = this.models;
-    var results = queryString ? model.filter(this.handleFilter(queryString)) : model;
+  allFunctions: ApiFunction[] = [];
 
-    cb(results.map(model => ({value: model.name, item: model})));
+  mounted() {
+    this.allFunctions.push({
+      name: 'getListActive',
+      modelUUID: '0.492427911996681',
+      method: 'GET',
+      uuid: '1',
+      isList: true,
+      hasSearch: true,
+      hasPaginate: true,
+      hasFilter: true,
+    });
   }
 
-  handleFilter(queryString: string) {
-    return (model: Model) => {
-      return (model.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-    };
+  get emptyApiFunction(): ApiFunction {
+    return {
+      uuid: Math.random().toString(),
+      name: '',
+      method: 'GET',
+      modelUUID: '',
+      isList: false,
+      hasFilter: false,
+      hasPaginate: false,
+      hasSearch: false,
+    }
   }
 
-  get allModels() {
-    return this.$store.state.models;
+  get code() {
+    return `import 'package:mad_teams/_imports.dart';
+
+class Api {
+  static Future<ApiResponse<List<ChallengeSmall>>> getListActive({ String? search, Map<String, dynamic>? filters  }) {
+    final Map<String, dynamic> params = {};
+
+    if (search != null) {
+      params['search'] = search;
+    }
+
+    if (filters != null) {
+      params.addAll(params);
+    }
+
+    return ApiClient.dio
+        .get('/', queryParameters: {})
+        .then((value) => ApiResponse(
+              ChallengeSmall.listFromJson(value.data['data']),
+              meta: MetaPage.fromJson(value.data['meta']),
+            ))
+        .catchError((error) => ApiResponse(<ChallengeSmall>[], error: error));
+  }
+}
+`
   }
 
-  @Watch('allModels')
-  onChildChanged(val: string, oldVal: string) {
-    this.models = this.$store.state.models;
+  handleRemove(func: ApiFunction) {
+    const index = this.allFunctions.findIndex(e => e.uuid == func.uuid)
+    console.log(this.allFunctions.map(e => e.uuid))
+    console.log(func.uuid)
+    if (index != -1) {
+      this.allFunctions.splice(index, 1)
+    }
   }
-
-  handleSelect(item: { value: string, item: Model }) {
-    this.selectModel = item.item;
-  }
-
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.code {
+  padding: 0 1rem;
 
+  span {
+    padding: .2rem 1rem;
+  }
+
+  pre {
+    overflow: hidden;
+    padding: 1rem;
+
+    background-color: $color-gray-100;
+  }
+}
 </style>

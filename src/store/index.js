@@ -12,6 +12,7 @@ export var MUTATIONS;
     MUTATIONS["RESTORE_MODELS"] = "RESTORE_MODELS";
     MUTATIONS["SET_MODEL"] = "SET_MODEL";
     MUTATIONS["REMOVE_MODEL"] = "REMOVE_MODEL";
+    MUTATIONS["UPDATE_PENDING"] = "UPDATE_PENDING";
 })(MUTATIONS || (MUTATIONS = {}));
 export var ACTIONS;
 (function (ACTIONS) {
@@ -34,10 +35,14 @@ export default new Vuex.Store({
         db: null,
         models: [],
         project: 'mad_team',
+        isPending: false,
     },
     mutations: (_a = {},
         _a[MUTATIONS.SET_USER] = function (state, user) {
             state.user = user;
+        },
+        _a[MUTATIONS.UPDATE_PENDING] = function (state, status) {
+            state.isPending = status;
         },
         _a[MUTATIONS.SET_DB] = function (state, db) {
             Vue.set(state, 'db', db);
@@ -73,13 +78,17 @@ export default new Vuex.Store({
                 var db;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, unAuthDb()];
+                        case 0:
+                            // ctx.commit(MUTATIONS.RESTORE_MODELS);
+                            ctx.commit(MUTATIONS.UPDATE_PENDING, true);
+                            return [4 /*yield*/, unAuthDb()];
                         case 1:
                             db = _a.sent();
                             ctx.commit(MUTATIONS.SET_DB, db);
                             return [4 /*yield*/, ctx.dispatch(ACTIONS.LOAD_ALL)];
                         case 2:
                             _a.sent();
+                            ctx.commit(MUTATIONS.UPDATE_PENDING, false);
                             return [2 /*return*/];
                     }
                 });

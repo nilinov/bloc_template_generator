@@ -13,6 +13,7 @@ export enum MUTATIONS {
     RESTORE_MODELS = 'RESTORE_MODELS',
     SET_MODEL = 'SET_MODEL',
     REMOVE_MODEL = 'REMOVE_MODEL',
+    UPDATE_PENDING = 'UPDATE_PENDING',
 }
 
 export enum ACTIONS {
@@ -26,6 +27,7 @@ interface State {
     db: firebase.database.Database | null,
     models: Model[],
     project: string,
+    isPending: boolean
 }
 
 const STORE_MODELS = 'STORE_MODELS';
@@ -44,10 +46,14 @@ export default new Vuex.Store<State>({
         db: null,
         models: [],
         project: 'mad_team',
+        isPending: false,
     },
     mutations: {
         [MUTATIONS.SET_USER](state, user) {
             state.user = user;
+        },
+        [MUTATIONS.UPDATE_PENDING](state, status) {
+            state.isPending = status;
         },
         [MUTATIONS.SET_DB](state, db) {
             Vue.set(state, 'db', db)
@@ -82,11 +88,14 @@ export default new Vuex.Store<State>({
         async [ACTIONS.RESTORE](ctx) {
             // ctx.commit(MUTATIONS.RESTORE_MODELS);
 
-            const db = await unAuthDb();
+            ctx.commit(MUTATIONS.UPDATE_PENDING, true);
 
+            const db = await unAuthDb();
             ctx.commit(MUTATIONS.SET_DB, db);
 
             await ctx.dispatch(ACTIONS.LOAD_ALL);
+
+            ctx.commit(MUTATIONS.UPDATE_PENDING, false);
         },
         async [ACTIONS.LOGIN](ctx) {
             const res = await authInApp();

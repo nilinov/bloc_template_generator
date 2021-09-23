@@ -1,4 +1,4 @@
-export var props = function (itemType) { return ({
+export const props = (itemType) => ({
     items: {
         name: 'items',
         typeName: itemType,
@@ -21,8 +21,8 @@ export var props = function (itemType) { return ({
         name: 'error',
         typeTemplate: { dynamic: true },
     },
-}); };
-var getters = function (itemType) {
+});
+const getters = (itemType) => {
     var _a, _b, _c;
     return ({
         byId: {
@@ -63,89 +63,85 @@ var getters = function (itemType) {
         }
     });
 };
-var eventName = {
+const eventName = {
     loading: 'loading',
     loadingNext: 'loadingNext',
     loaded: 'loaded',
     loadFail: 'loadFail',
     searching: 'searching',
 };
-var sampleLoadList = function (name, itemType) {
-    var _a;
-    return ({
-        name: "" + name,
-        state: {
-            props: props(itemType),
-            getters: getters(itemType)
+const sampleLoadList = (name, itemType) => ({
+    name: `${name}`,
+    state: {
+        props: props(itemType),
+        getters: getters(itemType)
+    },
+    events: [
+        { name: eventName.loading },
+        {
+            name: eventName.loaded,
+            props: { "items": props(itemType).items, "meta": props(itemType).meta }
         },
-        events: [
-            { name: eventName.loading },
-            {
-                name: eventName.loaded,
-                props: { "items": props(itemType).items, "meta": props(itemType).meta }
-            },
-            { name: eventName.loadingNext },
-            {
-                name: eventName.loadFail,
-                props: { "error": props(itemType).error },
-                isDefaultError: true
-            },
-            {
-                name: eventName.searching,
-                props: { "search": props(itemType).search },
-            },
-        ],
-        bloc: {
-            case_event: (_a = {},
-                _a[eventName.loading] = {
-                    stateUpdate: {
-                        loadStatus: "LoadStatusEnum.LOADING",
-                        items: "[]",
-                        error: "null",
-                    },
-                    content: "final res = await ApiCall();",
-                    nextEvent: eventName.loaded,
-                    nextEventPayload: "items: res.items, meta: res.meta",
-                },
-                _a[eventName.searching] = {
-                    stateUpdate: {
-                        loadStatus: "LoadStatusEnum.SEARCH",
-                        items: "[]",
-                        error: "null",
-                        search: "search"
-                    },
-                    content: "final res = await ApiCall(search: search);",
-                    nextEvent: eventName.loaded,
-                    nextEventPayload: "items: res.items, meta: res.meta",
-                },
-                _a[eventName.loaded] = {
-                    stateUpdate: {
-                        loadStatus: "LoadStatusEnum.DONE",
-                        items: "items",
-                        meta: "meta"
-                    }
-                },
-                _a[eventName.loadingNext] = {
-                    stateUpdate: {
-                        loadStatus: "LoadStatusEnum.LOADING_NEXT",
-                        error: "null",
-                    },
-                    content: "final res = await ApiCall(count: 5, currentPage: state.currentPage + 1, search: state.search);",
-                    nextEvent: eventName.loaded,
-                    nextEventPayload: "items: [ ...state.items, ...res.items], meta: res.meta",
-                },
-                _a[eventName.loadFail] = {
-                    stateUpdate: {
-                        loadStatus: "LoadStatusEnum.ERROR",
-                        items: "[]",
-                    }
-                },
-                _a),
-            onError: true,
+        { name: eventName.loadingNext },
+        {
+            name: eventName.loadFail,
+            props: { "error": props(itemType).error },
+            isDefaultError: true
         },
-        actionProp: actionProps,
-    });
-};
-var actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
+        {
+            name: eventName.searching,
+            props: { "search": props(itemType).search },
+        },
+    ],
+    bloc: {
+        case_event: {
+            [eventName.loading]: {
+                stateUpdate: {
+                    loadStatus: "LoadStatusEnum.LOADING",
+                    items: "[]",
+                    error: "null",
+                },
+                content: "final res = await ApiCall();",
+                nextEvent: eventName.loaded,
+                nextEventPayload: "items: res.items, meta: res.meta",
+            },
+            [eventName.searching]: {
+                stateUpdate: {
+                    loadStatus: "LoadStatusEnum.SEARCH",
+                    items: "[]",
+                    error: "null",
+                    search: "search"
+                },
+                content: "final res = await ApiCall(search: search);",
+                nextEvent: eventName.loaded,
+                nextEventPayload: "items: res.items, meta: res.meta",
+            },
+            [eventName.loaded]: {
+                stateUpdate: {
+                    loadStatus: "LoadStatusEnum.DONE",
+                    items: "items",
+                    meta: "meta"
+                }
+            },
+            [eventName.loadingNext]: {
+                stateUpdate: {
+                    loadStatus: "LoadStatusEnum.LOADING_NEXT",
+                    error: "null",
+                },
+                content: "final res = await ApiCall(count: 5, currentPage: state.currentPage + 1, search: state.search);",
+                nextEvent: eventName.loaded,
+                nextEventPayload: "items: [ ...state.items, ...res.items], meta: res.meta",
+            },
+            [eventName.loadFail]: {
+                stateUpdate: {
+                    loadStatus: "LoadStatusEnum.ERROR",
+                    items: "[]",
+                }
+            }
+        },
+        onError: true,
+    },
+    actionProp: actionProps,
+});
+const actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
 export { sampleLoadList };
-//# sourceMappingURL=sample.load.list.js.map

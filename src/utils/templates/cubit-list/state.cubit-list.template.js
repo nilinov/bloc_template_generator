@@ -1,10 +1,17 @@
 import { camelToSnakeCase, getGetters } from "../../utils.js";
 import getStateDefaultCode from "../../getStateDefaultCode";
-export var EmptyProps = {};
-export var EmptyGetter = {};
-var stateCubitListTemplate = function (bloc) {
+export const EmptyProps = {};
+export const EmptyGetter = {};
+const stateCubitListTemplate = (bloc) => {
     var _a;
-    return "\npart of '" + camelToSnakeCase(bloc.name) + "_cubit.dart';\n\nclass " + bloc.name + "State {\n  " + getStateDefaultCode(bloc) + "\n\n  " + getGetters((_a = bloc.state.getters) !== null && _a !== void 0 ? _a : EmptyGetter) + "\n}\n";
+    return `
+part of '${camelToSnakeCase(bloc.name)}_cubit.dart';
+
+class ${bloc.name}State {
+  ${getStateDefaultCode(bloc)}
+
+  ${getGetters((_a = bloc.state.getters) !== null && _a !== void 0 ? _a : EmptyGetter)}
+}
+`;
 };
 export default stateCubitListTemplate;
-//# sourceMappingURL=state.cubit-list.template.js.map

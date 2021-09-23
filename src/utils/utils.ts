@@ -116,7 +116,7 @@ export function getVariableAndType(variables: { [x: string]: Prop }, params?: { 
 export function getAllFinalVariables(variables: { [x: string]: Prop }, params?: { addAction?: Prop }) {
     const res = Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable]));
 
-    if (params?.addAction) {
+    if (params?.addAction?.name) {
         res.push('\t' + getFinalVariable(params?.addAction?.name, params?.addAction))
     }
 
@@ -144,7 +144,7 @@ export function getVariables(props: { [x: string]: Prop }, params?: { required: 
         });
     }
 
-    if (params?.addAction) {
+    if (params?.addAction?.name) {
         res.push(getParamFunction(params.addAction.name, false))
     }
 
@@ -154,7 +154,7 @@ export function getVariables(props: { [x: string]: Prop }, params?: { required: 
 export function getCopyWithParams(bloc: JsonData, params?: { addAction?: Prop }) {
     const res = Object.keys(bloc.state.props ?? {}).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`);
 
-    if (params?.addAction) {
+    if (params?.addAction?.name) {
         res.push(`\t ${params?.addAction?.name}: ${params?.addAction?.name},\n`)
     }
 

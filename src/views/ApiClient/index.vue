@@ -88,15 +88,17 @@ export default class ApiClient extends Vue {
     }
   }
 
-  get allModels(): Model[] {return this.$store.state.models; }
+  get allModels(): Model[] {
+    return this.$store.state.models;
+  }
 
   get code() {
     return `import 'package:mad_teams/_imports.dart';
 class Api {
   ${this.allFunctions.map(e => {
-    const model = this.allModels.find(e1 => e1.uuid == e.modelUUID);
-    if (model && e.isList)
-      return `static Future<ApiResponse<List<${model.name}>>> getListActive(${getParamsApiFunction(e)}) {
+      const model = this.allModels.find(e1 => e1.uuid == e.modelUUID);
+      if (model && e.isList)
+        return `static Future<ApiResponse<List<${model.name}>>> getListActive(${getParamsApiFunction(e)}) {
         final Map<String, dynamic> params = {};
 
         ${e.hasPaginate ? 'params[\'page\'] = page;\n' : ''}
@@ -111,7 +113,20 @@ class Api {
                 ))
             .catchError((error) => ApiResponse(<${model.name}>[], error: error));
       }`;
-    })}
+
+      if (model && !e.isList) {
+        return `  static Future<ApiResponse<${model.name}>> getChallenge(${e.params.map(param => `${param.type} ${param.name}`)}) {
+    return ApiClient.dio
+        .get('${e.path.split(":").join("$")}')
+        .then((value) => ApiResponse(
+              ${model.name}.fromJson(value.data['data']),
+            ))
+        .catchError((error) => ApiResponse<${model.name}>(${model.name}.empty(), error: error));
+  }`;
+      }
+
+
+    }).join('\n\n')}
 }
 `
   }

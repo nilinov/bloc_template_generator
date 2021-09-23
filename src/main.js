@@ -7,7 +7,10 @@ import store from './store';
 // Import the functions you need from the SDKs you need
 import firebase from "firebase/compat";
 // import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 Vue.config.productionTip = false;
+Vue.use(ElementUI);
 new Vue({
     router: router,
     store: store,

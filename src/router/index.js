@@ -15,8 +15,13 @@ var routes = [
         component: ModelEditor
     },
     {
+        path: '/Model/Add',
+        name: 'ModelAdd',
+        component: ModelEditor
+    },
+    {
         path: '/Model/:uuid',
-        name: 'Model',
+        name: 'ModelEdit',
         component: ModelEditor
     },
     {

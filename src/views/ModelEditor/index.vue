@@ -4,17 +4,18 @@
       <div class="model" v-for="item of allModels" :class="{active: uuid === item.uuid}"
            @click="$router.push(`/Model/${item.uuid}`)">{{ item.name }}
       </div>
-      <div class="model" @click="$router.push(`/Model`)">Добавить</div>
+      <div class="model" @click="$router.push(`/Model/Add`)">Добавить</div>
     </div>
-    <div class="content">
+    <div class="content" v-if="isOpen">
       <h4>Edit model {{ name }}
-        <button @click="auth">Auth</button>
+<!--        <button @click="auth">Auth</button>-->
         <button @click="handleRemove">Удалить</button>
       </h4>
 
       <div class="inline">
         <TextBox placeholder="Name class" v-model="name"/>
-        <SelectBox :options="[{ key: 'class', value: 'class' }, { key: 'enum', value: 'enum' }]" placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
+        <SelectBox :options="[{ key: 'class', value: 'class' }, { key: 'enum', value: 'enum' }]"
+                   placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
       </div>
 
       <PropLine
@@ -32,6 +33,9 @@
 
       <render-code v-if="!isEnum" :items="items" :name-class="name"/>
       <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>
+    </div>
+    <div v-else>
+      Не выбрана модель
     </div>
   </div>
 </template>
@@ -60,6 +64,7 @@ export default class ModelEditor extends Vue {
   name = 'Item';
   AdditionalInfo = '';
   isEnum: boolean = false;
+  isOpen = true;
 
   @Watch('AdditionalInfo')
   onChildChanged(val: string, oldVal: string) {
@@ -76,15 +81,61 @@ export default class ModelEditor extends Vue {
     this.$store.commit(MUTATIONS.SET_MODEL, this.model);
   }
 
-  @Watch('items', { immediate: false, deep: true })
+  @Watch('items', {immediate: false, deep: true})
   onChildChanged4(val: any, oldVal: any) {
     this.$store.commit(MUTATIONS.SET_MODEL, this.model);
   }
 
-  async mounted() {
-    await this.$store.dispatch(ACTIONS.RESTORE)
+  @Watch('route', {immediate: false, deep: true})
+  onChildChanged5(val: any, oldVal: any) {
+    if (this.$route.name == 'ModelEdit') {
+      this.restoreFormState(this.$route.params.uuid)
+    }
+    if (this.$route.name == 'ModelAdd') {
+      this.handleOpenAdd()
+    }
+    if (this.$route.name == 'Model') {
+      if (this.allModels.length) {
+        this.$router.push({name: 'ModelEdit', params: { uuid: this.allModels[0].uuid }})
+      }
+    }
+  }
 
-    this.restoreFormState(this.$route.params.uuid)
+  async mounted() {
+    if (this.$route.name == 'ModelEdit') {
+      this.restoreFormState(this.$route.params.uuid)
+    }
+
+    if (this.$route.name == 'ModelAdd') {
+      this.handleOpenAdd()
+    }
+
+    if (this.$route.name == 'Model') {
+      if (this.allModels.length) {
+        this.$router.push({name: 'ModelEdit', params: { uuid: this.allModels[0].uuid }})
+      }
+    }
+  }
+
+  handleOpenAdd() {
+    this.name = 'Item';
+    this.uuid = Math.random().toString();
+    this.isEnum = false;
+    this.AdditionalInfo = '';
+
+    this.items = [
+      {
+        name: 'id',
+        type: 'int',
+        defaultValue: '0',
+        nullable: false,
+      },
+      {
+        name: 'title',
+        type: 'String',
+        defaultValue: '""',
+        nullable: false,
+      }]
   }
 
   get model(): Model {
@@ -108,20 +159,7 @@ export default class ModelEditor extends Vue {
     return this.$route.fullPath
   }
 
-  items: PropItem[] = [
-    {
-      name: 'id',
-      type: 'int',
-      defaultValue: '0',
-      nullable: false,
-    },
-    {
-      name: 'title',
-      type: 'String',
-      defaultValue: '0',
-      nullable: false,
-    }
-  ];
+  items: PropItem[] = [];
 
   emptyItem: PropItem = {
     name: '',
@@ -138,7 +176,7 @@ export default class ModelEditor extends Vue {
       this.items = item.props;
       this.isEnum = item.isEnum;
       if (this.isEnum) this.AdditionalInfo = 'enum'
-      else  this.AdditionalInfo = 'class'
+      else this.AdditionalInfo = 'class'
     }
   }
 
@@ -166,7 +204,7 @@ export default class ModelEditor extends Vue {
 
   handleRemove() {
     this.$store.commit(MUTATIONS.REMOVE_MODEL, this.uuid)
-
+    this.$router.push({name: 'Model'})
   }
 }
 

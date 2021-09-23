@@ -52,11 +52,24 @@ export default class ApiClient extends Vue {
       name: 'getListActive',
       modelUUID: '0.492427911996681',
       method: 'GET',
+      path: '/',
       uuid: '1',
       isList: true,
       hasSearch: true,
       hasPaginate: true,
       hasFilter: true,
+      params: [],
+    }, {
+      name: 'getChallenge',
+      modelUUID: '1',
+      method: 'GET',
+      path: '/challenge/:id',
+      uuid: '2',
+      isList: false,
+      hasSearch: false,
+      hasPaginate: false,
+      hasFilter: false,
+      params: [{type: 'int', name: 'id', place: 'in-path'}],
     });
   }
 
@@ -64,12 +77,14 @@ export default class ApiClient extends Vue {
     return {
       uuid: Math.random().toString(),
       name: '',
+      path: '/',
       method: 'GET',
       modelUUID: '',
       isList: false,
       hasFilter: false,
       hasPaginate: false,
       hasSearch: false,
+      params: [],
     }
   }
 

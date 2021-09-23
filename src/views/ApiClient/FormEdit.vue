@@ -13,6 +13,7 @@
     </div>
 
     <el-input v-model="localItem.name" placeholder="Имя функции"></el-input>
+    <el-input v-model="localItem.path" placeholder="Путь запроса"></el-input>
     <el-autocomplete
         class="inline-input"
         v-model="labelSelectModel"
@@ -25,6 +26,32 @@
     <el-checkbox v-model="localItem.hasPaginate" v-if="localItem.isList">Есть пагинация</el-checkbox>
     <el-checkbox v-model="localItem.hasSearch" v-if="localItem.isList">Есть поиск</el-checkbox>
     <el-checkbox v-model="localItem.hasFilter" v-if="localItem.isList">Есть фильтры</el-checkbox>
+
+    <div v-for="(item, index) of localItem.params" class="form-variable"
+         :key="`variable-${localItem.uuid}-${item.name}`">
+      <el-select v-model="item.place" placeholder="Способ">
+        <el-option v-for="item in optionsPlaceVariable" :key="item" :label="item" :value="item"></el-option>
+      </el-select>
+      <el-select v-model="item.type" placeholder="Тип">
+        <el-option v-for="item in optionsTypeVariable" :key="item" :label="item" :value="item"></el-option>
+      </el-select>
+      <el-input v-model="item.name" placeholder="Имя переменной"></el-input>
+      <div @click="handleRemoveVariable(index)">
+        <el-icon name="minus"></el-icon>
+      </div>
+    </div>
+    <div class="form-variable">
+      <el-select v-model="localVariable.place" placeholder="Способ">
+        <el-option v-for="item in optionsPlaceVariable" :key="item" :label="item" :value="item"></el-option>
+      </el-select>
+      <el-select v-model="localVariable.type" placeholder="Тип">
+        <el-option v-for="item in optionsTypeVariable" :key="item" :label="item" :value="item"></el-option>
+      </el-select>
+      <el-input v-model="localVariable.name" placeholder="Имя переменной"></el-input>
+      <div @click="handleAddVariable">
+        <el-icon name="plus"></el-icon>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -32,15 +59,23 @@
 import {Vue, Component, Watch, Emit} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 
+export interface ApiFunctionParam {
+  place: 'in-path' | 'query' | 'body',
+  name: string
+  type: 'int' | 'String' | 'bool'
+}
+
 export interface ApiFunction {
   uuid: string
   name: string
+  path: string
   method: 'GET' | 'POST'
   modelUUID: string
   isList: boolean
   hasPaginate: boolean
   hasSearch: boolean
   hasFilter: boolean
+  params: ApiFunctionParam[]
 }
 
 @Component({
@@ -53,6 +88,7 @@ export default class FormEdit extends Vue {
 
   localItem: ApiFunction = {
     uuid: Math.random().toString(),
+    path: '/',
     name: '',
     method: 'GET',
     modelUUID: '',
@@ -60,6 +96,7 @@ export default class FormEdit extends Vue {
     hasFilter: false,
     hasPaginate: false,
     hasSearch: false,
+    params: [],
   }
 
   models: Model[] = [];
@@ -74,6 +111,15 @@ export default class FormEdit extends Vue {
     label: 'POST',
   }];
 
+  optionsPlaceVariable = ['in-path', 'query', 'body'];
+  optionsTypeVariable = ['int', 'String', 'bool'];
+
+  localVariable: ApiFunctionParam = {
+    name: '',
+    type: 'int',
+    place: 'query'
+  }
+
   created() {
     this.updateFromProps();
   }
@@ -86,11 +132,13 @@ export default class FormEdit extends Vue {
   updateFromProps() {
     this.localItem.uuid = this.item.uuid;
     this.localItem.name = this.item.name;
+    this.localItem.path = this.item.path;
     this.localItem.method = this.item.method;
     this.localItem.isList = this.item.isList;
     this.localItem.hasPaginate = this.item.hasPaginate;
     this.localItem.hasSearch = this.item.hasSearch;
     this.localItem.hasFilter = this.item.hasFilter;
+    this.localItem.params = this.item.params;
 
     this.selectModel = this.allModels.find(e => e.uuid == this.item.modelUUID)
     this.labelSelectModel = this.selectModel?.name ?? '';
@@ -124,6 +172,25 @@ export default class FormEdit extends Vue {
     this.sendUpdate();
   }
 
+  handleAddVariable() {
+    console.log('handleAddVariable')
+    this.localItem.params.push({...this.localVariable})
+    this.localVariable = this.emptyVariable;
+  }
+
+  handleRemoveVariable(index: number) {
+    console.log('handleRemoveVariable')
+    this.localItem.params.splice(index, 1)
+  }
+
+  get emptyVariable(): ApiFunctionParam {
+    return {
+      name: '',
+      place: 'in-path',
+      type: 'int'
+    }
+  }
+
   @Emit('update')
   sendUpdate() {
     console.log('sdfsdf')
@@ -154,6 +221,13 @@ export default class FormEdit extends Vue {
       width: 150px;
       margin-left: 10px;
     }
+  }
+
+  .form-variable {
+    display: grid;
+    grid-template-columns: 1fr 1fr 3fr auto;
+    grid-gap: 1rem;
+    align-items: center;
   }
 }
 </style>

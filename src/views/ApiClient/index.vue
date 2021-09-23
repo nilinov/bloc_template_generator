@@ -89,7 +89,7 @@ class Api {
         ${e.hasFilter ? 'if (filters != null) { params.addAll(params); }\n' : ''}
 
         return ApiClient.dio
-            .get('/', queryParameters: params)
+            ${e.method == 'GET' ? `.get('/', queryParameters: params)` : `.post('/', data: params)`}
             .then((value) => ApiResponse(
                   ${model.name}.listFromJson(value.data['data']),
                   meta: MetaPage.fromJson(value.data['meta']),

@@ -28,7 +28,7 @@ export function getDefaultValue(bloc, name) {
     return 'null';
 }
 export function getVariablesAndDefault(bloc, params) {
-    var _a, _b;
+    var _a, _b, _c;
     const defaultState = bloc.state;
     const res = Object.keys((_a = defaultState.props) !== null && _a !== void 0 ? _a : []).map((variable) => {
         var _a, _b, _c;
@@ -39,8 +39,8 @@ export function getVariablesAndDefault(bloc, params) {
         }
         return `${variable}: ${defaultValue}`;
     });
-    if (params === null || params === void 0 ? void 0 : params.addAction) {
-        res.push(`${params.addAction.name}: ${(_b = params.addAction.default) !== null && _b !== void 0 ? _b : 'null'}`);
+    if ((_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name) {
+        res.push(`${params.addAction.name}: ${(_c = params.addAction.default) !== null && _c !== void 0 ? _c : 'null'}`);
     }
     return res.join(', \n');
 }

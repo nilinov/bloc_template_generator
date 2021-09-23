@@ -37,7 +37,7 @@ export function getVariablesAndDefault(bloc: JsonData, params?: { addAction?: Pr
         return `${variable}: ${defaultValue}`;
     })
 
-    if (params?.addAction) {
+    if (params?.addAction?.name) {
         res.push(`${params.addAction.name}: ${params.addAction.default ?? 'null'}`)
     }
 

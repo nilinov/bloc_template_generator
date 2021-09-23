@@ -34,7 +34,9 @@ export default (bloc: JsonData, params = {postfix: 'State'}) => {
   
     toJson() => ${toMap(bloc.state.props ?? EmptyProps)};
     
-    static fromJson(Map<String, dynamic> json) => ${bloc.name}(${fromMap(bloc.state.props ?? EmptyProps)});
+    static ${bloc.name} fromJson(Map<String, dynamic> json) => ${bloc.name}(${fromMap(bloc.state.props ?? EmptyProps)});
+    
+    static List<${bloc.name}> listFromJson(List? json) => (json ?? []).map((e) => ${bloc.name}.fromJson(e)).toList();
     
     static empty() => ${bloc.name}${params?.postfix}(${getVariablesAndDefault(bloc, {addAction: bloc.actionProp})});
   `;

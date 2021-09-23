@@ -106,7 +106,7 @@ export function getVariableAndType(variables: { [x: string]: Prop }, params?: { 
         res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`);
     }
 
-    if (params?.addAction) {
+    if (params?.addAction?.name) {
         res.push(`\t required ${getFullType(params?.addAction)} ${params?.addAction?.name},\n`);
     }
 

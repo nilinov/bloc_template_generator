@@ -9,7 +9,10 @@
       <br><br>
       <span>{{ nameExamplar }}ToJson({{ nameClass }} {{ nameExamplar }}) {</span>
       <br>
-      <pre>       return {{ nameExamplar }}.toString();</pre>
+      <pre>  switch({{ nameExamplar }}) {
+        {{ items.map(e => `case ${nameClass}.${e.name}: return '${e.name}';`).join('\n\t') }}
+        }
+      </pre>
       <br>
       <span>}</span>
       <br>
@@ -17,7 +20,7 @@
       <pre>
 {{ nameExamplar }}FromJson(String {{ nameExamplar }}) {
   switch ({{ nameExamplar }}) {
-<pre v-for="item of items">     case '{{ nameExamplar }}.{{ item.name }}': return {{ nameClass }}.{{
+<pre v-for="item of items">     case '{{ item.name }}': return {{ nameClass }}.{{
     item.name
   }};<br></pre>
   }
@@ -37,7 +40,7 @@ import {
   renderCodeCopyWithParams, PropItem
 } from "./RenderCodeLineType";
 import getStateDefaultCode from "@/utils/getStateDefaultCode";
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import {BlocState, JsonData, Prop} from "@/utils/interfaces";
 import {getEnumContent} from '@/utils/getStateDefaultCode';
 import _ from "lodash";

@@ -113,7 +113,7 @@ export function getFinalVariable(variable, type, params) {
     return `final ${getFullType(type)}${nullable} ${variable};`;
 }
 export function getVariableAndType(variables, params) {
-    var _a;
+    var _a, _b;
     let res = [];
     if (params === null || params === void 0 ? void 0 : params.required) {
         res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`);
@@ -124,8 +124,8 @@ export function getVariableAndType(variables, params) {
     else {
         res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`);
     }
-    if (params === null || params === void 0 ? void 0 : params.addAction) {
-        res.push(`\t required ${getFullType(params === null || params === void 0 ? void 0 : params.addAction)} ${(_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name},\n`);
+    if ((_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name) {
+        res.push(`\t required ${getFullType(params === null || params === void 0 ? void 0 : params.addAction)} ${(_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name},\n`);
     }
     return res.join('');
 }

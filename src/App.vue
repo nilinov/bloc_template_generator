@@ -4,6 +4,7 @@
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
         <el-menu-item index="/">BLoC</el-menu-item>
         <el-menu-item index="/Model">Models</el-menu-item>
+        <el-menu-item index="/ApiClient">Api Client</el-menu-item>
       </el-menu>
     </el-header>
     <el-main v-loading="isLoading">

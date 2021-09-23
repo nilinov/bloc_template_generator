@@ -25,7 +25,9 @@ export default (bloc, params = { postfix: 'State' }) => {
   
     toJson() => ${toMap((_f = bloc.state.props) !== null && _f !== void 0 ? _f : EmptyProps)};
     
-    static fromJson(Map<String, dynamic> json) => ${bloc.name}(${fromMap((_g = bloc.state.props) !== null && _g !== void 0 ? _g : EmptyProps)});
+    static ${bloc.name} fromJson(Map<String, dynamic> json) => ${bloc.name}(${fromMap((_g = bloc.state.props) !== null && _g !== void 0 ? _g : EmptyProps)});
+    
+    static List<${bloc.name}> listFromJson(List? json) => (json ?? []).map((e) => ${bloc.name}.fromJson(e)).toList();
     
     static empty() => ${bloc.name}${params === null || params === void 0 ? void 0 : params.postfix}(${getVariablesAndDefault(bloc, { addAction: bloc.actionProp })});
   `;

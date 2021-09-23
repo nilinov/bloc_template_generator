@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Editor from '../views/Editor.vue';
 import ModelEditor from '../views/ModelEditor/index.vue';
+import ApiClient from "@/views/ApiClient/index.vue";
 Vue.use(VueRouter);
 var routes = [
     {
@@ -25,12 +26,9 @@ var routes = [
         component: ModelEditor
     },
     {
-        path: '/about',
-        name: 'About',
-        // route level utils-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: function () { return import(/* webpackChunkName: "about" */ '../views/About.vue'); }
+        path: '/ApiClient',
+        name: 'ApiClient',
+        component: ApiClient
     }
 ];
 var router = new VueRouter({

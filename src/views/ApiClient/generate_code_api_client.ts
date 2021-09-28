@@ -1,5 +1,24 @@
-import {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/FormEdit.vue";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
+
+export interface ApiFunctionParam {
+    place: 'in-path' | 'query' | 'body',
+    name: string
+    type: 'int' | 'String' | 'bool'
+}
+
+export interface ApiFunction {
+    uuid: string
+    name: string
+    path: string
+    method: 'GET' | 'POST'
+    modelUUID: string
+    isList: boolean
+    isMock: boolean
+    hasPaginate: boolean
+    hasSearch: boolean
+    hasFilter: boolean
+    params: ApiFunctionParam[]
+}
 
 function generateCodeApiClient(functions: ApiFunction[] = [], models: Model[] = []) {
     console.log('generate code', [...functions.map(e => ({...e}))])
@@ -8,7 +27,7 @@ function generateCodeApiClient(functions: ApiFunction[] = [], models: Model[] = 
 class Api {
   ${functions.map(e => {
         const model = models.find(e1 => e1.uuid == e.modelUUID);
-        console.log(`render request ${e?.name}`, e, model)
+        // console.log(`render request ${e?.name}`, e, model)
 
         if (model && e.isList) {
             const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
@@ -51,7 +70,7 @@ class Api {
 }
 
 function bindParams(path: string, params: ApiFunctionParam[] = [], hasPaginate = false) {
-    console.log(`bindParams `, [...params])
+    // console.log(`bindParams `, [...params])
     const paramsInPath = params.filter(e => e.place == 'in-path');
     let result = path;
 
@@ -60,14 +79,14 @@ function bindParams(path: string, params: ApiFunctionParam[] = [], hasPaginate =
         paramsInPath.push({name: 'page', type: 'int', place: 'in-path'});
     }
 
-    console.log({paramsInPath})
+    // console.log({paramsInPath})
 
     for (let param of paramsInPath) {
-        console.log({param: result.split(`/:${param.name}`)})
+        // console.log({param: result.split(`/:${param.name}`)})
         result = result.split(`/:${param.name}`).join(`/\$${param.name}`)
     }
 
-    console.log({result})
+    // console.log({result})
 
     return result;
 }

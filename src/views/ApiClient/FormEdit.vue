@@ -57,34 +57,11 @@
 </template>
 
 <script lang="ts">
-import {Vue, Component, Watch, Emit} from "vue-property-decorator";
+import {Component, Emit, Vue, Watch} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
+import {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
 
-export interface ApiFunctionParam {
-  place: 'in-path' | 'query' | 'body',
-  name: string
-  type: 'int' | 'String' | 'bool'
-}
-
-export interface ApiFunction {
-  uuid: string
-  name: string
-  path: string
-  method: 'GET' | 'POST'
-  modelUUID: string
-  isList: boolean
-  isMock: boolean
-  hasPaginate: boolean
-  hasSearch: boolean
-  hasFilter: boolean
-  params: ApiFunctionParam[]
-}
-
-@Component({
-  props: {
-    item: Object,
-  }
-})
+@Component({props: {item: Object}})
 export default class FormEdit extends Vue {
   item!: ApiFunction
 
@@ -135,12 +112,14 @@ export default class FormEdit extends Vue {
 
   @Watch('item')
   handleChange1(val: ApiFunction) {
-    if (this.isMounted)
+    if (this.isMounted && JSON.stringify(this.localItem) != JSON.stringify(val)) {
       this.updateFromProps();
+    }
   }
 
   updateFromProps() {
     this.localItem.uuid = this.item.uuid;
+    this.localItem.modelUUID = this.item.modelUUID;
     this.localItem.name = this.item.name;
     this.localItem.path = this.item.path;
     this.localItem.method = this.item.method;
@@ -178,19 +157,18 @@ export default class FormEdit extends Vue {
   }
 
   @Watch('localItem', {deep: true})
-  onChildChanged1(val: string, oldVal: string) {
-    // if (this.isMounted)
-    //   this.sendUpdate();
+  handleChange2(val: string, oldVal: string) {
+    if (this.isMounted && JSON.stringify(this.item) != JSON.stringify(val)) {
+      this.sendUpdate();
+    }
   }
 
   handleAddVariable() {
-    console.log('handleAddVariable')
     this.localItem.params.push({...this.localVariable})
     this.localVariable = this.emptyVariable;
   }
 
   handleRemoveVariable(index: number) {
-    console.log('handleRemoveVariable')
     this.localItem.params.splice(index, 1)
   }
 
@@ -204,12 +182,12 @@ export default class FormEdit extends Vue {
 
   @Emit('update')
   sendUpdate() {
-    console.log('send update', {...this.localItem})
     return {...this.localItem};
   }
 
   handleSelectModel(item: { value: string, item: Model }) {
     this.selectModel = item.item;
+    this.localItem.modelUUID = item.item.uuid;
   }
 }
 </script>

@@ -10,7 +10,7 @@
       </el-col>
       <el-col :span="8">
         <template v-for="(item, index) of allFunctions">
-          <FormEdit :item="item" @remove="handleRemove" @update="handleUpdate" :key="`form-${item.uuid}-${item.name}`"/>
+          <FormEdit :item="item" @remove="handleRemove" @update="handleUpdate" :key="`form-${item.uuid}`"/>
           <br><br>
         </template>
         <el-button @click="allFunctions.push(emptyApiFunction)">Добавить</el-button>
@@ -26,8 +26,8 @@
 <script lang="ts">
 import {Component, Vue, Watch} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
-import FormEdit, {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/FormEdit.vue";
-import {generateCodeApiClient} from "@/views/ApiClient/generate_code_api_client";
+import FormEdit from "@/views/ApiClient/FormEdit.vue";
+import {generateCodeApiClient, ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
 
 @Component({
   components: {FormEdit}
@@ -97,8 +97,9 @@ export default class ApiClient extends Vue {
 
   handleUpdate(item: ApiFunction) {
     const index = this.allFunctions.findIndex(e => e.uuid == item.uuid);
-    if (index != -1)
-      this.allFunctions.splice(index, 1, item);
+    if (index != -1) {
+      Vue.set(this.allFunctions, index, item)
+    }
   }
 
   handleRemove(func: ApiFunction) {

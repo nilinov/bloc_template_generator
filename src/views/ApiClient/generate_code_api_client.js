@@ -5,7 +5,7 @@ function generateCodeApiClient(functions, models) {
     console.log('generate code', __spreadArrays(functions.map(function (e) { return (__assign({}, e)); })));
     return "import 'package:mad_teams/_imports.dart';\nclass Api {\n  " + functions.map(function (e) {
         var model = models.find(function (e1) { return e1.uuid == e.modelUUID; });
-        console.log("render request " + (e === null || e === void 0 ? void 0 : e.name), e, model);
+        // console.log(`render request ${e?.name}`, e, model)
         if (model && e.isList) {
             var codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
             var codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
@@ -23,20 +23,20 @@ function generateCodeApiClient(functions, models) {
 function bindParams(path, params, hasPaginate) {
     if (params === void 0) { params = []; }
     if (hasPaginate === void 0) { hasPaginate = false; }
-    console.log("bindParams ", __spreadArrays(params));
+    // console.log(`bindParams `, [...params])
     var paramsInPath = params.filter(function (e) { return e.place == 'in-path'; });
     var result = path;
     if (hasPaginate) {
         result += "/page/:page";
         paramsInPath.push({ name: 'page', type: 'int', place: 'in-path' });
     }
-    console.log({ paramsInPath: paramsInPath });
+    // console.log({paramsInPath})
     for (var _i = 0, paramsInPath_1 = paramsInPath; _i < paramsInPath_1.length; _i++) {
         var param = paramsInPath_1[_i];
-        console.log({ param: result.split("/:" + param.name) });
+        // console.log({param: result.split(`/:${param.name}`)})
         result = result.split("/:" + param.name).join("/$" + param.name);
     }
-    console.log({ result: result });
+    // console.log({result})
     return result;
 }
 function getParamsApiFunction(e) {

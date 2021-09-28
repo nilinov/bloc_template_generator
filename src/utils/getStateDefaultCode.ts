@@ -1,7 +1,7 @@
 import {JsonData} from "./interfaces";
 import {
   fromMap,
-  getAllFinalVariables,
+  getAllFinalVariables, getClearWithParams,
   getCopyWithParams,
   getGetters,
   getVariableAndType,
@@ -29,14 +29,15 @@ export default (bloc: JsonData, params = {postfix: 'State'}) => {
     ${bloc.name}${params?.postfix} clearValue({
       ${Object.keys(bloc.state.props ?? EmptyProps).map(name => `\tbool ${name} = false,\n`).join('')}}) {
       return ${bloc.name}${params?.postfix}(
-        ${Object.keys(bloc.state.props ?? EmptyProps).map(name => `\t ${name}: ${name} ? ${getDefaultValue(bloc, name)} : this.${name}, \n`).join('')});
+        ${getClearWithParams(bloc, {addAction: bloc.actionProp})});
     }
   
     toJson() => ${toMap(bloc.state.props ?? EmptyProps)};
     
-    static ${bloc.name} fromJson(Map<String, dynamic> json) => ${bloc.name}(${fromMap(bloc.state.props ?? EmptyProps)});
+    static ${bloc.name}${params?.postfix} fromJson(Map<String, dynamic> json) => 
+        ${bloc.name}${params?.postfix}(${fromMap(bloc.state.props ?? EmptyProps, {addAction: bloc.actionProp})});
     
-    static List<${bloc.name}> listFromJson(List? json) => (json ?? []).map((e) => ${bloc.name}.fromJson(e)).toList();
+    static List<${bloc.name}${params?.postfix}> listFromJson(List? json) => (json ?? []).map((e) => ${bloc.name}${params?.postfix}.fromJson(e)).toList();
     
     static empty() => ${bloc.name}${params?.postfix}(${getVariablesAndDefault(bloc, {addAction: bloc.actionProp})});
   `;

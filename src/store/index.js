@@ -26,6 +26,9 @@ export var ACTIONS;
 var STORE_MODELS = 'STORE_MODELS';
 export default new Vuex.Store({
     getters: {
+        allModelsItems: function (state) {
+            return state.models;
+        },
         allModels: function (state) {
             return __spreadArrays(state.models.map(function (e) { return e.name; }), state.models.map(function (e) { return "List<" + e.name + ">"; }));
         },

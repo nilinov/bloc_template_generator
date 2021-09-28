@@ -37,10 +37,13 @@ const STORE_MODELS = 'STORE_MODELS';
 
 export default new Vuex.Store<RootState>({
     getters: {
+        allModelsItems(state) {
+            return state.models;
+        },
         allModels(state) {
             return [...state.models.map(e => e.name), ...state.models.map(e => `List<${e.name}>`)]
         },
-        allModelsClasses(state) {
+        allModelsClasses(state): string[] {
             return [...state.models.filter(e => e.isEnum == false).map(e => e.name)]
         }
     },

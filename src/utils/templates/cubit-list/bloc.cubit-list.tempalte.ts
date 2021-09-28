@@ -14,15 +14,26 @@ import {
     getVariablesEvent
 } from "../bloc-default/bloc.default.tempalte";
 
-const blocCubitListTemplate = (bloc: JsonData) => `
-const key${UpperFirstLetter(bloc.name)}State = '${UpperFirstLetter(bloc.name)}';
-
+const blocCubitListTemplate = (bloc: JsonData, params = {
+    ApiCall: 'ApiCall',
+    hasSearch: true,
+    hasPaginate: true,
+    hasFilter: true,
+}) => `
 part '${camelToSnakeCase(bloc.name)}_state.dart';
+
+const key${UpperFirstLetter(bloc.name)}State = '${UpperFirstLetter(bloc.name)}';
 
 class ${bloc.name}Cubit extends Cubit<${bloc.name}State> {
   ${bloc.name}Cubit() : super(${bloc.name}State.empty());
 
-  ${bloc.events.map(event => getEvents(bloc.name, event, bloc)).filter((e) => e).join('\n')}
+  ${bloc.events.filter(e => {
+    if (!params.hasSearch) if (e.tags?.includes('search')) return false;
+    if (!params.hasPaginate) if (e.tags?.includes('paginate')) return false;
+    if (!params.hasFilter) if (e.tags?.includes('filter')) return false;
+
+    return true;
+}).map(event => getEvents(bloc.name, event, bloc)).filter((e) => e).join('\n')}
 }
 
 `
@@ -42,7 +53,7 @@ function getEvents(blocName: string, event: BlocEvent, bloc: JsonData) {
     const caseEvent = bloc.bloc.case_event ? bloc.bloc.case_event[event.name] ?? {} : {};
 
     return ` ${nameFunction} {
-        emit(state.copyWith(\n${getVariablesEvent(caseEvent, { addAction: bloc.actionProp, eventName: name })}));
+        emit(state.copyWith(\n${getVariablesEvent(caseEvent, {addAction: bloc.actionProp, eventName: name})}));
         ${caseEvent.content ?? ''}
         ${caseEvent.nextEvent ? `${caseEvent.nextEvent}( ${caseEvent.nextEventPayload} );` : ''}
       }

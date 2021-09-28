@@ -3,6 +3,16 @@
     <div class="props">
       <TextBox class="text-box" placeholder="Name bloc" v-model="nameBloc" @input="updateCode"/>
       <TextBox class="text-box" placeholder="Name class entity" v-model="nameClassEntity" @input="updateCode"/>
+
+      <el-select v-model="apiFunctionUUID" placeholder="Api Request" clearable @change="updateApiFunction">
+        <el-option
+            v-for="item in allApiFunctions"
+            :key="item.uuid"
+            :label="item.name"
+            :value="item.uuid">
+        </el-option>
+      </el-select>
+
       <div class="space"></div>
       <SelectBox class="select-box" v-model="typeTemplate" :options="templates" @input="updateCode"/>
       <SelectBox class="select-box" v-model="dataTemplate" :options="templatesData" @input="updateCode"/>
@@ -24,7 +34,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import {TextBox, SelectBox} from "@/components";
 import stateDefaultTemplate from "@/utils/templates/bloc-default/state.default.template";
 import {sampleLoadList} from "@/utils/sample.load.list";
@@ -34,9 +44,9 @@ import {blocCubitListTemplate} from "@/utils/templates/cubit-list/bloc.cubit-lis
 import stateCubitListTemplate from "@/utils/templates/cubit-list/state.cubit-list.template";
 import {sampleLoadView} from "@/utils/sample.load.view";
 
-import * as firebase from "firebase/auth";
-import {authInApp, firebaseApp} from "@/main";
 import {Component, Vue} from "vue-property-decorator";
+import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
+import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 
 @Component({components: {TextBox, SelectBox}})
 export default class GenerateScreen extends Vue {
@@ -75,16 +85,50 @@ export default class GenerateScreen extends Vue {
   ];
   user = null;
 
+  apiFunctionUUID = '';
+
+  get apiFunction() {
+    return this.allApiFunctions.find(e => e.uuid == this.apiFunctionUUID);
+  }
+
+  get allApiFunctions(): ApiFunction[] {
+    return this.$store.getters.allApiFunctions ?? [];
+  }
 
   mounted() {
     this.updateCode();
   };
 
+  updateApiFunction() {
+    if (this.apiFunction) {
+      const nameClass = (this.$store.getters.allModelsItems as Model[]).find(e => e.uuid == this.apiFunction.modelUUID);
+      this.nameClassEntity = nameClass?.name;
+      this.nameBloc = this.apiFunction.name.replace('get', '').replace('post', '');
+
+      this.typeTemplate = 'cubit-list';
+
+      if (this.apiFunction.isList) {
+        this.dataTemplate = 'sample-list'
+      } else {
+        this.dataTemplate = 'sample-view'
+      }
+
+      this.updateCode();
+    } else {
+
+    }
+  }
+
   updateCode() {
-    let data = sampleLoadList(this.nameBloc, this.nameClassEntity);
+    const ApiCall = 'Api.' + this.apiFunction?.name ?? 'ApiCall';
+    const hasSearch = this.apiFunction?.hasSearch ?? true;
+    const hasPaginate = this.apiFunction?.hasPaginate ?? true;
+    const hasFilter = this.apiFunction?.hasFilter ?? true;
+
+    let data = sampleLoadList(this.nameBloc, this.nameClassEntity, {ApiCall, hasSearch, hasPaginate, hasFilter});
     switch (this.dataTemplate) {
       case "sample-list":
-        data = sampleLoadList(this.nameBloc, this.nameClassEntity);
+        data = sampleLoadList(this.nameBloc, this.nameClassEntity, {ApiCall, hasSearch, hasPaginate, hasFilter});
         break;
       case "sample-view":
         data = sampleLoadView(this.nameBloc, this.nameClassEntity);
@@ -98,8 +142,8 @@ export default class GenerateScreen extends Vue {
     }
 
     if (this.typeTemplate === 'cubit-list') {
-      this.code.bloc = blocCubitListTemplate(data)
-      this.code.state = stateCubitListTemplate(data)
+      this.code.bloc = blocCubitListTemplate(data, {ApiCall, hasSearch, hasPaginate, hasFilter})
+      this.code.state = stateCubitListTemplate(data, {ApiCall, hasSearch, hasPaginate, hasFilter})
       this.code.event = '';
     }
   };

@@ -23,6 +23,7 @@ export interface BlocEvent {
     name: string
     props?: { [name: string]: Prop },
     isDefaultError?: boolean
+    tags?: string[]
 }
 
 export interface BlocState {
@@ -36,6 +37,7 @@ export interface BlocGetter {
     returnType?: string
     params?: string,
     content: string
+    tags?: string[]
 }
 
 export interface CaseEvent {
@@ -43,6 +45,7 @@ export interface CaseEvent {
     content?: string
     nextEvent?: string
     nextEventPayload?: string
+    tags?: string[]
 }
 
 export interface Bloc {

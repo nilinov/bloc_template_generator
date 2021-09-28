@@ -1,5 +1,6 @@
 import {BlocGetter, JsonData, Prop} from "./interfaces.js";
 import * as _ from 'lodash';
+import {getDefaultValue} from "./templates/bloc-default/bloc.default.tempalte";
 
 export function getFullType(prop: Prop, params?: { noRequired?: boolean }): string {
     const afterNoRequired = params?.noRequired ? '?' : '';
@@ -26,10 +27,12 @@ export function getFullType(prop: Prop, params?: { noRequired?: boolean }): stri
 export function toMap(props: { [name: string]: Prop }) {
     return '{\n' + Object.keys(props).map((key) => {
         const prop = props[key];
+        const nullable = prop.typeTemplate?.nullable ? '?' : '';
+
         if (prop.typeTemplate?.array) {
-            return `"${key}": '[' + ${key}.map(e => e.toMap().join(', ') + ']'`;
+            return `"${key}": '[' + (${key} ?? []).map((e) => e.toJson()).join(', ') + ']'`;
         } else if (prop.typeTemplate?.enum) {
-            return `"${key}": ${key}.toString()`;
+            return `"${key}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
         } else if (prop.typeTemplate?.double) {
             return `"${key}": ${key}`;
         } else if (prop.typeTemplate?.int) {
@@ -39,6 +42,10 @@ export function toMap(props: { [name: string]: Prop }) {
         } else if (prop.typeTemplate?.bool) {
             return `"${key}": ${key}`;
         } else if (prop.typeTemplate?.map) {
+            return `"${key}": ${key}`;
+        } else if (prop.typeTemplate?.class) {
+            return `"${key}": ${key}${nullable}.toJson()`;
+        } else if (prop.typeTemplate?.dynamic) {
             return `"${key}": ${key}`;
         } else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
@@ -60,14 +67,15 @@ function getPropNameFromList(prop: Prop) {
     return prop.typeName?.substr(5, prop.typeName?.length - 6);
 }
 
-export function fromMap(props: { [name: string]: Prop }) {
+export function fromMap(props: { [name: string]: Prop }, params?: { addAction?: Prop }) {
     console.log({props})
-    return Object.keys(props).map((key) => {
+
+    const keys = Object.keys(props).map((key) => {
         const prop = props[key];
-        const nullable = prop.typeTemplate.nullable ? '?' : '';
+        const nullable = prop.typeTemplate?.nullable ? '?' : '';
 
         if (prop.typeTemplate?.array) {
-            return `${key}: json["${key}"].map(e => ${key}.fromJson(e)) ?? [] as List<${key}>`;
+            return `${key}: ${prop.typeName}.listFromJson(json["${key}"])`;
         } else if (prop.typeTemplate?.enum) {
             return `${key}: ${key}FromJson(json["${key}"])`;
         } else if (prop.typeTemplate?.double) {
@@ -80,6 +88,8 @@ export function fromMap(props: { [name: string]: Prop }) {
             return `${key}: ${key}FromJson(json["${key}"])`;
         } else if (prop.typeTemplate?.class) {
             return `${key}: ${prop.typeName}.fromJson(json["${key}"]) as ${prop.typeName}`;
+        } else if (prop.typeTemplate?.dynamic) {
+            return `${key}: json["${key}"]`;
         } else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
                 return `${key}: DateTime.parse(json["${key}"])`;
@@ -90,12 +100,31 @@ export function fromMap(props: { [name: string]: Prop }) {
             } else {
                 return `${key}: ${_.camelCase(prop.typeName)}FromJson(json["${key}"])`;
             }
+        } else {
+            console.error(`Не могу вывести свойство ${key}`, prop)
         }
-    }).filter(e => e).join(', \n');
+    })
+
+    if (params?.addAction?.name) {
+        keys.push(`${params.addAction.name}: json['${params.addAction.name}']`)
+    }
+
+    return keys.filter(e => e).join(', \n');
 }
 
-export function getGetters(getters: { [x: string]: BlocGetter }) {
-    return Object.keys(getters).map((key) => {
+export function getGetters(getters: { [x: string]: BlocGetter }, params = {
+    ApiCall: 'ApiCall',
+    hasSearch: true,
+    hasPaginate: true,
+    hasFilter: true,
+}) {
+    return Object.keys(getters).filter(e => {
+        if (!params.hasSearch && getters[e].tags?.includes('search')) return false;
+        if (!params.hasPaginate && getters[e].tags?.includes('pagination')) return false;
+        if (!params.hasFilter && getters[e].tags?.includes('filter')) return false;
+
+        return true;
+    }).map((key) => {
         const getter = getters[key];
         if (getter.params)
             return `${getter.returnType ?? ''} ${key}(${getter.params ?? ''}) => ${getter.content};`
@@ -169,6 +198,16 @@ export function getVariables(props: { [x: string]: Prop }, params?: { required: 
 
 export function getCopyWithParams(bloc: JsonData, params?: { addAction?: Prop }) {
     const res = Object.keys(bloc.state.props ?? {}).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`);
+
+    if (params?.addAction?.name) {
+        res.push(`\t ${params?.addAction?.name}: ${params?.addAction?.name},\n`)
+    }
+
+    return res.join('');
+}
+
+export function getClearWithParams(bloc: JsonData, params?: { addAction?: Prop }) {
+    const res = Object.keys(bloc.state.props ?? {}).map(name => `\t ${name}: ${name} ? ${getDefaultValue(bloc, name)} : this.${name}, \n`);
 
     if (params?.addAction?.name) {
         res.push(`\t ${params?.addAction?.name}: ${params?.addAction?.name},\n`)

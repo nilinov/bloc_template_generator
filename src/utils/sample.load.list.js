@@ -1,13 +1,18 @@
-export var props = function (itemType) { return ({
+export const props = (itemType) => ({
     items: {
         name: 'items',
         typeName: itemType,
         typeTemplate: { array: itemType },
         default: "[]"
     },
-    meta: { typeName: "MetaPage", name: 'meta', default: 'MetaPage.empty()' },
-    loadStatus: {
-        name: 'loadStatus',
+    meta: {
+        typeName: "MetaPage",
+        name: 'meta',
+        default: 'MetaPage.empty()',
+        typeTemplate: { class: true, nullable: true }
+    },
+    loadStatusEnum: {
+        name: 'loadStatusEnum',
         typeName: "LoadStatusEnum",
         typeTemplate: { enum: true },
         default: "LoadStatusEnum.INIT"
@@ -21,131 +26,149 @@ export var props = function (itemType) { return ({
         name: 'error',
         typeTemplate: { dynamic: true },
     },
-}); };
-var getters = function (itemType) {
+});
+const getters = (itemType) => {
     var _a, _b, _c;
     return ({
         byId: {
             name: 'byId',
             returnType: (_c = (_b = (_a = props(itemType)) === null || _a === void 0 ? void 0 : _a.items) === null || _b === void 0 ? void 0 : _b.typeTemplate) === null || _c === void 0 ? void 0 : _c.array,
             params: "int id",
-            content: "items.firstWhere((element) => element.id == id)"
+            content: "items.firstWhere((element) => element.id == id)",
+            tags: ['load'],
         },
         currentPage: {
             name: 'currentPage',
             returnType: "int",
-            content: "meta.currentPage"
+            content: "meta?.currentPage ?? 1",
+            tags: ['pagination'],
         },
         canLoadNext: {
             name: 'canLoadNext',
             returnType: "bool",
-            content: "meta.lastPage > meta.currentPage && !processLoading"
+            content: "(meta?.lastPage ?? 1) > (meta?.currentPage ?? 1) && !processLoading",
+            tags: ['pagination'],
         },
         loading: {
             name: 'loading',
             returnType: "bool",
-            content: "loadStatus == LoadStatusEnum.LOADING"
+            content: "loadStatusEnum == LoadStatusEnum.LOADING",
+            tags: ['load'],
         },
         loadingNext: {
             name: 'loadingNext',
             returnType: "bool",
-            content: "loadStatus == LoadStatusEnum.LOADING_NEXT"
+            content: "loadStatusEnum == LoadStatusEnum.LOADING_NEXT",
+            tags: ['pagination'],
         },
         processLoading: {
             name: 'processLoading',
             returnType: "bool",
-            content: "[LoadStatusEnum.LOADING, LoadStatusEnum.LOADING_NEXT, LoadStatusEnum.REFRESH, LoadStatusEnum.SEARCH].contains(loadStatus)"
+            content: "[LoadStatusEnum.LOADING, LoadStatusEnum.LOADING_NEXT, LoadStatusEnum.REFRESH, LoadStatusEnum.SEARCH].contains(loadStatusEnum)",
+            tags: ['load'],
         },
         showList: {
             name: 'showList',
             returnType: "bool",
-            content: "[LoadStatusEnum.DONE, LoadStatusEnum.REFRESH, LoadStatusEnum.LOADING_NEXT].contains(loadStatus)"
+            content: "[LoadStatusEnum.DONE, LoadStatusEnum.REFRESH, LoadStatusEnum.LOADING_NEXT].contains(loadStatusEnum)",
+            tags: ['reload'],
         }
     });
 };
-var eventName = {
+const eventName = {
     loading: 'loading',
     loadingNext: 'loadingNext',
     loaded: 'loaded',
     loadFail: 'loadFail',
     searching: 'searching',
 };
-var sampleLoadList = function (name, itemType) {
-    var _a;
+const sampleLoadList = (name, itemType, params = {
+    ApiCall: 'ApiCall',
+    hasSearch: true,
+    hasPaginate: true,
+    hasFilter: true,
+}) => {
     return ({
-        name: "" + name,
+        name: `${name}`,
         state: {
             props: props(itemType),
             getters: getters(itemType)
         },
         events: [
-            { name: eventName.loading },
+            { name: eventName.loading, tags: ['load'] },
             {
                 name: eventName.loaded,
-                props: { "items": props(itemType).items, "meta": props(itemType).meta }
+                props: { "items": props(itemType).items, "meta": props(itemType).meta },
+                tags: ['load', 'reload'],
             },
             { name: eventName.loadingNext },
             {
                 name: eventName.loadFail,
                 props: { "error": props(itemType).error },
-                isDefaultError: true
+                isDefaultError: true,
+                tags: ['pagination'],
             },
             {
                 name: eventName.searching,
                 props: { "search": props(itemType).search },
+                tags: ['search'],
             },
         ],
         bloc: {
-            case_event: (_a = {},
-                _a[eventName.loading] = {
+            case_event: {
+                [eventName.loading]: {
                     stateUpdate: {
-                        loadStatus: "LoadStatusEnum.LOADING",
+                        loadStatusEnum: "LoadStatusEnum.LOADING",
                         items: "[]",
                         error: "null",
                     },
-                    content: "final res = await ApiCall();",
+                    content: `final res = await ${params.ApiCall}();`,
                     nextEvent: eventName.loaded,
                     nextEventPayload: "items: res.items, meta: res.meta",
+                    tags: ['load'],
                 },
-                _a[eventName.searching] = {
+                [eventName.searching]: {
                     stateUpdate: {
-                        loadStatus: "LoadStatusEnum.SEARCH",
+                        loadStatusEnum: "LoadStatusEnum.SEARCH",
                         items: "[]",
                         error: "null",
                         search: "search"
                     },
-                    content: "final res = await ApiCall(search: search);",
+                    content: `final res = await ${params.ApiCall}(${params.hasSearch ? 'search: search' : ''});`,
                     nextEvent: eventName.loaded,
                     nextEventPayload: "items: res.items, meta: res.meta",
+                    tags: ['search'],
                 },
-                _a[eventName.loaded] = {
+                [eventName.loaded]: {
                     stateUpdate: {
-                        loadStatus: "LoadStatusEnum.DONE",
+                        loadStatusEnum: "LoadStatusEnum.DONE",
                         items: "items",
                         meta: "meta"
-                    }
+                    },
+                    tags: ['load'],
                 },
-                _a[eventName.loadingNext] = {
+                [eventName.loadingNext]: {
                     stateUpdate: {
-                        loadStatus: "LoadStatusEnum.LOADING_NEXT",
+                        loadStatusEnum: "LoadStatusEnum.LOADING_NEXT",
                         error: "null",
                     },
-                    content: "final res = await ApiCall(count: 5, currentPage: state.currentPage + 1, search: state.search);",
+                    content: `final res = await ${params.ApiCall}(page: state.currentPage + 1, ${params.hasSearch ? 'search: state.search' : ''});`,
                     nextEvent: eventName.loaded,
                     nextEventPayload: "items: [ ...state.items, ...res.items], meta: res.meta",
+                    tags: ['pagination'],
                 },
-                _a[eventName.loadFail] = {
+                [eventName.loadFail]: {
                     stateUpdate: {
-                        loadStatus: "LoadStatusEnum.ERROR",
+                        loadStatusEnum: "LoadStatusEnum.ERROR",
                         items: "[]",
-                    }
-                },
-                _a),
+                    },
+                    tags: ['load'],
+                }
+            },
             onError: true,
         },
         actionProp: actionProps,
     });
 };
-var actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
+const actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
 export { sampleLoadList };
-//# sourceMappingURL=sample.load.list.js.map

@@ -6,8 +6,6 @@
       <div class="space"></div>
       <SelectBox class="select-box" v-model="typeTemplate" :options="templates" @input="updateCode"/>
       <SelectBox class="select-box" v-model="dataTemplate" :options="templatesData" @input="updateCode"/>
-      <button @click="auth" v-if="!user">Auth</button>
-      <button v-if="user">{{user.displayName}}</button>
     </div>
     <div class="areas">
       <div class="area-event">
@@ -38,79 +36,74 @@ import {sampleLoadView} from "@/utils/sample.load.view";
 
 import * as firebase from "firebase/auth";
 import {authInApp, firebaseApp} from "@/main";
+import {Component, Vue} from "vue-property-decorator";
 
-export default {
-  name: "GenerateScreen",
-  components: {TextBox, SelectBox},
-  props: {},
-  data: () => ({
-    nameBloc: 'Coupon',
-    nameClassEntity: 'Coupon',
-    typeTemplate: 'cubit-list',
-    dataTemplate: 'sample-view',
-    code: {
-      bloc: '',
-      state: '',
-      event: '',
+@Component({components: {TextBox, SelectBox}})
+export default class GenerateScreen extends Vue {
+  nameBloc = 'Coupon';
+  nameClassEntity = 'Coupon';
+  typeTemplate = 'cubit-list';
+  dataTemplate = 'sample-view';
+  code = {
+    bloc: '',
+    state: '',
+    event: '',
+  };
+  templates = [
+    {
+      key: 'bloc',
+      value: 'BLoC list',
     },
-    templates: [
-      {
-        key: 'bloc',
-        value: 'BLoC list',
-      },
-      {
-        key: 'cubit-list',
-        value: 'Cubit list'
-      },
-      {
-        key: 'cubit-view',
-        value: 'Cubit view',
-      }
-    ],
-    templatesData: [
-      {
-        key: 'sample-list',
-        value: 'Sample list',
-      },
-      {
-        key: 'sample-view',
-        value: 'Sample view',
-      },
-    ],
-    user: null
-  }),
+    {
+      key: 'cubit-list',
+      value: 'Cubit list'
+    },
+    {
+      key: 'cubit-view',
+      value: 'Cubit view',
+    }
+  ];
+  templatesData = [
+    {
+      key: 'sample-list',
+      value: 'Sample list',
+    },
+    {
+      key: 'sample-view',
+      value: 'Sample view',
+    },
+  ];
+  user = null;
+
+
   mounted() {
     this.updateCode();
-  },
-  methods: {
-    updateCode() {
-      let data = sampleLoadList(this.nameBloc, this.nameClassEntity);
-      switch (this.dataTemplate) {
-        case "sample-list":
-          data = sampleLoadList(this.nameBloc, this.nameClassEntity);
-          break;
-        case "sample-view":
-          data = sampleLoadView(this.nameBloc, this.nameClassEntity);
-          break;
-      }
+  };
 
-      if (this.typeTemplate === 'bloc') {
-        this.code.bloc = blocDefaultTemplate(data)
-        this.code.state = stateDefaultTemplate(data)
-        this.code.event = eventTemplate(data)
-      }
-
-      if (this.typeTemplate === 'cubit-list') {
-        this.code.bloc = blocCubitListTemplate(data)
-        this.code.state = stateCubitListTemplate(data)
-        this.code.event = '';
-      }
-    },
-    async auth() {
-      this.user = await authInApp()
-      console.log(this.user)
+  updateCode() {
+    let data = sampleLoadList(this.nameBloc, this.nameClassEntity);
+    switch (this.dataTemplate) {
+      case "sample-list":
+        data = sampleLoadList(this.nameBloc, this.nameClassEntity);
+        break;
+      case "sample-view":
+        data = sampleLoadView(this.nameBloc, this.nameClassEntity);
+        break;
     }
-  }
+
+    if (this.typeTemplate === 'bloc') {
+      this.code.bloc = blocDefaultTemplate(data)
+      this.code.state = stateDefaultTemplate(data)
+      this.code.event = eventTemplate(data)
+    }
+
+    if (this.typeTemplate === 'cubit-list') {
+      this.code.bloc = blocCubitListTemplate(data)
+      this.code.state = stateCubitListTemplate(data)
+      this.code.event = '';
+    }
+  };
+
 };
 </script>
 

@@ -36,8 +36,22 @@ export function toMap(props: { [name: string]: Prop }) {
             return `"${key}": ${key}`;
         } else if (prop.typeTemplate?.string) {
             return `"${key}": ${key}`;
+        } else if (prop.typeTemplate?.bool) {
+            return `"${key}": ${key}`;
         } else if (prop.typeTemplate?.map) {
             return `"${key}": ${key}`;
+        } else if (prop.typeName) {
+            if (prop.typeName == 'DateTime') {
+                return `"${key}": ${key}.toIso8601String()`;
+            } else if (prop.typeName == 'bool') {
+                return `"${key}": ${key}`;
+            } else if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') != -1) {
+                return `"${key}": ${key}`;
+            } else {
+                return `"${key}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
+            }
+        } else {
+            console.error(`Не могу вывести свойство ${key}`, prop)
         }
     }).filter(e => e).join(', \n') + '\n}';
 }
@@ -50,16 +64,18 @@ export function fromMap(props: { [name: string]: Prop }) {
     console.log({props})
     return Object.keys(props).map((key) => {
         const prop = props[key];
+        const nullable = prop.typeTemplate.nullable ? '?' : '';
+
         if (prop.typeTemplate?.array) {
             return `${key}: json["${key}"].map(e => ${key}.fromJson(e)) ?? [] as List<${key}>`;
         } else if (prop.typeTemplate?.enum) {
             return `${key}: ${key}FromJson(json["${key}"])`;
         } else if (prop.typeTemplate?.double) {
-            return `${key}: json["${key}"] as double`;
+            return `${key}: ${key} != null ? (json["${key}"] as num).toDouble() : null`;
         } else if (prop.typeTemplate?.int) {
-            return `${key}: json["${key}"] as int`;
+            return `${key}: json["${key}"] as int${nullable}`;
         } else if (prop.typeTemplate?.string) {
-            return `${key}: json["${key}"] as String`;
+            return `${key}: json["${key}"] as String${nullable}`;
         } else if (prop.typeTemplate?.map) {
             return `${key}: ${key}FromJson(json["${key}"])`;
         } else if (prop.typeTemplate?.class) {
@@ -68,7 +84,7 @@ export function fromMap(props: { [name: string]: Prop }) {
             if (prop.typeName == 'DateTime') {
                 return `${key}: DateTime.parse(json["${key}"])`;
             } else if (prop.typeName == 'bool') {
-                return `${key}: json["${key}"] as bool`;
+                return `${key}: json["${key}"] as bool${nullable}`;
             } else if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') != -1) {
                 return `${key}: json["${key}"].map((e) => ${getPropNameFromList(prop)}.fromJson(e)) ?? [] as List<${getPropNameFromList(prop)}>`;
             } else {

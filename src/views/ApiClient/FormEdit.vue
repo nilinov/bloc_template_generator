@@ -1,5 +1,5 @@
 <template>
-  <div class="FormEdit">
+  <div class="FormEdit" :key="`form-item-${localItem.uuid}`">
     <div class="line-wrap">
       <el-select v-model="localItem.method" placeholder="Метод">
         <el-option
@@ -22,6 +22,7 @@
         @select="handleSelectModel"
     ></el-autocomplete>
 
+    <el-checkbox v-model="localItem.isMock">Моки</el-checkbox>
     <el-checkbox v-model="localItem.isList">Список</el-checkbox>
     <el-checkbox v-model="localItem.hasPaginate" v-if="localItem.isList">Есть пагинация</el-checkbox>
     <el-checkbox v-model="localItem.hasSearch" v-if="localItem.isList">Есть поиск</el-checkbox>
@@ -72,6 +73,7 @@ export interface ApiFunction {
   method: 'GET' | 'POST'
   modelUUID: string
   isList: boolean
+  isMock: boolean
   hasPaginate: boolean
   hasSearch: boolean
   hasFilter: boolean
@@ -93,6 +95,7 @@ export default class FormEdit extends Vue {
     method: 'GET',
     modelUUID: '',
     isList: false,
+    isMock: true,
     hasFilter: false,
     hasPaginate: false,
     hasSearch: false,
@@ -120,13 +123,20 @@ export default class FormEdit extends Vue {
     place: 'query'
   }
 
+  isMounted = false;
+
   created() {
     this.updateFromProps();
   }
 
+  mounted() {
+    this.isMounted = true;
+  }
+
   @Watch('item')
   handleChange1(val: ApiFunction) {
-    this.updateFromProps();
+    if (this.isMounted)
+      this.updateFromProps();
   }
 
   updateFromProps() {
@@ -169,7 +179,8 @@ export default class FormEdit extends Vue {
 
   @Watch('localItem', {deep: true})
   onChildChanged1(val: string, oldVal: string) {
-    this.sendUpdate();
+    // if (this.isMounted)
+    //   this.sendUpdate();
   }
 
   handleAddVariable() {
@@ -193,7 +204,8 @@ export default class FormEdit extends Vue {
 
   @Emit('update')
   sendUpdate() {
-    console.log('sdfsdf')
+    console.log('send update', {...this.localItem})
+    return {...this.localItem};
   }
 
   handleSelectModel(item: { value: string, item: Model }) {

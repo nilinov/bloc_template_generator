@@ -14,6 +14,7 @@ export interface Prop {
         dynamic?: boolean
         nullable?: boolean
         class?: boolean
+        bool?: boolean
     }
     default?: string
 }

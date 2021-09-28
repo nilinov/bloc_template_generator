@@ -27,7 +27,7 @@ export function getFullType(prop, params) {
 }
 export function toMap(props) {
     return '{\n' + Object.keys(props).map(function (key) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         var prop = props[key];
         if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.array) {
             return "\"" + key + "\": '[' + " + key + ".map(e => e.toMap().join(', ') + ']'";
@@ -44,8 +44,28 @@ export function toMap(props) {
         else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.string) {
             return "\"" + key + "\": " + key;
         }
-        else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.map) {
+        else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.bool) {
             return "\"" + key + "\": " + key;
+        }
+        else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.map) {
+            return "\"" + key + "\": " + key;
+        }
+        else if (prop.typeName) {
+            if (prop.typeName == 'DateTime') {
+                return "\"" + key + "\": " + key + ".toIso8601String()";
+            }
+            else if (prop.typeName == 'bool') {
+                return "\"" + key + "\": " + key;
+            }
+            else if (((_h = prop.typeTemplate) === null || _h === void 0 ? void 0 : _h.array) || prop.typeName.indexOf('List<') != -1) {
+                return "\"" + key + "\": " + key;
+            }
+            else {
+                return "\"" + key + "\": " + _.camelCase(prop.typeName) + "ToJson(" + key + ")";
+            }
+        }
+        else {
+            console.error("\u041D\u0435 \u043C\u043E\u0433\u0443 \u0432\u044B\u0432\u0435\u0441\u0442\u0438 \u0441\u0432\u043E\u0439\u0441\u0442\u0432\u043E " + key, prop);
         }
     }).filter(function (e) { return e; }).join(', \n') + '\n}';
 }
@@ -58,6 +78,7 @@ export function fromMap(props) {
     return Object.keys(props).map(function (key) {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         var prop = props[key];
+        var nullable = prop.typeTemplate.nullable ? '?' : '';
         if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.array) {
             return key + ": json[\"" + key + "\"].map(e => " + key + ".fromJson(e)) ?? [] as List<" + key + ">";
         }
@@ -65,13 +86,13 @@ export function fromMap(props) {
             return key + ": " + key + "FromJson(json[\"" + key + "\"])";
         }
         else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.double) {
-            return key + ": json[\"" + key + "\"] as double";
+            return key + ": " + key + " != null ? (json[\"" + key + "\"] as num).toDouble() : null";
         }
         else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.int) {
-            return key + ": json[\"" + key + "\"] as int";
+            return key + ": json[\"" + key + "\"] as int" + nullable;
         }
         else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.string) {
-            return key + ": json[\"" + key + "\"] as String";
+            return key + ": json[\"" + key + "\"] as String" + nullable;
         }
         else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.map) {
             return key + ": " + key + "FromJson(json[\"" + key + "\"])";
@@ -84,7 +105,7 @@ export function fromMap(props) {
                 return key + ": DateTime.parse(json[\"" + key + "\"])";
             }
             else if (prop.typeName == 'bool') {
-                return key + ": json[\"" + key + "\"] as bool";
+                return key + ": json[\"" + key + "\"] as bool" + nullable;
             }
             else if (((_h = prop.typeTemplate) === null || _h === void 0 ? void 0 : _h.array) || prop.typeName.indexOf('List<') != -1) {
                 return key + ": json[\"" + key + "\"].map((e) => " + getPropNameFromList(prop) + ".fromJson(e)) ?? [] as List<" + getPropNameFromList(prop) + ">";

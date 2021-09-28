@@ -6,11 +6,12 @@ import ApiClient from "@/views/ApiClient/index.vue";
 Vue.use(VueRouter);
 var routes = [
     {
-        path: '/',
+        path: '/State',
         name: 'Home',
         component: Editor
     },
     {
+        alias: "/",
         path: '/Model',
         name: 'Model',
         component: ModelEditor

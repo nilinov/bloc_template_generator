@@ -8,11 +8,12 @@ Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/',
+    path: '/State',
     name: 'Home',
     component: Editor
   },
   {
+    alias: "/",
     path: '/Model',
     name: 'Model',
     component: ModelEditor

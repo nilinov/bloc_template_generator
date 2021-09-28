@@ -143,7 +143,7 @@ export default class FormEdit extends Vue {
 
   handleFilterModel(queryString: string) {
     return (model: Model) => {
-      return (model.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+      return (model.name.toLowerCase().includes(queryString.toLowerCase()));
     };
   }
 

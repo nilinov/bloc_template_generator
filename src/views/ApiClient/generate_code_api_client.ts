@@ -17,7 +17,7 @@ export interface ApiFunction {
     hasPaginate: boolean
     hasSearch: boolean
     hasFilter: boolean
-    params: ApiFunctionParam[]
+    params?: ApiFunctionParam[]
 }
 
 function generateCodeApiClient(functions: ApiFunction[] = [], models: Model[] = []) {
@@ -92,7 +92,7 @@ function bindParams(path: string, params: ApiFunctionParam[] = [], hasPaginate =
 }
 
 function getParamsApiFunction(e: ApiFunction) {
-    const res: string[] = e.params.map(e => `required ${e.type} ${e.name}`);
+    const res: string[] = e.params?.map(e => `required ${e.type} ${e.name}`) ?? [];
 
     if (e.isList) {
         if (e.hasSearch) res.push('String? search,')

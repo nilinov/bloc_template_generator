@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
-import store from './store'
+import store, {ACTIONS} from './store'
 // Import the functions you need from the SDKs you need
 import firebase from "firebase/compat";
 // import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
@@ -16,7 +16,7 @@ Vue.use(ElementUI);
 new Vue({
     router,
     store,
-    render: h => h(App)
+    render: h => h(App),
 }).$mount('#app')
 
 let firebaseApp: firebase.app.App;

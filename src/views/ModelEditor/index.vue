@@ -73,17 +73,17 @@ export default class ModelEditor extends Vue {
 
   @Watch('name')
   onChildChanged2(val: string, oldVal: string) {
-    this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+    this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
   }
 
   @Watch('isEnum')
   onChildChanged3(val: string, oldVal: string) {
-    this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+    this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
   }
 
   @Watch('items', {immediate: false, deep: true})
   onChildChanged4(val: any, oldVal: any) {
-    this.$store.commit(MUTATIONS.SET_MODEL, this.model);
+    this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
   }
 
   @Watch('route', {immediate: false, deep: true})

@@ -2,8 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {authInApp, unAuthDb} from "@/main";
 import {Model, User} from "@/views/ModelEditor/RenderCodeLineType";
-import {getAllData, getDataBaseRef, getModels, storeData, storeModel} from "@/database";
+import {getAllData, getApiFunctions, getDataBaseRef, getModels, storeData, storeModel} from "@/database";
 import firebase from "firebase/compat";
+import {apiFunctionsModule, MUTATIONS_API_FUNCTIONS} from "@/store/api_functions";
 
 Vue.use(Vuex)
 
@@ -19,10 +20,12 @@ export enum MUTATIONS {
 export enum ACTIONS {
     RESTORE = 'RESTORE',
     LOGIN = 'LOGIN',
+    SET_MODEL = 'SET_MODEL',
+    REMOVE_MODEL = 'REMOVE_MODEL',
     LOAD_ALL = 'LOAD_ALL',
 }
 
-interface State {
+export interface RootState {
     user: { user: User } | null,
     db: firebase.database.Database | null,
     models: Model[],
@@ -32,7 +35,7 @@ interface State {
 
 const STORE_MODELS = 'STORE_MODELS';
 
-export default new Vuex.Store<State>({
+export default new Vuex.Store<RootState>({
     getters: {
         allModels(state) {
             return [...state.models.map(e => e.name), ...state.models.map(e => `List<${e.name}>`)]
@@ -61,33 +64,24 @@ export default new Vuex.Store<State>({
         [MUTATIONS.RESTORE_MODELS](state, models: Model[]) {
             Vue.set(state, 'models', models)
         },
-        [MUTATIONS.SET_MODEL](state, model: Model) {
-            const index = state.models.findIndex(e => e.uuid == model.uuid);
+        [MUTATIONS.SET_MODEL](state, item: Model) {
+            const index = state.models.findIndex(e => e.uuid == item.uuid);
             if (index != -1) {
-                state.models.splice(index, 1, model);
+                state.models.splice(index, 1, item);
+                Vue.set(state.models, index, item)
             } else {
-                state.models.push(model);
+                state.models.push(item);
             }
-            //localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
-
-            if (state.db)
-                storeModel(state.db, state.project, state.models);
         },
         [MUTATIONS.REMOVE_MODEL](state, uuid: string) {
             const index = state.models.findIndex(e => e.uuid == uuid);
             if (index != -1) {
                 state.models.splice(index, 1);
             }
-            //localStorage.setItem(STORE_MODELS, JSON.stringify(state.models));
-
-            if (state.db)
-                storeModel(state.db, state.project, state.models);
         },
     },
     actions: {
         async [ACTIONS.RESTORE](ctx) {
-            // ctx.commit(MUTATIONS.RESTORE_MODELS);
-
             ctx.commit(MUTATIONS.UPDATE_PENDING, true);
 
             const db = await unAuthDb();
@@ -108,10 +102,28 @@ export default new Vuex.Store<State>({
         },
         async [ACTIONS.LOAD_ALL](ctx) {
             if (ctx.state.db) {
-                const data = await getModels(ctx.state.db, ctx.state.project)
-                ctx.commit(MUTATIONS.RESTORE_MODELS, data);
+                const [models, apiFunctions] = await Promise.all([
+                    await getModels(ctx.state.db, ctx.state.project),
+                    await getApiFunctions(ctx.state.db, ctx.state.project),
+                ]);
+                ctx.commit(MUTATIONS.RESTORE_MODELS, models);
+                ctx.commit(MUTATIONS_API_FUNCTIONS.RESTORE, apiFunctions);
+            }
+        },
+        async [ACTIONS.SET_MODEL]({state, commit}, item: Model) {
+            if (state.db) {
+                commit(MUTATIONS.SET_MODEL, item)
+                storeModel(state.db, state.project, state.models);
+            }
+        },
+        async [ACTIONS.REMOVE_MODEL]({state, commit}, uuid: string) {
+            if (state.db) {
+                commit(MUTATIONS.REMOVE_MODEL, uuid)
+                storeModel(state.db, state.project, state.models);
             }
         },
     },
-    modules: {}
+    modules: {
+        apiFunctionsModule
+    }
 })

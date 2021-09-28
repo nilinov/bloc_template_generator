@@ -11,7 +11,9 @@
       <el-col :span="8">
         <template v-for="(item, index) of allFunctions">
           <FormEdit :item="item" @remove="handleRemove" @update="handleUpdate" :key="`form-${item.uuid}`"/>
-          <br><br>
+          <br>
+          <hr>
+          <br>
         </template>
         <el-button @click="allFunctions.push(emptyApiFunction)">Добавить</el-button>
       </el-col>
@@ -28,41 +30,22 @@ import {Component, Vue, Watch} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import FormEdit from "@/views/ApiClient/FormEdit.vue";
 import {generateCodeApiClient, ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
+import {ACTIONS_API_FUNCTIONS, MUTATIONS_API_FUNCTIONS} from "@/store/api_functions";
 
 @Component({
   components: {FormEdit}
 })
 export default class ApiClient extends Vue {
 
-  allFunctions: ApiFunction[] = [];
+  get allFunctions(): ApiFunction[] {
+    return this.$store.getters.allApiFunctions ?? [];
+  }
+
   code = '';
 
   created() {
-    this.allFunctions.push({
-      name: 'getListActive',
-      modelUUID: '0.492427911996681',
-      method: 'GET',
-      path: '/mock/active',
-      uuid: '1',
-      isList: true,
-      isMock: true,
-      hasSearch: false,
-      hasPaginate: true,
-      hasFilter: false,
-      params: [],
-    }, {
-      name: 'getChallenge',
-      modelUUID: '1',
-      method: 'GET',
-      path: '/challenge/:id',
-      uuid: '2',
-      isList: false,
-      isMock: true,
-      hasSearch: false,
-      hasPaginate: false,
-      hasFilter: false,
-      params: [{type: 'int', name: 'id', place: 'in-path'}],
-    });
+    if (!this.$store.state.isPending)
+      this.code = generateCodeApiClient(this.allFunctions, this.allModels);
   }
 
   get emptyApiFunction(): ApiFunction {
@@ -98,8 +81,9 @@ export default class ApiClient extends Vue {
   handleUpdate(item: ApiFunction) {
     const index = this.allFunctions.findIndex(e => e.uuid == item.uuid);
     if (index != -1) {
-      Vue.set(this.allFunctions, index, item)
+      this.$store.dispatch(ACTIONS_API_FUNCTIONS.SET, item)
     }
+
   }
 
   handleRemove(func: ApiFunction) {

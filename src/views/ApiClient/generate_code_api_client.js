@@ -40,7 +40,8 @@ function bindParams(path, params, hasPaginate) {
     return result;
 }
 function getParamsApiFunction(e) {
-    var res = e.params.map(function (e) { return "required " + e.type + " " + e.name; });
+    var _a, _b;
+    var res = (_b = (_a = e.params) === null || _a === void 0 ? void 0 : _a.map(function (e) { return "required " + e.type + " " + e.name; })) !== null && _b !== void 0 ? _b : [];
     if (e.isList) {
         if (e.hasSearch)
             res.push('String? search,');

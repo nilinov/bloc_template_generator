@@ -14,7 +14,7 @@ Vue.use(ElementUI);
 new Vue({
     router: router,
     store: store,
-    render: function (h) { return h(App); }
+    render: function (h) { return h(App); },
 }).$mount('#app');
 var firebaseApp;
 export function unAuthDb() {

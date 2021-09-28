@@ -77,7 +77,7 @@ export function toMap(props) {
         }
     }).filter(e => e).join(', \n') + '\n}';
 }
-function getPropNameFromList(prop) {
+export function getPropNameFromList(prop) {
     var _a, _b;
     return (_a = prop.typeName) === null || _a === void 0 ? void 0 : _a.substr(5, ((_b = prop.typeName) === null || _b === void 0 ? void 0 : _b.length) - 6);
 }

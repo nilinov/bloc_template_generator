@@ -1,4 +1,4 @@
-export const props = (itemType) => ({
+export var props = function (itemType) { return ({
     items: {
         name: 'items',
         typeName: itemType,
@@ -26,8 +26,8 @@ export const props = (itemType) => ({
         name: 'error',
         typeTemplate: { dynamic: true },
     },
-});
-const getters = (itemType) => {
+}); };
+var getters = function (itemType) {
     var _a, _b, _c;
     return ({
         byId: {
@@ -75,21 +75,23 @@ const getters = (itemType) => {
         }
     });
 };
-const eventName = {
+var eventName = {
     loading: 'loading',
     loadingNext: 'loadingNext',
     loaded: 'loaded',
     loadFail: 'loadFail',
     searching: 'searching',
 };
-const sampleLoadList = (name, itemType, params = {
-    ApiCall: 'ApiCall',
-    hasSearch: true,
-    hasPaginate: true,
-    hasFilter: true,
-}) => {
+var sampleLoadList = function (name, itemType, params) {
+    var _a;
+    if (params === void 0) { params = {
+        ApiCall: 'ApiCall',
+        hasSearch: true,
+        hasPaginate: true,
+        hasFilter: true,
+    }; }
     return ({
-        name: `${name}`,
+        name: "" + name,
         state: {
             props: props(itemType),
             getters: getters(itemType)
@@ -115,31 +117,31 @@ const sampleLoadList = (name, itemType, params = {
             },
         ],
         bloc: {
-            case_event: {
-                [eventName.loading]: {
+            case_event: (_a = {},
+                _a[eventName.loading] = {
                     stateUpdate: {
                         loadStatusEnum: "LoadStatusEnum.LOADING",
                         items: "[]",
                         error: "null",
                     },
-                    content: `final res = await ${params.ApiCall}();`,
+                    content: "final res = await " + params.ApiCall + "();",
                     nextEvent: eventName.loaded,
                     nextEventPayload: "items: res.items, meta: res.meta",
                     tags: ['load'],
                 },
-                [eventName.searching]: {
+                _a[eventName.searching] = {
                     stateUpdate: {
                         loadStatusEnum: "LoadStatusEnum.SEARCH",
                         items: "[]",
                         error: "null",
                         search: "search"
                     },
-                    content: `final res = await ${params.ApiCall}(${params.hasSearch ? 'search: search' : ''});`,
+                    content: "final res = await " + params.ApiCall + "(" + (params.hasSearch ? 'search: search' : '') + ");",
                     nextEvent: eventName.loaded,
                     nextEventPayload: "items: res.items, meta: res.meta",
                     tags: ['search'],
                 },
-                [eventName.loaded]: {
+                _a[eventName.loaded] = {
                     stateUpdate: {
                         loadStatusEnum: "LoadStatusEnum.DONE",
                         items: "items",
@@ -147,28 +149,29 @@ const sampleLoadList = (name, itemType, params = {
                     },
                     tags: ['load'],
                 },
-                [eventName.loadingNext]: {
+                _a[eventName.loadingNext] = {
                     stateUpdate: {
                         loadStatusEnum: "LoadStatusEnum.LOADING_NEXT",
                         error: "null",
                     },
-                    content: `final res = await ${params.ApiCall}(page: state.currentPage + 1, ${params.hasSearch ? 'search: state.search' : ''});`,
+                    content: "final res = await " + params.ApiCall + "(page: state.currentPage + 1, " + (params.hasSearch ? 'search: state.search' : '') + ");",
                     nextEvent: eventName.loaded,
                     nextEventPayload: "items: [ ...state.items, ...res.items], meta: res.meta",
                     tags: ['pagination'],
                 },
-                [eventName.loadFail]: {
+                _a[eventName.loadFail] = {
                     stateUpdate: {
                         loadStatusEnum: "LoadStatusEnum.ERROR",
                         items: "[]",
                     },
                     tags: ['load'],
-                }
-            },
+                },
+                _a),
             onError: true,
         },
         actionProp: actionProps,
     });
 };
-const actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
+var actionProps = { name: 'action', default: '"INIT"', typeTemplate: { string: true } };
 export { sampleLoadList };
+//# sourceMappingURL=sample.load.list.js.map

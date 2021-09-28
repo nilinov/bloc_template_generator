@@ -18,8 +18,20 @@
         <el-button @click="allFunctions.push(emptyApiFunction)">Добавить</el-button>
       </el-col>
       <el-col :span="16" class="code">
-        <span class="fileName">api.dart</span>
-        <pre class="codeForSave" v-text="code"></pre>
+        <el-tabs v-model="lang">
+          <el-tab-pane label="Dart" name="dart">
+            <template v-if="lang === 'dart'">
+              <span class="fileName">api.dart</span>
+              <pre class="codeForSave" v-text="code"></pre>
+            </template>
+          </el-tab-pane>
+          <el-tab-pane label="Swagger" name="swagger">
+            <template v-if="lang === 'swagger'">
+              <span class="fileName">swagger.yaml</span>
+              <pre class="codeForSave" v-text="code"></pre>
+            </template>
+          </el-tab-pane>
+        </el-tabs>
       </el-col>
     </el-row>
   </div>
@@ -27,15 +39,19 @@
 
 <script lang="ts">
 import {Component, Vue, Watch} from "vue-property-decorator";
-import {Model} from "@/views/ModelEditor/RenderCodeLineType";
+import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import FormEdit from "@/views/ApiClient/FormEdit.vue";
 import {generateCodeApiClient, ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
 import {ACTIONS_API_FUNCTIONS, MUTATIONS_API_FUNCTIONS} from "@/store/api_functions";
+import {getDataBaseRef} from "@/database";
+import {getPropNameFromList} from "@/utils/utils";
 
 @Component({
   components: {FormEdit}
 })
 export default class ApiClient extends Vue {
+
+  lang = 'swagger'
 
   get allFunctions(): ApiFunction[] {
     return this.$store.getters.allApiFunctions ?? [];
@@ -45,7 +61,7 @@ export default class ApiClient extends Vue {
 
   created() {
     if (!this.$store.state.isPending)
-      this.code = generateCodeApiClient(this.allFunctions, this.allModels);
+      this.updateCode();
   }
 
   get emptyApiFunction(): ApiFunction {
@@ -70,12 +86,105 @@ export default class ApiClient extends Vue {
 
   @Watch('allFunctions')
   handleChange1() {
-    this.code = generateCodeApiClient(this.allFunctions, this.allModels);
+    this.updateCode();
   }
 
   @Watch('allModels')
   handleChange2() {
-    this.code = generateCodeApiClient(this.allFunctions, this.allModels);
+    this.updateCode();
+  }
+
+  @Watch('lang')
+  handleChange3() {
+    this.updateCode();
+  }
+
+  updateCode() {
+    console.log(this.allModels)
+    if (this.lang == 'dart') {
+      this.code = generateCodeApiClient(this.allFunctions, this.allModels);
+    } else {
+      const keysModels: { [x: string]: any } = {}
+
+      for (let model of this.allModels) {
+        keysModels[model.name] = this.getSchemaDescByClass(model);
+      }
+
+      this.code = JSON.stringify({
+        "swagger": "2.0",
+        "info": {
+          "version": "1.0.0",
+          "title": "Mad Team swagger",
+          "description": ""
+        },
+        "host": "ovz5.j1121565.m719m.vps.myjino.ru",
+        "basePath": "",
+        "schemes": ["http"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "paths": this.allFunctions.map(func => {
+          const model = this.allModels.find(model => model.uuid == func.modelUUID);
+
+          return ({
+            [func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')]: {
+              "get": {
+                "summary": `function ${func.name}`,
+                "responses": {
+                  "200": {
+                    "description": "",
+                    "schema": this.getSchemaLinkByClass(model)
+                  }
+                },
+              }
+            },
+          });
+        }),
+        "definitions": keysModels
+      }, null, 2);
+    }
+  }
+
+  getSchemaDescByClass(model?: Model) {
+    const props: { [x: string]: any } = {};
+
+    for (const prop of model?.props ?? []) {
+      props[prop.name] = {
+        "type": this.allModels.find(e => e.name == this.getNameClassSingle(prop.name)) ?
+            {"$ref": `#/definitions/${this.getNameClassSingle(model?.name ?? '')}`} :
+            prop.type.toLowerCase(),
+      }
+    }
+
+    return {
+      "type": "object",
+      "properties": props,
+    }
+  }
+
+  getNameClassSingle(name: string) {
+    if (name?.indexOf('List<') == 0) return name?.substr(5, name?.length - 6)
+
+    return name;
+  }
+
+  getSchemaLinkByClass(model?: Model) {
+    if (model?.isEnum) return {
+      "type": "string",
+      "enum": model.props.map(e => e.name),
+    }
+
+    if (model?.name?.indexOf('List<') == 0) {
+      return {
+        "type": "array",
+        "items": `$ref: '#/definitions/${this.getNameClassSingle(model.name ?? '')}`
+      }
+    }
+
+    return {"$ref": `#/definitions/${model?.name}`}
+  }
+
+  getPropsByClass(model?: Model) {
+
   }
 
   handleUpdate(item: ApiFunction) {
@@ -83,7 +192,6 @@ export default class ApiClient extends Vue {
     if (index != -1) {
       this.$store.dispatch(ACTIONS_API_FUNCTIONS.SET, item)
     }
-
   }
 
   handleRemove(func: ApiFunction) {

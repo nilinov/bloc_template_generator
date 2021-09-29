@@ -27,7 +27,7 @@
           </el-tab-pane>
           <el-tab-pane label="Swagger" name="swagger">
             <template v-if="lang === 'swagger'">
-              <span class="fileName">swagger.yaml</span>
+              <span class="fileName">swagger.json</span>
               <pre class="codeForSave" v-text="code"></pre>
             </template>
           </el-tab-pane>
@@ -51,7 +51,7 @@ import {getPropNameFromList} from "@/utils/utils";
 })
 export default class ApiClient extends Vue {
 
-  lang = 'swagger'
+  lang = 'dart'
 
   get allFunctions(): ApiFunction[] {
     return this.$store.getters.allApiFunctions ?? [];
@@ -110,6 +110,25 @@ export default class ApiClient extends Vue {
         keysModels[model.name] = this.getSchemaDescByClass(model);
       }
 
+      const path: {[x: string]: any} = {}
+
+      for (const func of this.allFunctions) {
+        const model = this.allModels.find(model => model.uuid == func.modelUUID);
+
+        path[func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')] = {
+          "get": {
+            "summary": `function ${func.name}`,
+            "responses": {
+              "200": {
+                "description": "",
+                "schema": this.getSchemaLinkByClass(model)
+              }
+            },
+          }
+        }
+      }
+
+
       this.code = JSON.stringify({
         "swagger": "2.0",
         "info": {
@@ -118,27 +137,10 @@ export default class ApiClient extends Vue {
           "description": ""
         },
         "host": "ovz5.j1121565.m719m.vps.myjino.ru",
-        "basePath": "",
         "schemes": ["http"],
         "consumes": ["application/json"],
         "produces": ["application/json"],
-        "paths": this.allFunctions.map(func => {
-          const model = this.allModels.find(model => model.uuid == func.modelUUID);
-
-          return ({
-            [func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')]: {
-              "get": {
-                "summary": `function ${func.name}`,
-                "responses": {
-                  "200": {
-                    "description": "",
-                    "schema": this.getSchemaLinkByClass(model)
-                  }
-                },
-              }
-            },
-          });
-        }),
+        "paths": path,
         "definitions": keysModels
       }, null, 2);
     }
@@ -146,12 +148,51 @@ export default class ApiClient extends Vue {
 
   getSchemaDescByClass(model?: Model) {
     const props: { [x: string]: any } = {};
+    console.log({props})
 
     for (const prop of model?.props ?? []) {
-      props[prop.name] = {
-        "type": this.allModels.find(e => e.name == this.getNameClassSingle(prop.name)) ?
-            {"$ref": `#/definitions/${this.getNameClassSingle(model?.name ?? '')}`} :
-            prop.type.toLowerCase(),
+      const _name = this.getNameClassSingle(prop.name);
+      const model = this.allModels.find(e => e.name == prop.type);
+      const name = model?.name || _name;
+
+      const isArray = name?.indexOf('List<') == 0;
+
+      if (!model || !model?.isEnum) {
+
+        let type: any = prop.type.toLowerCase();
+        let isModel = false;
+
+        if (model) {
+          type = {"$ref": `#/definitions/${this.getNameClassSingle(model?.name ?? '')}`};
+          isModel = true;
+        }
+
+        if (prop.type.indexOf('List<') == 0) {
+          type = {"$ref": `#/definitions/${this.getNameClassSingle(prop.type ?? '')}`};
+          isModel = true;
+        }
+
+        switch (type) {
+          case 'int':
+            type = "integer";
+            break;
+          case 'datetime':
+            type = "string";
+            break;
+          case 'double':
+            type = "number";
+            break;
+          case 'bool':
+            type = "boolean";
+            break;
+        }
+        if (isModel) {
+          props[name] = type
+        } else {
+        props[name] = {
+          "type": type,
+        }
+        }
       }
     }
 

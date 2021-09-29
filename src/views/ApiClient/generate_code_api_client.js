@@ -27,7 +27,8 @@ function bindParams(path, params, hasPaginate) {
     var paramsInPath = params.filter(function (e) { return e.place == 'in-path'; });
     var result = path;
     if (hasPaginate) {
-        result += "/page/:page";
+        if (!result.includes('/page/:page'))
+            result += "/page/:page";
         paramsInPath.push({ name: 'page', type: 'int', place: 'in-path' });
     }
     // console.log({paramsInPath})

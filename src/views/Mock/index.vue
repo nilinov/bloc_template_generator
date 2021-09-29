@@ -28,7 +28,7 @@ import Component from "vue-class-component";
 import {Vue, Watch} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
-import {generateKrakendList} from "@/views/Mock/generate_krakend";
+import {generateKrakendItem, generateKrakendList} from "@/views/Mock/generate_krakend";
 import _ from "lodash/fp";
 
 @Component({})
@@ -56,6 +56,8 @@ export default class MockEditor extends Vue{
   get result() {
     if (this.selectedApiFunction?.isList) {
       return generateKrakendList(this.mockParse, this.selectedApiFunction)
+    } else {
+      return generateKrakendItem(this.mockParse, this.selectedApiFunction)
     }
   }
 

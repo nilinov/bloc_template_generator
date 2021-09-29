@@ -76,7 +76,8 @@ function bindParams(path: string, params: ApiFunctionParam[] = [], hasPaginate =
     let result = path;
 
     if (hasPaginate) {
-        result += "/page/:page"
+        if (!result.includes('/page/:page'))
+            result += "/page/:page";
         paramsInPath.push({name: 'page', type: 'int', place: 'in-path'});
     }
 

@@ -2,8 +2,8 @@
   <div class="ModelEditor" :class="{isEnum}">
     <TextBox class="text-box" placeholder="Name property" v-model="item.name"/>
     <SelectBox v-if="!isEnum" class="select-box" placeholder="Select type" :options="options" v-model="item.type"/>
-    <TextBox v-if="!isEnum" class="text-box" placeholder="Default value" v-model="item.defaultValue"
-             :disabled="item.nullable"/>
+    <TextBox v-if="!isEnum" class="text-box" placeholder="Default value" v-model="item.defaultValue" :disabled="item.nullable"/>
+    <TextBox class="text-box" placeholder="Desc" v-model="item.desc" />
     <input v-if="!isEnum" type="checkbox" v-model="item.nullable">
     <button :disabled="disabled" v-if="action" @click="AddItem">Добавить</button>
     <button v-else @click="$emit('remove')">Удалить</button>
@@ -61,11 +61,11 @@ export default {
 .ModelEditor {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: auto auto auto 20px 150px;
+  grid-template-columns: auto auto auto auto 20px 150px;
   align-items: center;
 
   &.isEnum {
-    grid-template-columns: 1fr 150px;
+    grid-template-columns: 1fr auto 150px;
   }
 }
 </style>

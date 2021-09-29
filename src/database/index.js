@@ -51,7 +51,11 @@ function storeApiFunction(db, project, value) {
 function storeModel(db, project, value) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            return [2 /*return*/, db.ref(getProjectModel(project)).set(value)];
+            return [2 /*return*/, db.ref(getProjectModel(project)).set(value === null || value === void 0 ? void 0 : value.map(function (e) {
+                    if (e.desc == undefined)
+                        e.desc = '';
+                    return e;
+                }))];
         });
     });
 }

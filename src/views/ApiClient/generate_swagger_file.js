@@ -1,4 +1,5 @@
 export function generateSwaggerFile(allModels, allFunctions) {
+    console.log("generateSwaggerFile", allModels, allFunctions);
     var keysModels = {};
     for (var _i = 0, allModels_1 = allModels; _i < allModels_1.length; _i++) {
         var model = allModels_1[_i];
@@ -9,10 +10,10 @@ export function generateSwaggerFile(allModels, allFunctions) {
         var model = allModels.find(function (model) { return model.uuid == func.modelUUID; });
         path[func.path.split('/').map(function (e) { return e[0] === ':' ? "{" + e.replace(':', '') + "}" : e; }).join('/')] = {
             "get": {
-                "summary": "function " + func.name,
+                "summary": func.desc,
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Успешное выполнение запроса",
                         "schema": getSchemaLinkByClass(model)
                     }
                 },
@@ -42,7 +43,6 @@ function getSchemaDescByClass(model, allModels) {
     var _a, _b, _c;
     if (allModels === void 0) { allModels = []; }
     var props = {};
-    console.log({ props: props });
     var _loop_2 = function (prop) {
         var _name = getNameClassSingle(prop.name);
         var model_1 = allModels.find(function (e) { return e.name == prop.type; });
@@ -56,7 +56,12 @@ function getSchemaDescByClass(model, allModels) {
                 isModel = true;
             }
             if (prop.type.indexOf('List<') == 0) {
-                type = { "$ref": "#/definitions/" + getNameClassSingle((_c = prop.type) !== null && _c !== void 0 ? _c : '') };
+                type = {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/" + getNameClassSingle((_c = prop.type) !== null && _c !== void 0 ? _c : '')
+                    }
+                };
                 isModel = true;
             }
             switch (type) {
@@ -78,6 +83,7 @@ function getSchemaDescByClass(model, allModels) {
             }
             else {
                 props[name_1] = {
+                    "description": prop === null || prop === void 0 ? void 0 : prop.desc,
                     "type": type,
                 };
             }
@@ -89,6 +95,7 @@ function getSchemaDescByClass(model, allModels) {
     }
     return {
         "type": "object",
+        "description": model === null || model === void 0 ? void 0 : model.desc,
         "properties": props,
     };
 }

@@ -4,12 +4,14 @@ import {getParamFunction} from "@/utils/utils";
 export interface Model {
     uuid: string,
     name: string,
+    desc: string,
     props: PropItem[],
     isEnum: boolean,
 }
 
 export interface PropItem {
     name: string,
+    desc: string,
     type: 'String' | 'int' | 'double' | 'DateTime' | string,
     defaultValue: '' | '0' | 'false' | 'true' | string,
     nullable: boolean,

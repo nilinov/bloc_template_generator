@@ -8,12 +8,12 @@
     </div>
     <div class="content" v-if="isOpen">
       <h4>Edit model {{ name }}
-<!--        <button @click="auth">Auth</button>-->
         <button @click="handleRemove">Удалить</button>
       </h4>
 
       <div class="inline">
         <TextBox placeholder="Name class" v-model="name"/>
+        <TextBox placeholder="Desc" v-model="desc"/>
         <SelectBox :options="[{ key: 'class', value: 'class' }, { key: 'enum', value: 'enum' }]"
                    placeholder="AdditionalInfo" v-model="AdditionalInfo"/>
       </div>
@@ -62,6 +62,7 @@ import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
 export default class ModelEditor extends Vue {
   uuid = Math.random().toString();
   name = 'Item';
+  desc = '';
   AdditionalInfo = '';
   isEnum: boolean = false;
   isOpen = true;
@@ -73,6 +74,11 @@ export default class ModelEditor extends Vue {
 
   @Watch('name')
   onChildChanged2(val: string, oldVal: string) {
+    this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
+  }
+
+  @Watch('desc')
+  onChildChanged6(val: string, oldVal: string) {
     this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
   }
 
@@ -119,6 +125,7 @@ export default class ModelEditor extends Vue {
 
   handleOpenAdd() {
     this.name = 'Item';
+    this.desc = '';
     this.uuid = Math.random().toString();
     this.isEnum = false;
     this.AdditionalInfo = '';
@@ -126,12 +133,14 @@ export default class ModelEditor extends Vue {
     this.items = [
       {
         name: 'id',
+        desc: "ID",
         type: 'int',
         defaultValue: '0',
         nullable: false,
       },
       {
         name: 'title',
+        desc: "Заголовок",
         type: 'String',
         defaultValue: '""',
         nullable: false,
@@ -142,6 +151,7 @@ export default class ModelEditor extends Vue {
     return {
       uuid: this.uuid,
       name: this.name,
+      desc: this.desc,
       props: this.items,
       isEnum: this.isEnum,
     }
@@ -163,6 +173,7 @@ export default class ModelEditor extends Vue {
 
   emptyItem: PropItem = {
     name: '',
+    desc: '',
     type: 'String',
     nullable: false,
     defaultValue: '',
@@ -173,6 +184,7 @@ export default class ModelEditor extends Vue {
     if (item) {
       this.uuid = item.uuid;
       this.name = item.name;
+      this.desc = item.desc;
       this.items = item.props;
       this.isEnum = item.isEnum;
       if (this.isEnum) this.AdditionalInfo = 'enum'
@@ -183,6 +195,7 @@ export default class ModelEditor extends Vue {
   getEmptyItem(): PropItem {
     return {
       name: '',
+      desc: '',
       type: 'String',
       nullable: false,
       defaultValue: '',
@@ -220,7 +233,6 @@ export default class ModelEditor extends Vue {
     display: grid;
     grid-gap: 1rem;
 
-
     h4 {
       display: flex;
       justify-content: space-between;
@@ -237,8 +249,11 @@ export default class ModelEditor extends Vue {
         width: 100%;
       }
 
+      input {
+        margin-right: 1rem;
+      }
+
       select {
-        margin-left: 1rem;
         width: 500px;
       }
     }

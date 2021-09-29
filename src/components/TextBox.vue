@@ -6,8 +6,8 @@
 export default {
   name: "TextBox",
   props: {
-    value: {type: String, default: "Name bloc"},
-    placeholder: {type: String, default: "Name bloc"},
+    value: {type: String, default: ""},
+    placeholder: {type: String, default: ""},
     disabled: {type: Boolean, default: false},
   }
 };

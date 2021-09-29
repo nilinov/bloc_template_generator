@@ -10,6 +10,7 @@ export interface ApiFunction {
     uuid: string
     name: string
     path: string
+    desc: string
     method: 'GET' | 'POST'
     modelUUID: string
     isList: boolean

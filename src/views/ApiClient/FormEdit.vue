@@ -14,6 +14,7 @@
 
     <el-input v-model="localItem.name" placeholder="Имя функции"></el-input>
     <el-input v-model="localItem.path" placeholder="Путь запроса"></el-input>
+    <el-input v-model="localItem.desc" placeholder="Описание функции"></el-input>
     <el-autocomplete
         class="inline-input"
         v-model="labelSelectModel"
@@ -69,6 +70,7 @@ export default class FormEdit extends Vue {
     uuid: Math.random().toString(),
     path: '/',
     name: '',
+    desc: '',
     method: 'GET',
     modelUUID: '',
     isList: false,
@@ -121,6 +123,7 @@ export default class FormEdit extends Vue {
     this.localItem.uuid = this.item.uuid;
     this.localItem.modelUUID = this.item.modelUUID;
     this.localItem.name = this.item.name;
+    this.localItem.desc = this.item.desc ?? '';
     this.localItem.path = this.item.path;
     this.localItem.method = this.item.method;
     this.localItem.isList = this.item.isList;

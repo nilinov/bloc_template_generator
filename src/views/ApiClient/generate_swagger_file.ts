@@ -2,6 +2,8 @@ import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 
 export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunction[]) {
+    console.log(`generateSwaggerFile`, allModels, allFunctions)
+
     const keysModels: { [x: string]: any } = {}
 
     for (let model of allModels) {
@@ -15,10 +17,10 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
 
         path[func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')] = {
             "get": {
-                "summary": `function ${func.name}`,
+                "summary": func.desc,
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Успешное выполнение запроса",
                         "schema": getSchemaLinkByClass(model)
                     }
                 },
@@ -45,7 +47,6 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
 
 function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
     const props: { [x: string]: any } = {};
-    console.log({props})
 
     for (const prop of model?.props ?? []) {
         const _name = getNameClassSingle(prop.name);
@@ -65,7 +66,12 @@ function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
             }
 
             if (prop.type.indexOf('List<') == 0) {
-                type = {"$ref": `#/definitions/${getNameClassSingle(prop.type ?? '')}`};
+                type = {
+                    "type": "array",
+                    "items": {
+                        "$ref": `#/definitions/${getNameClassSingle(prop.type ?? '')}`
+                    }
+                };
                 isModel = true;
             }
 
@@ -87,6 +93,7 @@ function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
                 props[name] = type
             } else {
                 props[name] = {
+                    "description": prop?.desc,
                     "type": type,
                 }
             }
@@ -95,6 +102,7 @@ function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
 
     return {
         "type": "object",
+        "description": model?.desc,
         "properties": props,
     }
 }

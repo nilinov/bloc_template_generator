@@ -28,7 +28,10 @@ async function storeApiFunction(db: firebase.database.Database, project: string,
 }
 
 async function storeModel(db: firebase.database.Database, project: string, value: Model[]) {
-    return db.ref(getProjectModel(project)).set(value)
+    return db.ref(getProjectModel(project)).set(value?.map(e => {
+        if (e.desc == undefined) e.desc = ''
+        return e;
+    }))
 }
 
 function getProjectApiFunctions(project: string) {

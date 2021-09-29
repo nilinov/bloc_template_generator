@@ -7,8 +7,14 @@ export function generateKrakendList(json: any[], func: ApiFunction) {
     let res = [];
 
     for (let i = 0; i < pages; i++) {
+        let path = func.path;
+
+        if (func.isMock) {
+            path = path.replace('/page/:page', '');
+        }
+
         res.push({
-            "endpoint": `${func.path}/page/${i + 1}`,
+            "endpoint": `${path}/page/${i + 1}`,
             "backend": [
                 {
                     "host": [

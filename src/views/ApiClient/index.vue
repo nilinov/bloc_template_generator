@@ -52,7 +52,8 @@ import {generateSwaggerFile} from "@/views/ApiClient/generate_swagger_file";
 })
 export default class ApiClient extends Vue {
 
-  lang = 'swagger'
+  // lang = 'swagger'
+  lang = 'dart'
 
   get allFunctions(): ApiFunction[] {
     return this.$store.getters.allApiFunctions ?? [];

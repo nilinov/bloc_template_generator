@@ -45,6 +45,7 @@ import {generateCodeApiClient, ApiFunction, ApiFunctionParam} from "@/views/ApiC
 import {ACTIONS_API_FUNCTIONS, MUTATIONS_API_FUNCTIONS} from "@/store/api_functions";
 import {getDataBaseRef} from "@/database";
 import {getPropNameFromList} from "@/utils/utils";
+import {generateSwaggerFile} from "@/views/ApiClient/generate_swagger_file";
 
 @Component({
   components: {FormEdit}
@@ -104,128 +105,8 @@ export default class ApiClient extends Vue {
     if (this.lang == 'dart') {
       this.code = generateCodeApiClient(this.allFunctions, this.allModels);
     } else {
-      const keysModels: { [x: string]: any } = {}
-
-      for (let model of this.allModels) {
-        keysModels[model.name] = this.getSchemaDescByClass(model);
-      }
-
-      const path: {[x: string]: any} = {}
-
-      for (const func of this.allFunctions) {
-        const model = this.allModels.find(model => model.uuid == func.modelUUID);
-
-        path[func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')] = {
-          "get": {
-            "summary": `function ${func.name}`,
-            "responses": {
-              "200": {
-                "description": "",
-                "schema": this.getSchemaLinkByClass(model)
-              }
-            },
-          }
-        }
-      }
-
-
-      this.code = JSON.stringify({
-        "swagger": "2.0",
-        "info": {
-          "version": "1.0.0",
-          "title": "Mad Team swagger",
-          "description": ""
-        },
-        "host": "ovz5.j1121565.m719m.vps.myjino.ru",
-        "schemes": ["http"],
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "paths": path,
-        "definitions": keysModels
-      }, null, 2);
+      this.code = generateSwaggerFile(this.allModels, this.allFunctions);
     }
-  }
-
-  getSchemaDescByClass(model?: Model) {
-    const props: { [x: string]: any } = {};
-    console.log({props})
-
-    for (const prop of model?.props ?? []) {
-      const _name = this.getNameClassSingle(prop.name);
-      const model = this.allModels.find(e => e.name == prop.type);
-      const name = model?.name || _name;
-
-      const isArray = name?.indexOf('List<') == 0;
-
-      if (!model || !model?.isEnum) {
-
-        let type: any = prop.type.toLowerCase();
-        let isModel = false;
-
-        if (model) {
-          type = {"$ref": `#/definitions/${this.getNameClassSingle(model?.name ?? '')}`};
-          isModel = true;
-        }
-
-        if (prop.type.indexOf('List<') == 0) {
-          type = {"$ref": `#/definitions/${this.getNameClassSingle(prop.type ?? '')}`};
-          isModel = true;
-        }
-
-        switch (type) {
-          case 'int':
-            type = "integer";
-            break;
-          case 'datetime':
-            type = "string";
-            break;
-          case 'double':
-            type = "number";
-            break;
-          case 'bool':
-            type = "boolean";
-            break;
-        }
-        if (isModel) {
-          props[name] = type
-        } else {
-        props[name] = {
-          "type": type,
-        }
-        }
-      }
-    }
-
-    return {
-      "type": "object",
-      "properties": props,
-    }
-  }
-
-  getNameClassSingle(name: string) {
-    if (name?.indexOf('List<') == 0) return name?.substr(5, name?.length - 6)
-
-    return name;
-  }
-
-  getSchemaLinkByClass(model?: Model) {
-    if (model?.isEnum) return {
-      "type": "string",
-      "enum": model.props.map(e => e.name),
-    }
-
-    if (model?.name?.indexOf('List<') == 0) {
-      return {
-        "type": "array",
-        "items": `$ref: '#/definitions/${this.getNameClassSingle(model.name ?? '')}`
-      }
-    }
-
-    return {"$ref": `#/definitions/${model?.name}`}
-  }
-
-  getPropsByClass(model?: Model) {
-
   }
 
   handleUpdate(item: ApiFunction) {

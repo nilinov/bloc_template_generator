@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Editor from '../views/Editor.vue';
 import ModelEditor from '../views/ModelEditor/index.vue';
 import ApiClient from "@/views/ApiClient/index.vue";
+import MockEditor from "@/views/Mock/index.vue";
 Vue.use(VueRouter);
 var routes = [
     {
@@ -30,6 +31,16 @@ var routes = [
         path: '/ApiClient',
         name: 'ApiClient',
         component: ApiClient
+    },
+    {
+        path: '/MockEditor',
+        name: 'MockEditor',
+        component: MockEditor
+    },
+    {
+        path: '/MockEditor/:uuid',
+        name: 'MockEditor',
+        component: MockEditor
     }
 ];
 var router = new VueRouter({

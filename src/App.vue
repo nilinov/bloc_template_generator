@@ -5,6 +5,7 @@
         <el-menu-item index="/">Models</el-menu-item>
         <el-menu-item index="/ApiClient">Api Client</el-menu-item>
         <el-menu-item index="/State">State</el-menu-item>
+        <el-menu-item index="/MockEditor">Mock</el-menu-item>
       </el-menu>
     </el-header>
     <el-main v-loading="isLoading">

@@ -1,4 +1,5 @@
 export function generateSwaggerFile(allModels, allFunctions) {
+    var _a;
     console.log("generateSwaggerFile", allModels, allFunctions);
     var keysModels = {};
     for (var _i = 0, allModels_1 = allModels; _i < allModels_1.length; _i++) {
@@ -8,7 +9,30 @@ export function generateSwaggerFile(allModels, allFunctions) {
     var path = {};
     var _loop_1 = function (func) {
         var model = allModels.find(function (model) { return model.uuid == func.modelUUID; });
+        console.log({ func: func });
+        var params = [];
+        var paramsBody = [];
+        if (func.hasPaginate && func.isMock) {
+            params.push({
+                "name": "page",
+                "in": "path",
+                "required": true,
+                "type": "integer"
+            });
+        }
+        for (var _i = 0, _a = (_a = func.params) !== null && _a !== void 0 ? _a : []; _i < _a.length; _i++) {
+            var param = _a[_i];
+            if (param.place != 'body') {
+                params.push({
+                    name: param.name,
+                    in: getSwaggerPlace(param.place),
+                    required: true,
+                    type: getSwaggerType(param.type)
+                });
+            }
+        }
         path[func.path.split('/').map(function (e) { return e[0] === ':' ? "{" + e.replace(':', '') + "}" : e; }).join('/')] = {
+            "parameters": params,
             "get": {
                 "summary": func.desc,
                 "responses": {
@@ -20,8 +44,8 @@ export function generateSwaggerFile(allModels, allFunctions) {
             }
         };
     };
-    for (var _a = 0, allFunctions_1 = allFunctions; _a < allFunctions_1.length; _a++) {
-        var func = allFunctions_1[_a];
+    for (var _b = 0, allFunctions_1 = allFunctions; _b < allFunctions_1.length; _b++) {
+        var func = allFunctions_1[_b];
         _loop_1(func);
     }
     return JSON.stringify({
@@ -38,6 +62,32 @@ export function generateSwaggerFile(allModels, allFunctions) {
         "paths": path,
         "definitions": keysModels
     }, null, 2);
+}
+function getSwaggerPlace(place) {
+    switch (place) {
+        case "query":
+            return "query";
+        case 'in-path':
+            return 'path';
+    }
+    return place;
+}
+function getSwaggerType(type) {
+    switch (type) {
+        case 'int':
+            type = "integer";
+            break;
+        case 'datetime':
+            type = "string";
+            break;
+        case 'double':
+            type = "number";
+            break;
+        case 'bool':
+            type = "boolean";
+            break;
+    }
+    return type;
 }
 function getSchemaDescByClass(model, allModels) {
     var _a, _b, _c;
@@ -64,20 +114,7 @@ function getSchemaDescByClass(model, allModels) {
                 };
                 isModel = true;
             }
-            switch (type) {
-                case 'int':
-                    type = "integer";
-                    break;
-                case 'datetime':
-                    type = "string";
-                    break;
-                case 'double':
-                    type = "number";
-                    break;
-                case 'bool':
-                    type = "boolean";
-                    break;
-            }
+            type = getSwaggerType(type);
             if (isModel) {
                 props[name_1] = type;
             }

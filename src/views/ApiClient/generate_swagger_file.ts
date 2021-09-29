@@ -1,5 +1,5 @@
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
-import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
+import {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
 
 export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunction[]) {
     console.log(`generateSwaggerFile`, allModels, allFunctions)
@@ -10,12 +10,39 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
         keysModels[model.name] = getSchemaDescByClass(model, allModels);
     }
 
-    const path: {[x: string]: any} = {}
+    const path: { [x: string]: any } = {}
 
     for (const func of allFunctions) {
         const model = allModels.find(model => model.uuid == func.modelUUID);
 
+        console.log({func})
+
+        const params = [];
+        const paramsBody = [];
+
+        if (func.hasPaginate && func.isMock) {
+            params.push({
+                    "name": "page",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer"
+                }
+            )
+        }
+
+        for (const param of func.params ?? []) {
+            if (param.place != 'body') {
+                params.push({
+                    name: param.name,
+                    in: getSwaggerPlace(param.place),
+                    required: true,
+                    type: getSwaggerType(param.type)
+                })
+            }
+        }
+
         path[func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')] = {
+            "parameters": params,
             "get": {
                 "summary": func.desc,
                 "responses": {
@@ -43,6 +70,34 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
         "paths": path,
         "definitions": keysModels
     }, null, 2);
+}
+
+function getSwaggerPlace(place: 'in-path' | 'query' | 'body') {
+    switch (place) {
+        case "query":
+            return "query";
+        case 'in-path':
+            return 'path';
+    }
+    return place;
+}
+
+function getSwaggerType(type: any) {
+    switch (type) {
+        case 'int':
+            type = "integer";
+            break;
+        case 'datetime':
+            type = "string";
+            break;
+        case 'double':
+            type = "number";
+            break;
+        case 'bool':
+            type = "boolean";
+            break;
+    }
+    return type;
 }
 
 function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
@@ -74,21 +129,7 @@ function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
                 };
                 isModel = true;
             }
-
-            switch (type) {
-                case 'int':
-                    type = "integer";
-                    break;
-                case 'datetime':
-                    type = "string";
-                    break;
-                case 'double':
-                    type = "number";
-                    break;
-                case 'bool':
-                    type = "boolean";
-                    break;
-            }
+            type = getSwaggerType(type);
             if (isModel) {
                 props[name] = type
             } else {

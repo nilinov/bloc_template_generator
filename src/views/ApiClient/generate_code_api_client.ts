@@ -58,11 +58,8 @@ class Api {
         ${codePaginate}${codeFilter} ${codeSearch}
         return ApiClient.dio
             ${e.method == 'GET' ? `.get('${bindParams(e.path, e.params, e.isMock && e.isList)}', queryParameters: params)` : `.post('${bindParams(e.path, e.params, e.isMock && e.isList)}', data: params)`}
-            .then((value) => ApiResponse(
-                  ${model.name}.fromJson(value.data['data']),
-                  meta: MetaPage.fromJson(value.data['meta']),
-                ))
-            .catchError((error) => ApiResponse(<${model.name}>[], error: error));
+            .then((value) => ApiResponse(${model.name}.fromJson(value.data)))
+            .catchError((error) => ApiResponse(${model.name}.empty(), error: error));
       }\n`;
         }
     }).join('\n')}

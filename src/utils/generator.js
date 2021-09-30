@@ -1,4 +1,3 @@
-"use strict";
 // import {sampleLoadList} from './sample.load.list.js'
 // import stateDefaultTemplate from "./state.default.template.js";
 // import {eventTemplate} from "./event.template.js";
@@ -60,4 +59,3 @@
 // }
 //
 // init();
-//# sourceMappingURL=generator.js.map

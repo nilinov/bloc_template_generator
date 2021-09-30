@@ -131,7 +131,7 @@ export default class GenerateScreen extends Vue {
         data = sampleLoadList(this.nameBloc, this.nameClassEntity, {ApiCall, hasSearch, hasPaginate, hasFilter});
         break;
       case "sample-view":
-        data = sampleLoadView(this.nameBloc, this.nameClassEntity);
+        data = sampleLoadView(this.nameBloc, this.nameClassEntity, {ApiCall});
         break;
     }
 

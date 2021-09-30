@@ -11,10 +11,10 @@ export const props = (itemType: string): { [x: string]: Prop } => ({
     item: {
         name: 'item',
         typeName: itemType,
-        typeTemplate: {nullable: true}
+        typeTemplate: {nullable: true, class: true}
     },
-    loadStatus: {
-        name: 'loadStatus',
+    loadStatusEnum: {
+        name: 'loadStatusEnum',
         typeName: "LoadStatusEnum",
         typeTemplate: {enum: true},
         default: "LoadStatusEnum.INIT"
@@ -29,12 +29,20 @@ const getters = (itemType: string): { [x: string]: BlocGetter } => ({
     loading: {
         name: 'loading',
         returnType: "bool",
-        content: "loadStatus == LoadStatusEnum.LOADING"
+        content: "LoadStatusEnum == LoadStatusEnum.LOADING",
+        tags: ["load"],
+    },
+    loaded: {
+        name: 'loaded',
+        returnType: "bool",
+        content: "![LoadStatusEnum.LOADING, LoadStatusEnum.REFRESH].contains(loadStatusEnum)",
+        tags: ["load"],
     },
     refreshing: {
         name: 'refreshing',
         returnType: "bool",
-        content: "loadStatus == LoadStatusEnum.LOADING"
+        content: "loadStatusEnum == LoadStatusEnum.LOADING",
+        tags: ["load"],
     },
 })
 
@@ -44,7 +52,7 @@ const eventName = {
     loaded: 'loaded',
 }
 
-const sampleLoadView = (name: string, itemType: string): JsonData => ({
+const sampleLoadView = (name: string, itemType: string, params = {ApiCall: 'ApiCall'}): JsonData => ({
     name: `${name}`,
     state: {
         props: props(itemType),
@@ -65,26 +73,26 @@ const sampleLoadView = (name: string, itemType: string): JsonData => ({
         case_event: {
             [eventName.loading]: {
                 stateUpdate: {
-                    loadStatus: "LoadStatusEnum.LOADING",
+                    loadStatusEnum: "LoadStatusEnum.LOADING",
                     item: "null",
                     error: "null",
                 },
-                content: "final res = await ApiCall();",
+                content: `final res = await ${params.ApiCall}(id: id);`,
                 nextEvent: eventName.loaded,
                 nextEventPayload: "item: res",
             },
             [eventName.refresh]: {
                 stateUpdate: {
-                    loadStatus: "LoadStatusEnum.REFRESH",
+                    loadStatusEnum: "LoadStatusEnum.REFRESH",
                     error: "null",
                 },
-                content: "final res = await ApiCall();",
+                content: `final res = ${params.ApiCall}(id: state.id ?? 1);`,
                 nextEvent: eventName.loaded,
                 nextEventPayload: "item: res",
             },
             [eventName.loaded]: {
                 stateUpdate: {
-                    loadStatus: "LoadStatusEnum.DONE",
+                    loadStatusEnum: "LoadStatusEnum.DONE",
                     item: "item",
                 }
             },

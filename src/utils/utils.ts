@@ -25,6 +25,8 @@ export function getFullType(prop: Prop, params?: { noRequired?: boolean }): stri
 }
 
 export function toMap(props: { [name: string]: Prop }) {
+    console.log(`toMap()`, props)
+
     return '{\n' + Object.keys(props).map((key) => {
         const prop = props[key];
         const nullable = prop.typeTemplate?.nullable ? '?' : '';
@@ -96,7 +98,7 @@ export function fromMap(props: { [name: string]: Prop }, params?: { addAction?: 
             } else if (prop.typeName == 'bool') {
                 return `${key}: json["${key}"] as bool${nullable}`;
             } else if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') != -1) {
-                return `${key}: json["${key}"].map((e) => ${getPropNameFromList(prop)}.fromJson(e)) ?? [] as List<${getPropNameFromList(prop)}>`;
+                return `${key}: ${prop.typeName}.listFromJson(json["${key}"])`;
             } else {
                 return `${key}: ${_.camelCase(prop.typeName)}FromJson(json["${key}"])`;
             }

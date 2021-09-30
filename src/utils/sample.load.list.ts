@@ -7,9 +7,9 @@ export const props = (itemType: string): { [x: string]: Prop } => ({
         typeTemplate: {array: itemType},
         default: "[]"
     },
-    meta: {
+    metaPage: {
         typeName: "MetaPage",
-        name: 'meta',
+        name: 'metaPage',
         default: 'MetaPage.empty()',
         typeTemplate: {class: true, nullable: true}
     },
@@ -41,13 +41,13 @@ const getters = (itemType: string): { [x: string]: BlocGetter } => ({
     currentPage: {
         name: 'currentPage',
         returnType: "int",
-        content: "meta?.currentPage ?? 1",
+        content: "metaPage?.currentPage ?? 1",
         tags: ['pagination'],
     },
     canLoadNext: {
         name: 'canLoadNext',
         returnType: "bool",
-        content: "(meta?.lastPage ?? 1) > (meta?.currentPage ?? 1) && !processLoading",
+        content: "(metaPage?.lastPage ?? 1) > (metaPage?.currentPage ?? 1) && !processLoading",
         tags: ['pagination'],
     },
     loading: {
@@ -82,6 +82,7 @@ const eventName = {
     loaded: 'loaded',
     loadFail: 'loadFail',
     searching: 'searching',
+    reloading: 'reloading',
 }
 
 const sampleLoadList = (name: string, itemType: string, params = {
@@ -100,7 +101,7 @@ const sampleLoadList = (name: string, itemType: string, params = {
             {name: eventName.loading, tags: ['load']},
             {
                 name: eventName.loaded,
-                props: {"items": props(itemType).items, "meta": props(itemType).meta},
+                props: {"items": props(itemType).items, "metaPage": props(itemType).metaPage},
                 tags: ['load', 'reload'],
             },
             {name: eventName.loadingNext},
@@ -115,6 +116,10 @@ const sampleLoadList = (name: string, itemType: string, params = {
                 props: {"search": props(itemType).search},
                 tags: ['search'],
             },
+            {
+                name: eventName.reloading,
+                tags: ['reload'],
+            },
         ],
         bloc: {
             case_event: {
@@ -126,7 +131,7 @@ const sampleLoadList = (name: string, itemType: string, params = {
                     },
                     content: `final res = await ${params.ApiCall}();`,
                     nextEvent: eventName.loaded,
-                    nextEventPayload: "items: res.items, meta: res.meta",
+                    nextEventPayload: "items: res.items, metaPage: res.metaPage",
                     tags: ['load'],
                 },
                 [eventName.searching]: {
@@ -138,14 +143,14 @@ const sampleLoadList = (name: string, itemType: string, params = {
                     },
                     content: `final res = await ${params.ApiCall}(${params.hasSearch ? 'search: search' : ''});`,
                     nextEvent: eventName.loaded,
-                    nextEventPayload: "items: res.items, meta: res.meta",
+                    nextEventPayload: "items: res.items, metaPage: res.metaPage",
                     tags: ['search'],
                 },
                 [eventName.loaded]: {
                     stateUpdate: {
                         loadStatusEnum: "LoadStatusEnum.DONE",
                         items: "items",
-                        meta: "meta"
+                        metaPage: "metaPage"
                     },
                     tags: ['load'],
                 },
@@ -156,7 +161,7 @@ const sampleLoadList = (name: string, itemType: string, params = {
                     },
                     content: `final res = await ${params.ApiCall}(page: state.currentPage + 1, ${params.hasSearch ? 'search: state.search' : ''});`,
                     nextEvent: eventName.loaded,
-                    nextEventPayload: "items: [ ...state.items, ...res.items], meta: res.meta",
+                    nextEventPayload: "items: [ ...state.items, ...res.items], metaPage: res.metaPage",
                     tags: ['pagination'],
                 },
                 [eventName.loadFail]: {
@@ -165,7 +170,16 @@ const sampleLoadList = (name: string, itemType: string, params = {
                         items: "[]",
                     },
                     tags: ['load'],
-                }
+                },
+                [eventName.reloading]: {
+                    stateUpdate: {
+                        loadStatusEnum: "LoadStatusEnum.REFRESH",
+                    },
+                    content: `final res = await ${params.ApiCall}();`,
+                    nextEvent: eventName.loaded,
+                    nextEventPayload: "items: res.items, metaPage: res.metaPage",
+                    tags: ['reload'],
+                },
             },
             onError: true,
         },

@@ -29,44 +29,44 @@ export function getFullType(prop, params) {
 export function toMap(props) {
     console.log(`toMap()`, props);
     return '{\n' + Object.keys(props).map((key) => {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         const prop = props[key];
         const nullable = ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) ? '?' : '';
         if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.array) {
-            return `"${key}": '[' + (${key} ?? []).map((e) => e.toJson()).join(', ') + ']'`;
+            return `"${key}": '[' + (${key}${((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.nullable) ? ' ?? []' : ''}).map((e) => e.toJson()).join(', ') + ']'`;
         }
-        else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.enum) {
+        else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.enum) {
             return `"${key}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
         }
-        else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.double) {
+        else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.double) {
             return `"${key}": ${key}`;
         }
-        else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.int) {
+        else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.int) {
             return `"${key}": ${key}`;
         }
-        else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.string) {
+        else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.string) {
             return `"${key}": ${key}`;
         }
-        else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.bool) {
+        else if ((_h = prop.typeTemplate) === null || _h === void 0 ? void 0 : _h.bool) {
             return `"${key}": ${key}`;
         }
-        else if ((_h = prop.typeTemplate) === null || _h === void 0 ? void 0 : _h.map) {
+        else if ((_j = prop.typeTemplate) === null || _j === void 0 ? void 0 : _j.map) {
             return `"${key}": ${key}`;
         }
-        else if ((_j = prop.typeTemplate) === null || _j === void 0 ? void 0 : _j.class) {
+        else if ((_k = prop.typeTemplate) === null || _k === void 0 ? void 0 : _k.class) {
             return `"${key}": ${key}${nullable}.toJson()`;
         }
-        else if ((_k = prop.typeTemplate) === null || _k === void 0 ? void 0 : _k.dynamic) {
+        else if ((_l = prop.typeTemplate) === null || _l === void 0 ? void 0 : _l.dynamic) {
             return `"${key}": ${key}`;
         }
         else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
-                return `"${key}": ${key}.toIso8601String()`;
+                return `"${key}": ${key}${nullable}.toIso8601String()`;
             }
             else if (prop.typeName == 'bool') {
                 return `"${key}": ${key}`;
             }
-            else if (((_l = prop.typeTemplate) === null || _l === void 0 ? void 0 : _l.array) || prop.typeName.indexOf('List<') != -1) {
+            else if (((_m = prop.typeTemplate) === null || _m === void 0 ? void 0 : _m.array) || prop.typeName.indexOf('List<') != -1) {
                 return `"${key}": ${key}`;
             }
             else {
@@ -80,7 +80,9 @@ export function toMap(props) {
 }
 export function getPropNameFromList(prop) {
     var _a, _b;
-    return (_a = prop.typeName) === null || _a === void 0 ? void 0 : _a.substr(5, ((_b = prop.typeName) === null || _b === void 0 ? void 0 : _b.length) - 6);
+    if (prop.typeName.indexOf('List<') != -1)
+        return (_a = prop.typeName) === null || _a === void 0 ? void 0 : _a.substr(5, ((_b = prop.typeName) === null || _b === void 0 ? void 0 : _b.length) - 6);
+    return prop.typeName;
 }
 export function fromMap(props, params) {
     var _a;
@@ -88,15 +90,18 @@ export function fromMap(props, params) {
     const keys = Object.keys(props).map((key) => {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         const prop = props[key];
-        const nullable = ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) ? '?' : '';
+        const isNullable = (_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable;
+        const nullable = isNullable ? '?' : '';
         if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.array) {
-            return `${key}: ${prop.typeName}.listFromJson(json["${key}"])`;
+            return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${key}"])`;
         }
         else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.enum) {
             return `${key}: ${key}FromJson(json["${key}"])`;
         }
         else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.double) {
-            return `${key}: ${key} != null ? (json["${key}"] as num).toDouble() : null`;
+            if (isNullable)
+                return `${key}: json["${key}"] != null ? (json["${key}"] as num).toDouble() : null`;
+            return `${key}: (json["${key}"] as num).toDouble()`;
         }
         else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.int) {
             return `${key}: json["${key}"] as int${nullable}`;
@@ -115,13 +120,15 @@ export function fromMap(props, params) {
         }
         else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
+                if (isNullable)
+                    return `${key}: json["${key}"] == null ? null : DateTime.parse(json["${key}"])`;
                 return `${key}: DateTime.parse(json["${key}"])`;
             }
             else if (prop.typeName == 'bool') {
                 return `${key}: json["${key}"] as bool${nullable}`;
             }
             else if (((_k = prop.typeTemplate) === null || _k === void 0 ? void 0 : _k.array) || prop.typeName.indexOf('List<') != -1) {
-                return `${key}: ${prop.typeName}.listFromJson(json["${key}"])`;
+                return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${key}"])`;
             }
             else {
                 return `${key}: ${_.camelCase(prop.typeName)}FromJson(json["${key}"])`;

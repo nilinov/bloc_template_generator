@@ -32,7 +32,7 @@ export function toMap(props: { [name: string]: Prop }) {
         const nullable = prop.typeTemplate?.nullable ? '?' : '';
 
         if (prop.typeTemplate?.array) {
-            return `"${key}": '[' + (${key} ?? []).map((e) => e.toJson()).join(', ') + ']'`;
+            return `"${key}": '[' + (${key}${prop.typeTemplate?.nullable ? ' ?? []' : ''}).map((e) => e.toJson()).join(', ') + ']'`;
         } else if (prop.typeTemplate?.enum) {
             return `"${key}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
         } else if (prop.typeTemplate?.double) {
@@ -51,7 +51,7 @@ export function toMap(props: { [name: string]: Prop }) {
             return `"${key}": ${key}`;
         } else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
-                return `"${key}": ${key}.toIso8601String()`;
+                return `"${key}": ${key}${nullable}.toIso8601String()`;
             } else if (prop.typeName == 'bool') {
                 return `"${key}": ${key}`;
             } else if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') != -1) {
@@ -66,7 +66,9 @@ export function toMap(props: { [name: string]: Prop }) {
 }
 
 export function getPropNameFromList(prop: Prop) {
-    return prop.typeName?.substr(5, prop.typeName?.length - 6);
+    if (prop.typeName.indexOf('List<') != -1)
+        return prop.typeName?.substr(5, prop.typeName?.length - 6);
+    return prop.typeName;
 }
 
 export function fromMap(props: { [name: string]: Prop }, params?: { addAction?: Prop }) {
@@ -74,14 +76,18 @@ export function fromMap(props: { [name: string]: Prop }, params?: { addAction?: 
 
     const keys = Object.keys(props).map((key) => {
         const prop = props[key];
-        const nullable = prop.typeTemplate?.nullable ? '?' : '';
+        const isNullable = prop.typeTemplate?.nullable;
+        const nullable = isNullable ? '?' : '';
 
         if (prop.typeTemplate?.array) {
-            return `${key}: ${prop.typeName}.listFromJson(json["${key}"])`;
+            return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${key}"])`;
         } else if (prop.typeTemplate?.enum) {
             return `${key}: ${key}FromJson(json["${key}"])`;
         } else if (prop.typeTemplate?.double) {
-            return `${key}: ${key} != null ? (json["${key}"] as num).toDouble() : null`;
+            if (isNullable)
+                return `${key}: json["${key}"] != null ? (json["${key}"] as num).toDouble() : null`;
+
+            return `${key}: (json["${key}"] as num).toDouble()`;
         } else if (prop.typeTemplate?.int) {
             return `${key}: json["${key}"] as int${nullable}`;
         } else if (prop.typeTemplate?.string) {
@@ -94,11 +100,14 @@ export function fromMap(props: { [name: string]: Prop }, params?: { addAction?: 
             return `${key}: json["${key}"]`;
         } else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
+                if (isNullable)
+                    return `${key}: json["${key}"] == null ? null : DateTime.parse(json["${key}"])`;
+
                 return `${key}: DateTime.parse(json["${key}"])`;
             } else if (prop.typeName == 'bool') {
                 return `${key}: json["${key}"] as bool${nullable}`;
             } else if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') != -1) {
-                return `${key}: ${prop.typeName}.listFromJson(json["${key}"])`;
+                return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${key}"])`;
             } else {
                 return `${key}: ${_.camelCase(prop.typeName)}FromJson(json["${key}"])`;
             }
@@ -174,7 +183,7 @@ export const camelToSnakeCase = (str: string = '  ') => str.replace(/[A-Z]/g, le
 
 export const UpperFirstLetter = (str: string = '  ') => str[0].toUpperCase() + str.slice(1);
 
-export function getParamFunction(name = '', nullable = false ) {
+export function getParamFunction(name = '', nullable = false) {
     if (nullable)
         return `\tthis.${name},\n`
     return `\t required this.${name},\n`;

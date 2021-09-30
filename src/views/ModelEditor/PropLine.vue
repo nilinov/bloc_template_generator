@@ -7,7 +7,7 @@
     <el-autocomplete
         v-if="!isEnum"
         class="inline-input"
-        v-model="item.type"
+        v-model="typeLabel"
         :fetch-suggestions="querySearchModel"
         placeholder="Модель данных"
         @select="handleSelectModel"
@@ -57,6 +57,12 @@ export default class ModelEditor extends Vue {
   isEnum!: boolean
   action!: boolean
 
+  mounted() {
+    this.typeLabel = this.item.type;
+  }
+
+  typeLabel = ''
+
   querySearchModel(queryString: string, cb: Function) {
     console.log(queryString)
     const models: string[] = this.options;
@@ -66,6 +72,8 @@ export default class ModelEditor extends Vue {
   }
 
   handleSelectModel(item: { value: string, item: string }) {
+    console.log('handleSelectModel')
+    this.typeLabel = item.item;
     this.item.type = item.item;
   }
 

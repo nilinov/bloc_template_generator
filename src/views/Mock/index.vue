@@ -13,6 +13,10 @@
 
   </el-input>
 
+  <div v-for="key in pathParams">
+    <el-input :placeholder="key" v-model="paramsReplace[key]"> </el-input>
+  </div>
+
   <div class="code" v-if="result">
     <span class="fileName">{{nameFile}}</span>
     <pre v-text="includeText"></pre>
@@ -41,11 +45,16 @@ export default class MockEditor extends Vue{
 
   mockParse = [];
 
+  paramsReplace: {[x:string]: string} = {};
+
   created() {
     // this.uuid = this.$route.params.uuid;
     if (localStorage.mockApiFunctionUUID && localStorage.mock) {
       this.mockJSON = localStorage.mock;
       this.uuid = localStorage.mockApiFunctionUUID;
+    }
+    if (localStorage.mockParamsReplace) {
+      this.paramsReplace = JSON.parse(localStorage.mockParamsReplace);
     }
   }
 
@@ -59,9 +68,9 @@ export default class MockEditor extends Vue{
 
   get result() {
     if (this.selectedApiFunction?.isList) {
-      return generateKrakendList(this.mockParse, this.selectedApiFunction)
+      return generateKrakendList(this.mockParse, this.selectedApiFunction, this.paramsReplace)
     } else {
-      return generateKrakendItem(this.mockParse, this.selectedApiFunction)
+      return generateKrakendItem(this.mockParse, this.selectedApiFunction, this.paramsReplace)
     }
   }
 
@@ -79,6 +88,10 @@ export default class MockEditor extends Vue{
   ]
       `;
     }
+  }
+
+  get pathParams() {
+    return this.selectedApiFunction?.path.split('/').filter((e:string) => e[0] == ':').map((e:string) => e)
   }
 
   @Watch('mockJSON')
@@ -100,6 +113,11 @@ export default class MockEditor extends Vue{
   handleChange3() {
     this.selectedApiFunction = this.allApiFunction.find(e => e.uuid == this.uuid);
     localStorage.mockApiFunctionUUID = this.uuid;
+  }
+
+  @Watch('paramsReplace', {deep: true})
+  handleChange4(val) {
+    localStorage.mockParamsReplace = JSON.stringify(val);
   }
 }
 </script>

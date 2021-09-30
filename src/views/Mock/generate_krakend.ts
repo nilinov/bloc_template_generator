@@ -37,8 +37,7 @@ function generateKrakendListPaginate(path = '', json: any) {
     return res;
 }
 
-export function generateKrakendList(json: any[], func: ApiFunction) {
-
+export function generateKrakendList(json: any[], func: ApiFunction, paramsReplace: { [x: string]: string } = {}) {
     let res = [];
 
     let path = func.path;
@@ -49,7 +48,12 @@ export function generateKrakendList(json: any[], func: ApiFunction) {
 
     if (path.includes(':id')) {
         for (let i = 0; i < json.length; i++) {
-            res.push(...generateKrakendListPaginate(path.replace(':id', `${i + 1}`), json[i]));
+            if (json[i][0] == undefined) continue;
+
+            let pathRes = path.replace(':id', `${i + 1}`);
+            pathRes = pathRes.replace(':idCommand', json[i][0]['id']);
+
+            res.push(...generateKrakendListPaginate(pathRes, json[i]));
         }
     } else {
         res.push(...generateKrakendListPaginate(path, json));
@@ -60,34 +64,50 @@ export function generateKrakendList(json: any[], func: ApiFunction) {
     return resJson?.substr(1, resJson?.length - 2);
 }
 
-export function generateKrakendItem(json: any[], func: ApiFunction) {
+function generateKrakendItemCode(path = '', json = {}) {
+    return {
+        "endpoint": path,
+        "backend": [
+            {
+                "host": [
+                    "http://ovz5.j1121565.m719m.vps.myjino.ru/"
+                ]
+            }
+        ],
+        "extra_config": {
+            "github.com/devopsfaith/krakend/proxy": {
+                "static": {
+                    "strategy": "errored",
+                    "data": json
+                }
+            }
+        }
+    }
+}
+
+export function generateKrakendItem(json: any[], func: ApiFunction, paramsReplace: { [x: string]: string } = {}) {
+    console.log({func})
+
     let res = [];
 
     for (let i = 0; i < json.length; i++) {
-        let path = func.path;
+        let pathResult = func.path
+        for (const key in paramsReplace) {
+            if (paramsReplace[key] == 'page') {
+                pathResult = pathResult.replace(key, `${i + 1}`);
+            } else {
+                try {
+                    const value = json[i][0][paramsReplace[key]];
+                    pathResult = pathResult.replace(key, `${value}`);
+                } catch (e) {
 
-        for (const key in json[i]) {
-            path = path.replace(`:${key}`, json[i][key])
-        }
-
-        res.push({
-            "endpoint": path,
-            "backend": [
-                {
-                    "host": [
-                        "http://ovz5.j1121565.m719m.vps.myjino.ru/"
-                    ]
-                }
-            ],
-            "extra_config": {
-                "github.com/devopsfaith/krakend/proxy": {
-                    "static": {
-                        "strategy": "errored",
-                        "data": json[i]
-                    }
                 }
             }
-        })
+        }
+
+        if (json[i].length)
+            res.push(generateKrakendItemCode(pathResult, json[i][0]))
+
     }
 
     const resJson = JSON.stringify(res, null, 2);

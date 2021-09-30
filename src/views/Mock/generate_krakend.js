@@ -32,7 +32,8 @@ function generateKrakendListPaginate(path, json) {
     }
     return res;
 }
-export function generateKrakendList(json, func) {
+export function generateKrakendList(json, func, paramsReplace) {
+    if (paramsReplace === void 0) { paramsReplace = {}; }
     var res = [];
     var path = func.path;
     if (func.isMock) {
@@ -40,7 +41,11 @@ export function generateKrakendList(json, func) {
     }
     if (path.includes(':id')) {
         for (var i = 0; i < json.length; i++) {
-            res.push.apply(res, generateKrakendListPaginate(path.replace(':id', "" + (i + 1)), json[i]));
+            if (json[i][0] == undefined)
+                continue;
+            var pathRes = path.replace(':id', "" + (i + 1));
+            pathRes = pathRes.replace(':idCommand', json[i][0]['id']);
+            res.push.apply(res, generateKrakendListPaginate(pathRes, json[i]));
         }
     }
     else {
@@ -49,31 +54,49 @@ export function generateKrakendList(json, func) {
     var resJson = JSON.stringify(res, null, 2);
     return resJson === null || resJson === void 0 ? void 0 : resJson.substr(1, (resJson === null || resJson === void 0 ? void 0 : resJson.length) - 2);
 }
-export function generateKrakendItem(json, func) {
-    var res = [];
-    for (var i = 0; i < json.length; i++) {
-        var path = func.path;
-        for (var key in json[i]) {
-            path = path.replace(":" + key, json[i][key]);
-        }
-        res.push({
-            "endpoint": path,
-            "backend": [
-                {
-                    "host": [
-                        "http://ovz5.j1121565.m719m.vps.myjino.ru/"
-                    ]
-                }
-            ],
-            "extra_config": {
-                "github.com/devopsfaith/krakend/proxy": {
-                    "static": {
-                        "strategy": "errored",
-                        "data": json[i]
-                    }
+function generateKrakendItemCode(path, json) {
+    if (path === void 0) { path = ''; }
+    if (json === void 0) { json = {}; }
+    return {
+        "endpoint": path,
+        "backend": [
+            {
+                "host": [
+                    "http://ovz5.j1121565.m719m.vps.myjino.ru/"
+                ]
+            }
+        ],
+        "extra_config": {
+            "github.com/devopsfaith/krakend/proxy": {
+                "static": {
+                    "strategy": "errored",
+                    "data": json
                 }
             }
-        });
+        }
+    };
+}
+export function generateKrakendItem(json, func, paramsReplace) {
+    if (paramsReplace === void 0) { paramsReplace = {}; }
+    console.log({ func: func });
+    var res = [];
+    for (var i = 0; i < json.length; i++) {
+        var pathResult = func.path;
+        for (var key in paramsReplace) {
+            if (paramsReplace[key] == 'page') {
+                pathResult = pathResult.replace(key, "" + (i + 1));
+            }
+            else {
+                try {
+                    var value = json[i][0][paramsReplace[key]];
+                    pathResult = pathResult.replace(key, "" + value);
+                }
+                catch (e) {
+                }
+            }
+        }
+        if (json[i].length)
+            res.push(generateKrakendItemCode(pathResult, json[i][0]));
     }
     var resJson = JSON.stringify(res, null, 2);
     return resJson === null || resJson === void 0 ? void 0 : resJson.substr(1, (resJson === null || resJson === void 0 ? void 0 : resJson.length) - 2);

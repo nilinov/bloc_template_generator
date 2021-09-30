@@ -1,20 +1,14 @@
 import _ from "lodash";
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 
-export function generateKrakendList(json: any[], func: ApiFunction) {
-    const pages = Math.ceil(json.length / 10)
-
+function generateKrakendListPaginate(path = '', json: any) {
     let res = [];
 
-    for (let i = 0; i < pages; i++) {
-        let path = func.path;
-
-        if (func.isMock) {
-            path = path.replace('/page/:page', '');
-        }
+    const pages = Math.ceil(json.length / 10)
+    for (let index = 0; index < pages; index++) {
 
         res.push({
-            "endpoint": `${path}/page/${i + 1}`,
+            "endpoint": `${path}/page/${index + 1}`,
             "backend": [
                 {
                     "host": [
@@ -27,9 +21,9 @@ export function generateKrakendList(json: any[], func: ApiFunction) {
                     "static": {
                         "strategy": "errored",
                         "data": {
-                            "data": _.chunk(json, 10)[i],
+                            "data": _.chunk(json, 10)[index],
                             "meta": {
-                                currentPage: i + 1,
+                                currentPage: index + 1,
                                 lastPage: pages,
                                 total: json.length,
                             }
@@ -37,7 +31,28 @@ export function generateKrakendList(json: any[], func: ApiFunction) {
                     }
                 }
             }
-        })
+        });
+    }
+
+    return res;
+}
+
+export function generateKrakendList(json: any[], func: ApiFunction) {
+
+    let res = [];
+
+    let path = func.path;
+
+    if (func.isMock) {
+        path = path.replace('/page/:page', '');
+    }
+
+    if (path.includes(':id')) {
+        for (let i = 0; i < json.length; i++) {
+            res.push(...generateKrakendListPaginate(path.replace(':id', `${i + 1}`), json[i]));
+        }
+    } else {
+        res.push(...generateKrakendListPaginate(path, json));
     }
 
     const resJson = JSON.stringify(res, null, 2);

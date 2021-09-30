@@ -1,14 +1,11 @@
 import _ from "lodash";
-export function generateKrakendList(json, func) {
-    var pages = Math.ceil(json.length / 10);
+function generateKrakendListPaginate(path, json) {
+    if (path === void 0) { path = ''; }
     var res = [];
-    for (var i = 0; i < pages; i++) {
-        var path = func.path;
-        if (func.isMock) {
-            path = path.replace('/page/:page', '');
-        }
+    var pages = Math.ceil(json.length / 10);
+    for (var index = 0; index < pages; index++) {
         res.push({
-            "endpoint": path + "/page/" + (i + 1),
+            "endpoint": path + "/page/" + (index + 1),
             "backend": [
                 {
                     "host": [
@@ -21,9 +18,9 @@ export function generateKrakendList(json, func) {
                     "static": {
                         "strategy": "errored",
                         "data": {
-                            "data": _.chunk(json, 10)[i],
+                            "data": _.chunk(json, 10)[index],
                             "meta": {
-                                currentPage: i + 1,
+                                currentPage: index + 1,
                                 lastPage: pages,
                                 total: json.length,
                             }
@@ -32,6 +29,22 @@ export function generateKrakendList(json, func) {
                 }
             }
         });
+    }
+    return res;
+}
+export function generateKrakendList(json, func) {
+    var res = [];
+    var path = func.path;
+    if (func.isMock) {
+        path = path.replace('/page/:page', '');
+    }
+    if (path.includes(':id')) {
+        for (var i = 0; i < json.length; i++) {
+            res.push.apply(res, generateKrakendListPaginate(path.replace(':id', "" + (i + 1)), json[i]));
+        }
+    }
+    else {
+        res.push.apply(res, generateKrakendListPaginate(path, json));
     }
     var resJson = JSON.stringify(res, null, 2);
     return resJson === null || resJson === void 0 ? void 0 : resJson.substr(1, (resJson === null || resJson === void 0 ? void 0 : resJson.length) - 2);

@@ -42,7 +42,11 @@ export default class MockEditor extends Vue{
   mockParse = [];
 
   created() {
-    this.uuid = this.$route.params.uuid;
+    // this.uuid = this.$route.params.uuid;
+    if (localStorage.mockApiFunctionUUID && localStorage.mock) {
+      this.mockJSON = localStorage.mock;
+      this.uuid = localStorage.mockApiFunctionUUID;
+    }
   }
 
   get allModels(): Model[] {
@@ -81,6 +85,7 @@ export default class MockEditor extends Vue{
   handleChange1() {
     try {
       this.mockParse = JSON.parse(this.mockJSON);
+      localStorage.mock = this.mockJSON;
     } catch (e) {
       this.mockParse = []
     }
@@ -94,20 +99,7 @@ export default class MockEditor extends Vue{
   @Watch('uuid')
   handleChange3() {
     this.selectedApiFunction = this.allApiFunction.find(e => e.uuid == this.uuid);
-  }
-
-  querySearchModel(queryString: string, cb: Function) {
-    console.log(queryString)
-    const models: ApiFunction[] = this.$store.getters.allApiFunctions;
-    var results = queryString ? models.filter(this.handleFilterModel(queryString)) : models;
-
-    cb(results.map(model => ({value: model.name, item: model})));
-  }
-
-  handleFilterModel(queryString: string) {
-    return (model: ApiFunction) => {
-      return (model.name.toLowerCase().fuzzy(queryString.toLowerCase()));
-    };
+    localStorage.mockApiFunctionUUID = this.uuid;
   }
 }
 </script>

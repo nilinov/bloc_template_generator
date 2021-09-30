@@ -32,6 +32,9 @@ export default new Vuex.Store({
         allModels: function (state) {
             return __spreadArrays(state.models.map(function (e) { return e.name; }), state.models.map(function (e) { return "List<" + e.name + ">"; }));
         },
+        allTypes: function (state, getters) {
+            return [getters.allModels];
+        },
         allModelsClasses: function (state) {
             return __spreadArrays(state.models.filter(function (e) { return e.isEnum == false; }).map(function (e) { return e.name; }));
         }

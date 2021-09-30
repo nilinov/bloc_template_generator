@@ -106,3 +106,9 @@ function downloadURI(filename: string, text: string,) {
     document.body.removeChild(element);
 }
 
+(String.prototype as any).fuzzy = function (s: string) {
+    var hay = this.toLowerCase(), i = 0, n = -1, l;
+    s = s.toLowerCase();
+    for (; l = s[i++] ;) if (!~(n = hay.indexOf(l, n + 1))) return false;
+    return true;
+};

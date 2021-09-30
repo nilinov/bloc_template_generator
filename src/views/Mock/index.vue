@@ -106,7 +106,7 @@ export default class MockEditor extends Vue{
 
   handleFilterModel(queryString: string) {
     return (model: ApiFunction) => {
-      return (model.name.toLowerCase().includes(queryString.toLowerCase()));
+      return (model.name.toLowerCase().fuzzy(queryString.toLowerCase()));
     };
   }
 }

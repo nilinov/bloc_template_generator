@@ -8,7 +8,7 @@
     </div>
     <div class="content" v-if="isOpen">
       <h4>Edit model {{ name }}
-        <button @click="handleRemove">Удалить</button>
+        <button @click="handleRemove" v-if="$route.name === 'ModelEdit'">Удалить</button>
       </h4>
 
       <div class="inline">
@@ -104,6 +104,13 @@ export default class ModelEditor extends Vue {
       if (this.allModels.length) {
         this.$router.push({name: 'ModelEdit', params: { uuid: this.allModels[0].uuid }})
       }
+    }
+  }
+
+  @Watch('allModels')
+  onChildChanged7() {
+    if (this.$route.name == 'ModelEdit' && this.uuid != this.$route.params.uuid) {
+      this.restoreFormState(this.$route.params.uuid)
     }
   }
 

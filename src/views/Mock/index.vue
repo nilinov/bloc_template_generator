@@ -37,8 +37,6 @@ import _ from "lodash/fp";
 
 @Component({})
 export default class MockEditor extends Vue{
-  name: "index"
-
   selectedApiFunction: ApiFunction | null = null;
   uuid = "";
   mockJSON = "[]";
@@ -69,7 +67,7 @@ export default class MockEditor extends Vue{
   get result() {
     if (this.selectedApiFunction?.isList) {
       return generateKrakendList(this.mockParse, this.selectedApiFunction, this.paramsReplace)
-    } else {
+    } else if (this.selectedApiFunction) {
       return generateKrakendItem(this.mockParse, this.selectedApiFunction, this.paramsReplace)
     }
   }
@@ -106,17 +104,17 @@ export default class MockEditor extends Vue{
 
   @Watch('allApiFunction')
   handleChange2() {
-    this.selectedApiFunction = this.allApiFunction.find(e => e.uuid == this.uuid);
+    this.selectedApiFunction = this.allApiFunction.find(e => e.uuid == this.uuid) ?? null;
   }
 
   @Watch('uuid')
   handleChange3() {
-    this.selectedApiFunction = this.allApiFunction.find(e => e.uuid == this.uuid);
+    this.selectedApiFunction = this.allApiFunction.find(e => e.uuid == this.uuid) ?? null;
     localStorage.mockApiFunctionUUID = this.uuid;
   }
 
   @Watch('paramsReplace', {deep: true})
-  handleChange4(val) {
+  handleChange4(val: any) {
     localStorage.mockParamsReplace = JSON.stringify(val);
   }
 }

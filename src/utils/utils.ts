@@ -66,7 +66,7 @@ export function toMap(props: { [name: string]: Prop }) {
 }
 
 export function getPropNameFromList(prop: Prop) {
-    if (prop.typeName.indexOf('List<') != -1)
+    if (prop.typeName?.indexOf('List<') != -1)
         return prop.typeName?.substr(5, prop.typeName?.length - 6);
     return prop.typeName;
 }

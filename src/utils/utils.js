@@ -2,155 +2,154 @@ import * as _ from 'lodash';
 import { getDefaultValue } from "./templates/bloc-default/bloc.default.tempalte";
 export function getFullType(prop, params) {
     var _a, _b, _c, _d, _e, _f, _g;
-    var afterNoRequired = (params === null || params === void 0 ? void 0 : params.noRequired) ? '?' : '';
+    const afterNoRequired = (params === null || params === void 0 ? void 0 : params.noRequired) ? '?' : '';
     if ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.array) {
-        return "List<" + prop.typeName + ">" + afterNoRequired;
+        return `List<${prop.typeName}>${afterNoRequired}`;
     }
     else if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.enum) {
-        return "" + prop.typeName + afterNoRequired;
+        return `${prop.typeName}${afterNoRequired}`;
     }
     else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.double) {
-        return "double" + afterNoRequired;
+        return `double${afterNoRequired}`;
     }
     else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.int) {
-        return "int" + afterNoRequired;
+        return `int${afterNoRequired}`;
     }
     else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.string) {
-        return "String" + afterNoRequired;
+        return `String${afterNoRequired}`;
     }
     else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.map) {
-        return "Map<" + prop.typeTemplate.map.key + ", " + prop.typeTemplate.map.value + ">";
+        return `Map<${prop.typeTemplate.map.key}, ${prop.typeTemplate.map.value}>`;
     }
     else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.dynamic) {
-        return "dynamic";
+        return `dynamic`;
     }
-    return "" + prop.typeName + afterNoRequired;
+    return `${prop.typeName}${afterNoRequired}`;
 }
 export function toMap(props) {
-    console.log("toMap()", props);
-    return '{\n' + Object.keys(props).map(function (key) {
+    console.log(`toMap()`, props);
+    return '{\n' + Object.keys(props).map((key) => {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
-        var prop = props[key];
-        var nullable = ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) ? '?' : '';
+        const prop = props[key];
+        const nullable = ((_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) ? '?' : '';
         if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.array) {
-            return "\"" + key + "\": '[' + (" + key + (((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.nullable) ? ' ?? []' : '') + ").map((e) => e.toJson()).join(', ') + ']'";
+            return `"${key}": '[' + (${key}${((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.nullable) ? ' ?? []' : ''}).map((e) => e.toJson()).join(', ') + ']'`;
         }
         else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.enum) {
-            return "\"" + key + "\": " + _.camelCase(prop.typeName) + "ToJson(" + key + ")";
+            return `"${key}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
         }
         else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.double) {
-            return "\"" + key + "\": " + key;
+            return `"${key}": ${key}`;
         }
         else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.int) {
-            return "\"" + key + "\": " + key;
+            return `"${key}": ${key}`;
         }
         else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.string) {
-            return "\"" + key + "\": " + key;
+            return `"${key}": ${key}`;
         }
         else if ((_h = prop.typeTemplate) === null || _h === void 0 ? void 0 : _h.bool) {
-            return "\"" + key + "\": " + key;
+            return `"${key}": ${key}`;
         }
         else if ((_j = prop.typeTemplate) === null || _j === void 0 ? void 0 : _j.map) {
-            return "\"" + key + "\": " + key;
+            return `"${key}": ${key}`;
         }
         else if ((_k = prop.typeTemplate) === null || _k === void 0 ? void 0 : _k.class) {
-            return "\"" + key + "\": " + key + nullable + ".toJson()";
+            return `"${key}": ${key}${nullable}.toJson()`;
         }
         else if ((_l = prop.typeTemplate) === null || _l === void 0 ? void 0 : _l.dynamic) {
-            return "\"" + key + "\": " + key;
+            return `"${key}": ${key}`;
         }
         else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
-                return "\"" + key + "\": " + key + nullable + ".toIso8601String()";
+                return `"${key}": ${key}${nullable}.toIso8601String()`;
             }
             else if (prop.typeName == 'bool') {
-                return "\"" + key + "\": " + key;
+                return `"${key}": ${key}`;
             }
             else if (((_m = prop.typeTemplate) === null || _m === void 0 ? void 0 : _m.array) || prop.typeName.indexOf('List<') != -1) {
-                return "\"" + key + "\": " + key;
+                return `"${key}": ${key}`;
             }
             else {
-                return "\"" + key + "\": " + _.camelCase(prop.typeName) + "ToJson(" + key + ")";
+                return `"${key}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
             }
         }
         else {
-            console.error("\u041D\u0435 \u043C\u043E\u0433\u0443 \u0432\u044B\u0432\u0435\u0441\u0442\u0438 \u0441\u0432\u043E\u0439\u0441\u0442\u0432\u043E " + key, prop);
+            console.error(`Не могу вывести свойство ${key}`, prop);
         }
-    }).filter(function (e) { return e; }).join(', \n') + '\n}';
+    }).filter(e => e).join(', \n') + '\n}';
 }
 export function getPropNameFromList(prop) {
-    var _a, _b;
-    if (prop.typeName.indexOf('List<') != -1)
-        return (_a = prop.typeName) === null || _a === void 0 ? void 0 : _a.substr(5, ((_b = prop.typeName) === null || _b === void 0 ? void 0 : _b.length) - 6);
+    var _a, _b, _c;
+    if (((_a = prop.typeName) === null || _a === void 0 ? void 0 : _a.indexOf('List<')) != -1)
+        return (_b = prop.typeName) === null || _b === void 0 ? void 0 : _b.substr(5, ((_c = prop.typeName) === null || _c === void 0 ? void 0 : _c.length) - 6);
     return prop.typeName;
 }
 export function fromMap(props, params) {
     var _a;
-    console.log({ props: props });
-    var keys = Object.keys(props).map(function (key) {
+    console.log({ props });
+    const keys = Object.keys(props).map((key) => {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
-        var prop = props[key];
-        var isNullable = (_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable;
-        var nullable = isNullable ? '?' : '';
+        const prop = props[key];
+        const isNullable = (_a = prop.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable;
+        const nullable = isNullable ? '?' : '';
         if ((_b = prop.typeTemplate) === null || _b === void 0 ? void 0 : _b.array) {
-            return key + ": " + getPropNameFromList(prop) + ".listFromJson(json[\"" + key + "\"])";
+            return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${key}"])`;
         }
         else if ((_c = prop.typeTemplate) === null || _c === void 0 ? void 0 : _c.enum) {
-            return key + ": " + key + "FromJson(json[\"" + key + "\"])";
+            return `${key}: ${key}FromJson(json["${key}"])`;
         }
         else if ((_d = prop.typeTemplate) === null || _d === void 0 ? void 0 : _d.double) {
             if (isNullable)
-                return key + ": json[\"" + key + "\"] != null ? (json[\"" + key + "\"] as num).toDouble() : null";
-            return key + ": (json[\"" + key + "\"] as num).toDouble()";
+                return `${key}: json["${key}"] != null ? (json["${key}"] as num).toDouble() : null`;
+            return `${key}: (json["${key}"] as num).toDouble()`;
         }
         else if ((_e = prop.typeTemplate) === null || _e === void 0 ? void 0 : _e.int) {
-            return key + ": json[\"" + key + "\"] as int" + nullable;
+            return `${key}: json["${key}"] as int${nullable}`;
         }
         else if ((_f = prop.typeTemplate) === null || _f === void 0 ? void 0 : _f.string) {
-            return key + ": json[\"" + key + "\"] as String" + nullable;
+            return `${key}: json["${key}"] as String${nullable}`;
         }
         else if ((_g = prop.typeTemplate) === null || _g === void 0 ? void 0 : _g.map) {
-            return key + ": " + key + "FromJson(json[\"" + key + "\"])";
+            return `${key}: ${key}FromJson(json["${key}"])`;
         }
         else if ((_h = prop.typeTemplate) === null || _h === void 0 ? void 0 : _h.class) {
-            return key + ": " + prop.typeName + ".fromJson(json[\"" + key + "\"]) as " + prop.typeName;
+            return `${key}: ${prop.typeName}.fromJson(json["${key}"]) as ${prop.typeName}`;
         }
         else if ((_j = prop.typeTemplate) === null || _j === void 0 ? void 0 : _j.dynamic) {
-            return key + ": json[\"" + key + "\"]";
+            return `${key}: json["${key}"]`;
         }
         else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
                 if (isNullable)
-                    return key + ": json[\"" + key + "\"] == null ? null : DateTime.parse(json[\"" + key + "\"])";
-                return key + ": DateTime.parse(json[\"" + key + "\"])";
+                    return `${key}: json["${key}"] == null ? null : DateTime.parse(json["${key}"])`;
+                return `${key}: DateTime.parse(json["${key}"])`;
             }
             else if (prop.typeName == 'bool') {
-                return key + ": json[\"" + key + "\"] as bool" + nullable;
+                return `${key}: json["${key}"] as bool${nullable}`;
             }
             else if (((_k = prop.typeTemplate) === null || _k === void 0 ? void 0 : _k.array) || prop.typeName.indexOf('List<') != -1) {
-                return key + ": " + getPropNameFromList(prop) + ".listFromJson(json[\"" + key + "\"])";
+                return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${key}"])`;
             }
             else {
-                return key + ": " + _.camelCase(prop.typeName) + "FromJson(json[\"" + key + "\"])";
+                return `${key}: ${_.camelCase(prop.typeName)}FromJson(json["${key}"])`;
             }
         }
         else {
-            console.error("\u041D\u0435 \u043C\u043E\u0433\u0443 \u0432\u044B\u0432\u0435\u0441\u0442\u0438 \u0441\u0432\u043E\u0439\u0441\u0442\u0432\u043E " + key, prop);
+            console.error(`Не могу вывести свойство ${key}`, prop);
         }
     });
     if ((_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name) {
-        keys.push(params.addAction.name + ": json['" + params.addAction.name + "']");
+        keys.push(`${params.addAction.name}: json['${params.addAction.name}']`);
     }
-    return keys.filter(function (e) { return e; }).join(', \n');
+    return keys.filter(e => e).join(', \n');
 }
-export function getGetters(getters, params) {
-    if (params === void 0) { params = {
-        ApiCall: 'ApiCall',
-        hasSearch: true,
-        hasPaginate: true,
-        hasFilter: true,
-    }; }
-    return Object.keys(getters).filter(function (e) {
+export function getGetters(getters, params = {
+    ApiCall: 'ApiCall',
+    hasSearch: true,
+    hasPaginate: true,
+    hasFilter: true,
+}) {
+    return Object.keys(getters).filter(e => {
         var _a, _b, _c;
         if (!params.hasSearch && ((_a = getters[e].tags) === null || _a === void 0 ? void 0 : _a.includes('search')))
             return false;
@@ -159,94 +158,85 @@ export function getGetters(getters, params) {
         if (!params.hasFilter && ((_c = getters[e].tags) === null || _c === void 0 ? void 0 : _c.includes('filter')))
             return false;
         return true;
-    }).map(function (key) {
+    }).map((key) => {
         var _a, _b, _c;
-        var getter = getters[key];
+        const getter = getters[key];
         if (getter.params)
-            return ((_a = getter.returnType) !== null && _a !== void 0 ? _a : '') + " " + key + "(" + ((_b = getter.params) !== null && _b !== void 0 ? _b : '') + ") => " + getter.content + ";";
-        return ((_c = getter.returnType) !== null && _c !== void 0 ? _c : '') + " get " + key + " => " + getter.content + ";";
+            return `${(_a = getter.returnType) !== null && _a !== void 0 ? _a : ''} ${key}(${(_b = getter.params) !== null && _b !== void 0 ? _b : ''}) => ${getter.content};`;
+        return `${(_c = getter.returnType) !== null && _c !== void 0 ? _c : ''} get ${key} => ${getter.content};`;
     }).join(' \n');
 }
 export function getFinalVariable(variable, type, params) {
     var _a;
-    var nullable = '';
+    let nullable = '';
     if ((_a = type.typeTemplate) === null || _a === void 0 ? void 0 : _a.nullable) {
         nullable = '?';
     }
-    return "final " + getFullType(type) + nullable + " " + variable + ";";
+    return `final ${getFullType(type)}${nullable} ${variable};`;
 }
 export function getVariableAndType(variables, params) {
     var _a, _b;
-    var res = [];
+    let res = [];
     if (params === null || params === void 0 ? void 0 : params.required) {
-        res = Object.keys(variables).map(function (variable) { return "\t required " + getFullType(variables[variable]) + " " + variable + ",\n"; });
+        res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`);
     }
     else if (params === null || params === void 0 ? void 0 : params.noRequired) {
-        res = Object.keys(variables).map(function (variable) { return "\t " + getFullType(variables[variable], { noRequired: true }) + " " + variable + ",\n"; });
+        res = Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], { noRequired: true })} ${variable},\n`);
     }
     else {
-        res = Object.keys(variables).map(function (variable) { return "\t" + getFullType(variables[variable]) + " " + variable + ",\n"; });
+        res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`);
     }
     if ((_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name) {
-        res.push("\t required " + getFullType(params === null || params === void 0 ? void 0 : params.addAction) + " " + ((_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name) + ",\n");
+        res.push(`\t required ${getFullType(params === null || params === void 0 ? void 0 : params.addAction)} ${(_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name},\n`);
     }
     return res.join('');
 }
 export function getAllFinalVariables(variables, params) {
     var _a, _b;
-    var res = Object.keys(variables).map(function (variable) { return '\t' + getFinalVariable(variable, variables[variable]); });
+    const res = Object.keys(variables).map((variable) => '\t' + getFinalVariable(variable, variables[variable]));
     if ((_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name) {
         res.push('\t' + getFinalVariable((_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name, params === null || params === void 0 ? void 0 : params.addAction));
     }
     return res.join('\n');
 }
-export var camelToSnakeCase = function (str) {
-    if (str === void 0) { str = '  '; }
-    return str.replace(/[A-Z]/g, function (letter) { return "_" + letter.toLowerCase(); }).split('_').filter(function (e) { return e; }).join('_');
-};
-export var UpperFirstLetter = function (str) {
-    if (str === void 0) { str = '  '; }
-    return str[0].toUpperCase() + str.slice(1);
-};
-export function getParamFunction(name, nullable) {
-    if (name === void 0) { name = ''; }
-    if (nullable === void 0) { nullable = false; }
+export const camelToSnakeCase = (str = '  ') => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
+export const UpperFirstLetter = (str = '  ') => str[0].toUpperCase() + str.slice(1);
+export function getParamFunction(name = '', nullable = false) {
     if (nullable)
-        return "\tthis." + name + ",\n";
-    return "\t required this." + name + ",\n";
+        return `\tthis.${name},\n`;
+    return `\t required this.${name},\n`;
 }
 export function getVariables(props, params) {
     var _a;
-    var res = [];
+    let res = [];
     if (params === null || params === void 0 ? void 0 : params.required) {
-        res = Object.keys(props).map(function (name) { var _a, _b, _c; return getParamFunction(name, (_c = (_b = (_a = props[name]) === null || _a === void 0 ? void 0 : _a.typeTemplate) === null || _b === void 0 ? void 0 : _b.nullable) !== null && _c !== void 0 ? _c : false); });
+        res = Object.keys(props).map(name => { var _a, _b, _c; return getParamFunction(name, (_c = (_b = (_a = props[name]) === null || _a === void 0 ? void 0 : _a.typeTemplate) === null || _b === void 0 ? void 0 : _b.nullable) !== null && _c !== void 0 ? _c : false); });
     }
     else {
-        res = Object.keys(props).map(function (name) {
+        res = Object.keys(props).map(name => {
             var _a, _b, _c;
-            console.log("" + name);
+            console.log(`${name}`);
             return getParamFunction(name, (_c = (_b = (_a = props[name]) === null || _a === void 0 ? void 0 : _a.typeTemplate) === null || _b === void 0 ? void 0 : _b.nullable) !== null && _c !== void 0 ? _c : true);
         });
     }
     if ((_a = params === null || params === void 0 ? void 0 : params.addAction) === null || _a === void 0 ? void 0 : _a.name) {
         res.push(getParamFunction(params.addAction.name, false));
     }
-    return "{ \n" + res.join('') + " }";
+    return `{ \n${res.join('')} }`;
 }
 export function getCopyWithParams(bloc, params) {
     var _a, _b, _c, _d;
-    var res = Object.keys((_a = bloc.state.props) !== null && _a !== void 0 ? _a : {}).map(function (variable) { return "\t" + variable + ": " + variable + " ?? this." + variable + ",\n"; });
+    const res = Object.keys((_a = bloc.state.props) !== null && _a !== void 0 ? _a : {}).map(variable => `\t${variable}: ${variable} ?? this.${variable},\n`);
     if ((_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name) {
-        res.push("\t " + ((_c = params === null || params === void 0 ? void 0 : params.addAction) === null || _c === void 0 ? void 0 : _c.name) + ": " + ((_d = params === null || params === void 0 ? void 0 : params.addAction) === null || _d === void 0 ? void 0 : _d.name) + ",\n");
+        res.push(`\t ${(_c = params === null || params === void 0 ? void 0 : params.addAction) === null || _c === void 0 ? void 0 : _c.name}: ${(_d = params === null || params === void 0 ? void 0 : params.addAction) === null || _d === void 0 ? void 0 : _d.name},\n`);
     }
     return res.join('');
 }
 export function getClearWithParams(bloc, params) {
     var _a, _b, _c, _d;
-    var res = Object.keys((_a = bloc.state.props) !== null && _a !== void 0 ? _a : {}).map(function (name) { return "\t " + name + ": " + name + " ? " + getDefaultValue(bloc, name) + " : this." + name + ", \n"; });
+    const res = Object.keys((_a = bloc.state.props) !== null && _a !== void 0 ? _a : {}).map(name => `\t ${name}: ${name} ? ${getDefaultValue(bloc, name)} : this.${name}, \n`);
     if ((_b = params === null || params === void 0 ? void 0 : params.addAction) === null || _b === void 0 ? void 0 : _b.name) {
-        res.push("\t " + ((_c = params === null || params === void 0 ? void 0 : params.addAction) === null || _c === void 0 ? void 0 : _c.name) + ": " + ((_d = params === null || params === void 0 ? void 0 : params.addAction) === null || _d === void 0 ? void 0 : _d.name) + ",\n");
+        res.push(`\t ${(_c = params === null || params === void 0 ? void 0 : params.addAction) === null || _c === void 0 ? void 0 : _c.name}: ${(_d = params === null || params === void 0 ? void 0 : params.addAction) === null || _d === void 0 ? void 0 : _d.name},\n`);
     }
     return res.join('');
 }
-//# sourceMappingURL=utils.js.map

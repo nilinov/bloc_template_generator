@@ -61,6 +61,7 @@
 import {Component, Emit, Vue, Watch} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
+import {fuzzy} from "@/main";
 
 @Component({props: {item: Object}})
 export default class FormEdit extends Vue {
@@ -146,7 +147,7 @@ export default class FormEdit extends Vue {
 
   handleFilterModel(queryString: string) {
     return (model: Model) => {
-      return (model.name.toLowerCase().fuzzy(queryString.toLowerCase()));
+      return (fuzzy(model.name.toLowerCase(), queryString.toLowerCase()));
     };
   }
 
@@ -167,12 +168,12 @@ export default class FormEdit extends Vue {
   }
 
   handleAddVariable() {
-    this.localItem.params.push({...this.localVariable})
+    this.localItem.params?.push({...this.localVariable})
     this.localVariable = this.emptyVariable;
   }
 
   handleRemoveVariable(index: number) {
-    this.localItem.params.splice(index, 1)
+    this.localItem.params?.splice(index, 1)
   }
 
   get emptyVariable(): ApiFunctionParam {

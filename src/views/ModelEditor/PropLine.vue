@@ -28,6 +28,7 @@ import {TextBox, SelectBox} from "@/components";
 import Component from "vue-class-component";
 import {Vue} from "vue-property-decorator";
 import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
+import {fuzzy} from "@/main";
 
 @Component({
   props: {
@@ -66,7 +67,7 @@ export default class ModelEditor extends Vue {
   querySearchModel(queryString: string, cb: Function) {
     console.log(queryString)
     const models: string[] = this.options;
-    var results = queryString ? models.filter(model => model.toLowerCase().fuzzy(queryString.toLowerCase())) : models;
+    var results = queryString ? models.filter(model => fuzzy(model.toLowerCase(), queryString.toLowerCase())) : models;
 
     cb(results.map(model => ({value: model, item: model})));
   }

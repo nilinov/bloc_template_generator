@@ -101,8 +101,8 @@ export default class GenerateScreen extends Vue {
 
   updateApiFunction() {
     if (this.apiFunction) {
-      const nameClass = (this.$store.getters.allModelsItems as Model[]).find(e => e.uuid == this.apiFunction.modelUUID);
-      this.nameClassEntity = nameClass?.name;
+      const nameClass = (this.$store.getters.allModelsItems as Model[]).find(e => e.uuid == this.apiFunction?.modelUUID);
+      this.nameClassEntity = nameClass?.name ?? '';
       this.nameBloc = this.apiFunction.name.replace('get', '').replace('post', '');
 
       this.typeTemplate = 'cubit-list';

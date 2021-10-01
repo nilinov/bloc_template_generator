@@ -69,6 +69,7 @@ export default class ApiClient extends Vue {
   get emptyApiFunction(): ApiFunction {
     return {
       uuid: Math.random().toString(),
+      desc: '',
       name: '',
       path: '/',
       method: 'GET',

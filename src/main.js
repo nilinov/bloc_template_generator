@@ -112,10 +112,10 @@ function downloadURI(filename, text) {
     element.click();
     document.body.removeChild(element);
 }
-String.prototype.fuzzy = function (s) {
-    var hay = this.toLowerCase(), i = 0, n = -1, l;
-    s = s.toLowerCase();
-    for (; l = s[i++];)
+export var fuzzy = function (s1, s2) {
+    var hay = s1.toLowerCase(), i = 0, n = -1, l;
+    s2 = s2.toLowerCase();
+    for (; l = s2[i++];)
         if (!~(n = hay.indexOf(l, n + 1)))
             return false;
     return true;

@@ -97,6 +97,8 @@ export function generateKrakendItem(json, func, paramsReplace) {
         }
         if (json[i].length)
             res.push(generateKrakendItemCode(pathResult, json[i][0]));
+        else
+            res.push(generateKrakendItemCode(pathResult, json[i]));
     }
     var resJson = JSON.stringify(res, null, 2);
     return resJson === null || resJson === void 0 ? void 0 : resJson.substr(1, (resJson === null || resJson === void 0 ? void 0 : resJson.length) - 2);

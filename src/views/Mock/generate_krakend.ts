@@ -107,7 +107,8 @@ export function generateKrakendItem(json: any[], func: ApiFunction, paramsReplac
 
         if (json[i].length)
             res.push(generateKrakendItemCode(pathResult, json[i][0]))
-
+        else
+            res.push(generateKrakendItemCode(pathResult, json[i]))
     }
 
     const resJson = JSON.stringify(res, null, 2);

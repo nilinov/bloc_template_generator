@@ -39,7 +39,7 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
 
         path[func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')] = {
             "parameters": params,
-            "get": {
+            [func.method.toLowerCase()]: {
                 "summary": func.desc,
                 "responses": {
                     "200": {

@@ -20,17 +20,7 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
         const params = [];
         const paramsBody = [];
 
-        if (func.hasPaginate && func.isMock) {
-            params.push({
-                    "name": "page",
-                    "in": "path",
-                    "required": true,
-                    "type": "integer"
-                }
-            )
-        }
-
-        for (const param of func.params ?? []) {
+         for (const param of func.params ?? []) {
             if (param.place != 'body') {
                 params.push({
                     name: param.name,
@@ -39,6 +29,12 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
                     type: getSwaggerType(param.type)
                 })
             }
+        }
+
+        let localPath = func.path.split('/');
+
+        if (func.hasPaginate && func.isMock) {
+            localPath.push('page', ':page')
         }
 
         path[func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')] = {
@@ -137,6 +133,12 @@ function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
                     "description": prop?.desc,
                     "type": type,
                 }
+            }
+        } else {
+            props[name] = {
+                "description": prop?.desc + `\n ${model?.props?.map(e => e.name)}`,
+                "type": "string",
+                "enum": model?.props?.map(e => e.name),
             }
         }
     }

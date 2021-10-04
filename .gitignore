@@ -21,3 +21,15 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+/src/*.js
+/src/utils/*.js
+/src/utils/templates/bloc-default/*.js
+/src/utils/templates/cubit-list/*.js
+/src/utils/templates/cubit-view/*.js
+
+/src/*.js.map
+/src/utils/*.js.map
+/src/utils/templates/bloc-default/*.js.map
+/src/utils/templates/cubit-list/*.js.map
+/src/utils/templates/cubit-view/*.js.map

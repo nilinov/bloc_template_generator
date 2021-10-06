@@ -103,7 +103,7 @@ document.onkeydown = function (e) {
         return false;
     }
 };
-function downloadURI(filename, text) {
+export function downloadURI(filename, text) {
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);

@@ -6,10 +6,11 @@
         <el-menu-item index="/ApiClient">Api Client</el-menu-item>
         <el-menu-item index="/State">State</el-menu-item>
         <el-menu-item index="/MockEditor">Mock</el-menu-item>
+        <el-menu-item index="/Project">Проект</el-menu-item>
       </el-menu>
     </el-header>
     <el-main v-loading="isLoading">
-      <router-view/>
+      <router-view v-if="!isLoading"/>
     </el-main>
   </el-container>
 </template>
@@ -21,7 +22,10 @@ import {ACTIONS} from "@/store";
 @Component({})
 export default class App extends Vue {
   activeIndex = '/'
-  isLoading = true;
+
+  get isLoading() {
+    return this.$store.state.isPending;
+  }
 
   handleSelect(key: string, keyPath: string) {
     this.$router.push(key);
@@ -31,8 +35,6 @@ export default class App extends Vue {
     this.activeIndex = this.$route.path;
 
     await this.$store.dispatch(ACTIONS.RESTORE);
-
-    this.isLoading = false;
   }
 }
 </script>

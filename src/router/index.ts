@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Editor from '../views/Editor.vue'
+import Project from '../views/Project/index.vue'
 import ModelEditor from '../views/ModelEditor/index.vue'
 import ApiClient from "@/views/ApiClient/index.vue";
 import MockEditor from "@/views/Mock/index.vue";
@@ -43,6 +44,11 @@ const routes: Array<RouteConfig> = [
     path: '/MockEditor/:uuid',
     name: 'MockEditor',
     component: MockEditor
+  },
+  {
+    path: '/Project',
+    name: 'Project',
+    component: Project
   }
 ]
 

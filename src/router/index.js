@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Editor from '../views/Editor.vue';
+import Project from '../views/Project/index.vue';
 import ModelEditor from '../views/ModelEditor/index.vue';
 import ApiClient from "@/views/ApiClient/index.vue";
 import MockEditor from "@/views/Mock/index.vue";
@@ -41,6 +42,11 @@ var routes = [
         path: '/MockEditor/:uuid',
         name: 'MockEditor',
         component: MockEditor
+    },
+    {
+        path: '/Project',
+        name: 'Project',
+        component: Project
     }
 ];
 var router = new VueRouter({

@@ -116,3 +116,9 @@ function getParamsApiFunction(e: ApiFunction) {
 }
 
 export {generateCodeApiClient};
+
+export interface IProject {
+    name: string,
+    uuid: string,
+    version: number,
+}

@@ -2,9 +2,10 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {authInApp, unAuthDb} from "@/main";
 import {Model, User} from "@/views/ModelEditor/RenderCodeLineType";
-import {getAllData, getApiFunctions, getDataBaseRef, getModels, storeData, storeModel} from "@/database";
+import api from "@/api";
 import firebase from "firebase/compat";
 import {apiFunctionsModule, MUTATIONS_API_FUNCTIONS} from "@/store/api_functions";
+import {ACTIONS_PROJECT, projectsModule} from "@/store/project";
 
 Vue.use(Vuex)
 
@@ -15,6 +16,7 @@ export enum MUTATIONS {
     SET_MODEL = 'SET_MODEL',
     REMOVE_MODEL = 'REMOVE_MODEL',
     UPDATE_PENDING = 'UPDATE_PENDING',
+    SET_PROJECT = 'SET_PROJECT',
 }
 
 export enum ACTIONS {
@@ -23,13 +25,14 @@ export enum ACTIONS {
     SET_MODEL = 'SET_MODEL',
     REMOVE_MODEL = 'REMOVE_MODEL',
     LOAD_ALL = 'LOAD_ALL',
+    SET_PROJECT = 'SET_PROJECT',
 }
 
 export interface RootState {
     user: { user: User } | null,
     db: firebase.database.Database | null,
     models: Model[],
-    project: string,
+    project_uuid: string,
     isPending: boolean
 }
 
@@ -48,13 +51,13 @@ export default new Vuex.Store<RootState>({
         },
         allModelsClasses(state): string[] {
             return [...state.models.filter(e => e.isEnum == false).map(e => e.name)]
-        }
+        },
     },
     state: {
         user: null,
         db: null,
         models: [],
-        project: 'mad_team',
+        project_uuid: '1',
         isPending: false,
     },
     mutations: {
@@ -85,6 +88,9 @@ export default new Vuex.Store<RootState>({
                 state.models.splice(index, 1);
             }
         },
+        [MUTATIONS.SET_PROJECT](state, uuid: string) {
+            state.project_uuid = uuid;
+        },
     },
     actions: {
         async [ACTIONS.RESTORE](ctx) {
@@ -109,8 +115,9 @@ export default new Vuex.Store<RootState>({
         async [ACTIONS.LOAD_ALL](ctx) {
             if (ctx.state.db) {
                 const [models, apiFunctions] = await Promise.all([
-                    await getModels(ctx.state.db, ctx.state.project),
-                    await getApiFunctions(ctx.state.db, ctx.state.project),
+                    await api.getModels(ctx.state.db, ctx.state.project_uuid),
+                    await api.getApiFunctions(ctx.state.db, ctx.state.project_uuid),
+                    await ctx.dispatch(ACTIONS_PROJECT.RESTORE)
                 ]);
                 ctx.commit(MUTATIONS.RESTORE_MODELS, models);
                 ctx.commit(MUTATIONS_API_FUNCTIONS.RESTORE, apiFunctions);
@@ -119,17 +126,33 @@ export default new Vuex.Store<RootState>({
         async [ACTIONS.SET_MODEL]({state, commit}, item: Model) {
             if (state.db) {
                 commit(MUTATIONS.SET_MODEL, item)
-                storeModel(state.db, state.project, state.models);
+                api.storeModel(state.db, state.project_uuid, state.models);
             }
         },
         async [ACTIONS.REMOVE_MODEL]({state, commit}, uuid: string) {
             if (state.db) {
                 commit(MUTATIONS.REMOVE_MODEL, uuid)
-                storeModel(state.db, state.project, state.models);
+                api.storeModel(state.db, state.project_uuid, state.models);
+            }
+        },
+        async [ACTIONS.SET_PROJECT]({state, commit, dispatch, getters, rootGetters}, uuid: string) {
+            if (state.db) {
+                commit(MUTATIONS.UPDATE_PENDING, true);
+                if (getters.project) {
+                    commit(MUTATIONS.SET_PROJECT, uuid)
+                    const [models, apiFunctions] = await Promise.all([
+                        await api.getModels(state.db, state.project_uuid),
+                        await api.getApiFunctions(state.db, state.project_uuid),
+                    ]);
+                    commit(MUTATIONS.RESTORE_MODELS, models);
+                    commit(MUTATIONS_API_FUNCTIONS.RESTORE, apiFunctions);
+                    commit(MUTATIONS.UPDATE_PENDING, false);
+                }
             }
         },
     },
     modules: {
-        apiFunctionsModule
+        apiFunctionsModule,
+        projectsModule,
     }
 })

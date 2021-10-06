@@ -39,12 +39,10 @@
 
 <script lang="ts">
 import {Component, Vue, Watch} from "vue-property-decorator";
-import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
+import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import FormEdit from "@/views/ApiClient/FormEdit.vue";
-import {generateCodeApiClient, ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
-import {ACTIONS_API_FUNCTIONS, MUTATIONS_API_FUNCTIONS} from "@/store/api_functions";
-import {getDataBaseRef} from "@/database";
-import {getPropNameFromList} from "@/utils/utils";
+import {ApiFunction, generateCodeApiClient} from "@/views/ApiClient/generate_code_api_client";
+import {ACTIONS_API_FUNCTIONS} from "@/store/api_functions";
 import {generateSwaggerFile} from "@/views/ApiClient/generate_swagger_file";
 
 @Component({

@@ -1,8 +1,7 @@
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 import {Module} from "vuex";
-import {unAuthDb} from "@/main";
-import {ACTIONS, MUTATIONS, RootState} from "@/store/index";
-import {getApiFunctions, getModels, storeApiFunction} from "@/database";
+import {RootState} from "@/store/index";
+import {api} from "@/api";
 import Vue from "vue";
 
 interface State {
@@ -52,7 +51,7 @@ export const apiFunctionsModule: Module<State, RootState> = {
             ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, true);
 
             if (ctx.rootState.db) {
-                const data = await getApiFunctions(ctx.rootState.db, ctx.rootState.project)
+                const data = await api.getApiFunctions(ctx.rootState.db, ctx.rootState.project_uuid)
                 ctx.commit(MUTATIONS_API_FUNCTIONS.RESTORE, data);
             }
 
@@ -61,13 +60,13 @@ export const apiFunctionsModule: Module<State, RootState> = {
         async [ACTIONS_API_FUNCTIONS.SET](ctx, item: ApiFunction) {
             if (ctx.rootState.db) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.SET, item);
-                storeApiFunction(ctx.rootState.db, ctx.rootState.project, ctx.state.items);
+                api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
             }
         },
         async [ACTIONS_API_FUNCTIONS.REMOVE](ctx, uuid: string) {
             if (ctx.rootState.db) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.REMOVE, uuid);
-                storeApiFunction(ctx.rootState.db, ctx.rootState.project, ctx.state.items);
+                api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
             }
         },
     },

@@ -206,7 +206,7 @@ export default class FormEdit extends Vue {
   };
 
   handleClearModel() {
-    this.selectModel = null;
+    this.selectModel = undefined;
     this.localItem.modelUUID = '';
   };
 }

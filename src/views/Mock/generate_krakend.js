@@ -92,6 +92,12 @@ export function generateKrakendItem(json, func, paramsReplace) {
                     pathResult = pathResult.replace(key, "" + value);
                 }
                 catch (e) {
+                    try {
+                        var value = json[i][paramsReplace[key]];
+                        pathResult = pathResult.replace(key, "" + value);
+                    }
+                    catch (e) {
+                    }
                 }
             }
         }

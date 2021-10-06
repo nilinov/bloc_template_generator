@@ -40,12 +40,12 @@ export default class Project extends Vue {
     return this.$store.getters.allProjects ?? [];
   }
 
-  async handleSelect(uuid) {
+  async handleSelect(uuid: string) {
     await this.$store.dispatch(ACTIONS.SET_PROJECT, uuid);
     this.reset();
   }
 
-  handleRename(name) {
+  handleRename(name: string) {
     this.$store.dispatch(ACTIONS_PROJECT.SET, {...this.$store.getters.project, name})
   }
 

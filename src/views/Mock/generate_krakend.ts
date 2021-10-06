@@ -100,7 +100,12 @@ export function generateKrakendItem(json: any[], func: ApiFunction, paramsReplac
                     const value = json[i][0][paramsReplace[key]];
                     pathResult = pathResult.replace(key, `${value}`);
                 } catch (e) {
+                    try {
+                        const value = json[i][paramsReplace[key]];
+                        pathResult = pathResult.replace(key, `${value}`);
+                    } catch (e) {
 
+                    }
                 }
             }
         }

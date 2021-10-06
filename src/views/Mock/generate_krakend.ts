@@ -1,7 +1,9 @@
 import _ from "lodash";
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 
-function generateKrakendListPaginate(path = '', json: any) {
+function generateKrakendListPaginate(path = '', json: any, serverUrls: string[] = []) {
+    console.log({serverUrls})
+
     let res = [];
 
     const pages = Math.ceil(json.length / 10)
@@ -11,9 +13,7 @@ function generateKrakendListPaginate(path = '', json: any) {
             "endpoint": `${path}/page/${index + 1}`,
             "backend": [
                 {
-                    "host": [
-                        "http://ovz5.j1121565.m719m.vps.myjino.ru/"
-                    ]
+                    "host": serverUrls
                 }
             ],
             "extra_config": {
@@ -37,7 +37,7 @@ function generateKrakendListPaginate(path = '', json: any) {
     return res;
 }
 
-export function generateKrakendList(json: any[], func: ApiFunction, paramsReplace: { [x: string]: string } = {}) {
+export function generateKrakendList(json: any[], func: ApiFunction, paramsReplace: { [x: string]: string } = {}, serverUrls: string[] = []) {
     let res = [];
 
     let path = func.path;
@@ -53,10 +53,10 @@ export function generateKrakendList(json: any[], func: ApiFunction, paramsReplac
             let pathRes = path.replace(':id', `${i + 1}`);
             pathRes = pathRes.replace(':idCommand', json[i][0]['id']);
 
-            res.push(...generateKrakendListPaginate(pathRes, json[i]));
+            res.push(...generateKrakendListPaginate(pathRes, json[i], serverUrls));
         }
     } else {
-        res.push(...generateKrakendListPaginate(path, json));
+        res.push(...generateKrakendListPaginate(path, json, serverUrls));
     }
 
     const resJson = JSON.stringify(res, null, 2);
@@ -64,14 +64,12 @@ export function generateKrakendList(json: any[], func: ApiFunction, paramsReplac
     return resJson?.substr(1, resJson?.length - 2);
 }
 
-function generateKrakendItemCode(path = '', json = {}) {
+function generateKrakendItemCode(path = '', json = {}, serverUrls: string[] = []) {
     return {
         "endpoint": path,
         "backend": [
             {
-                "host": [
-                    "http://ovz5.j1121565.m719m.vps.myjino.ru/"
-                ]
+                "host": serverUrls
             }
         ],
         "extra_config": {
@@ -85,7 +83,7 @@ function generateKrakendItemCode(path = '', json = {}) {
     }
 }
 
-export function generateKrakendItem(json: any[], func: ApiFunction, paramsReplace: { [x: string]: string } = {}) {
+export function generateKrakendItem(json: any[], func: ApiFunction, paramsReplace: { [x: string]: string } = {}, serverUrls: string[] = []) {
     console.log({func})
 
     let res = [];
@@ -111,9 +109,9 @@ export function generateKrakendItem(json: any[], func: ApiFunction, paramsReplac
         }
 
         if (json[i].length)
-            res.push(generateKrakendItemCode(pathResult, json[i][0]))
+            res.push(generateKrakendItemCode(pathResult, json[i][0]), serverUrls)
         else
-            res.push(generateKrakendItemCode(pathResult, json[i]))
+            res.push(generateKrakendItemCode(pathResult, json[i]), serverUrls)
     }
 
     const resJson = JSON.stringify(res, null, 2);

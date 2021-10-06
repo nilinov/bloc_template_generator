@@ -9,6 +9,8 @@
     </el-option>
   </el-select>
 
+  <el-input type="textarea" placeholder="URL сервера" v-model="serverUrl"> </el-input>
+
   <el-input type="textarea" :disabled="!selectedApiFunction" v-model="mockJSON">
 
   </el-input>
@@ -43,13 +45,16 @@ export default class MockEditor extends Vue{
 
   mockParse = [];
 
+  serverUrl = ''
+
   paramsReplace: {[x:string]: string} = {};
 
   created() {
     // this.uuid = this.$route.params.uuid;
-    if (localStorage.mockApiFunctionUUID && localStorage.mock) {
+    if (localStorage.mockApiFunctionUUID && localStorage.mock && localStorage.serverUrl) {
       this.mockJSON = localStorage.mock;
       this.uuid = localStorage.mockApiFunctionUUID;
+      this.serverUrl = localStorage.serverUrl;
     }
     if (localStorage.mockParamsReplace) {
       this.paramsReplace = JSON.parse(localStorage.mockParamsReplace);
@@ -66,9 +71,9 @@ export default class MockEditor extends Vue{
 
   get result() {
     if (this.selectedApiFunction?.isList) {
-      return generateKrakendList(this.mockParse, this.selectedApiFunction, this.paramsReplace)
+      return generateKrakendList(this.mockParse, this.selectedApiFunction, this.paramsReplace, this.serverUrl.split('\n'))
     } else if (this.selectedApiFunction) {
-      return generateKrakendItem(this.mockParse, this.selectedApiFunction, this.paramsReplace)
+      return generateKrakendItem(this.mockParse, this.selectedApiFunction, this.paramsReplace, this.serverUrl.split('\n'))
     }
   }
 
@@ -116,6 +121,11 @@ export default class MockEditor extends Vue{
   @Watch('paramsReplace', {deep: true})
   handleChange4(val: any) {
     localStorage.mockParamsReplace = JSON.stringify(val);
+  }
+
+  @Watch('serverUrl')
+  handleChange5(val: any) {
+    localStorage.serverUrl = this.serverUrl;
   }
 }
 </script>

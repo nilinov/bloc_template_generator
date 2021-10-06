@@ -1,6 +1,8 @@
 import _ from "lodash";
-function generateKrakendListPaginate(path, json) {
+function generateKrakendListPaginate(path, json, serverUrls) {
     if (path === void 0) { path = ''; }
+    if (serverUrls === void 0) { serverUrls = []; }
+    console.log({ serverUrls: serverUrls });
     var res = [];
     var pages = Math.ceil(json.length / 10);
     for (var index = 0; index < pages; index++) {
@@ -8,9 +10,7 @@ function generateKrakendListPaginate(path, json) {
             "endpoint": path + "/page/" + (index + 1),
             "backend": [
                 {
-                    "host": [
-                        "http://ovz5.j1121565.m719m.vps.myjino.ru/"
-                    ]
+                    "host": serverUrls
                 }
             ],
             "extra_config": {
@@ -32,8 +32,9 @@ function generateKrakendListPaginate(path, json) {
     }
     return res;
 }
-export function generateKrakendList(json, func, paramsReplace) {
+export function generateKrakendList(json, func, paramsReplace, serverUrls) {
     if (paramsReplace === void 0) { paramsReplace = {}; }
+    if (serverUrls === void 0) { serverUrls = []; }
     var res = [];
     var path = func.path;
     if (func.isMock) {
@@ -45,25 +46,24 @@ export function generateKrakendList(json, func, paramsReplace) {
                 continue;
             var pathRes = path.replace(':id', "" + (i + 1));
             pathRes = pathRes.replace(':idCommand', json[i][0]['id']);
-            res.push.apply(res, generateKrakendListPaginate(pathRes, json[i]));
+            res.push.apply(res, generateKrakendListPaginate(pathRes, json[i], serverUrls));
         }
     }
     else {
-        res.push.apply(res, generateKrakendListPaginate(path, json));
+        res.push.apply(res, generateKrakendListPaginate(path, json, serverUrls));
     }
     var resJson = JSON.stringify(res, null, 2);
     return resJson === null || resJson === void 0 ? void 0 : resJson.substr(1, (resJson === null || resJson === void 0 ? void 0 : resJson.length) - 2);
 }
-function generateKrakendItemCode(path, json) {
+function generateKrakendItemCode(path, json, serverUrls) {
     if (path === void 0) { path = ''; }
     if (json === void 0) { json = {}; }
+    if (serverUrls === void 0) { serverUrls = []; }
     return {
         "endpoint": path,
         "backend": [
             {
-                "host": [
-                    "http://ovz5.j1121565.m719m.vps.myjino.ru/"
-                ]
+                "host": serverUrls
             }
         ],
         "extra_config": {
@@ -76,8 +76,9 @@ function generateKrakendItemCode(path, json) {
         }
     };
 }
-export function generateKrakendItem(json, func, paramsReplace) {
+export function generateKrakendItem(json, func, paramsReplace, serverUrls) {
     if (paramsReplace === void 0) { paramsReplace = {}; }
+    if (serverUrls === void 0) { serverUrls = []; }
     console.log({ func: func });
     var res = [];
     for (var i = 0; i < json.length; i++) {
@@ -102,9 +103,9 @@ export function generateKrakendItem(json, func, paramsReplace) {
             }
         }
         if (json[i].length)
-            res.push(generateKrakendItemCode(pathResult, json[i][0]));
+            res.push(generateKrakendItemCode(pathResult, json[i][0]), serverUrls);
         else
-            res.push(generateKrakendItemCode(pathResult, json[i]));
+            res.push(generateKrakendItemCode(pathResult, json[i]), serverUrls);
     }
     var resJson = JSON.stringify(res, null, 2);
     return resJson === null || resJson === void 0 ? void 0 : resJson.substr(1, (resJson === null || resJson === void 0 ? void 0 : resJson.length) - 2);

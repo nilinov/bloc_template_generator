@@ -21,6 +21,8 @@
         :fetch-suggestions="querySearchModel"
         placeholder="Модель данных"
         @select="handleSelectModel"
+        @clear="handleClearModel"
+        clearable
     ></el-autocomplete>
 
     <el-checkbox v-model="localItem.isMock">Моки</el-checkbox>
@@ -92,10 +94,19 @@ export default class FormEdit extends Vue {
   }, {
     value: 'POST',
     label: 'POST',
+  }, {
+    value: 'PUT',
+    label: 'PUT',
+  }, {
+    value: 'DELETE',
+    label: 'DELETE',
   }];
 
   optionsPlaceVariable = ['in-path', 'query', 'body'];
-  optionsTypeVariable = ['int', 'String', 'bool'];
+
+  get optionsTypeVariable() {
+    return ['int', 'bool', 'String', ...this.$store.getters.allModelsClasses];
+  }
 
   localVariable: ApiFunctionParam = {
     name: '',
@@ -192,7 +203,12 @@ export default class FormEdit extends Vue {
   handleSelectModel(item: { value: string, item: Model }) {
     this.selectModel = item.item;
     this.localItem.modelUUID = item.item.uuid;
-  }
+  };
+
+  handleClearModel() {
+    this.selectModel = null;
+    this.localItem.modelUUID = '';
+  };
 }
 </script>
 

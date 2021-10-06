@@ -1,4 +1,5 @@
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
+import _ from "lodash";
 
 export interface ApiFunctionParam {
     place: 'in-path' | 'query' | 'body',
@@ -11,7 +12,7 @@ export interface ApiFunction {
     name: string
     path: string
     desc: string
-    method: 'GET' | 'POST'
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE'
     modelUUID: string
     isList: boolean
     isMock: boolean
@@ -35,36 +36,48 @@ class Api {
             const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
             const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
 
-            return `static Future<ApiResponse<List<${model.name}>>> ${e.name}(${getParamsApiFunction(e)}) {
+            return `static Future<ApiResponse<List<${model.name}>>> ${e.name}(${getParamsApiFunction(e)}) async {
         final Map<String, dynamic> params = {};
         ${codePaginate}${codeFilter} ${codeSearch}
-        return ApiClient.dio
+        
+        try {
+        return await ApiClient.dio
             ${e.method == 'GET' ? `.get('${bindParams(e.path, e.params, e.isMock && e.isList)}', queryParameters: params)` : `.post('${bindParams(e.path, e.params, e.isMock && e.isList)}', data: params)`}
             .then((value) => ApiResponse(
                   ${model.name}.listFromJson(value.data['data']),
                   meta: MetaPage.fromJson(value.data['meta']),
-                ))
-            .catchError((error) => ApiResponse(<${model.name}>[], error: error));
+                ));
+        } catch (error) {
+            return ApiResponse(<${model.name}>[], error: error);
+        }
       }\n`;
         }
 
-        if (model && !e.isList) {
+        if (!e.isList) {
             const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
             const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
             const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
 
-            return `static Future<ApiResponse<${model.name}>> ${e.name}(${getParamsApiFunction(e)}) {
+            return `static Future<${model ? `ApiResponse<${model.name}>` : 'dynamic'}> ${e.name}(${getParamsApiFunction(e)}) async {
         final Map<String, dynamic> params = {};
-        ${codePaginate}${codeFilter} ${codeSearch}
-        return ApiClient.dio
-            ${e.method == 'GET' ? `.get('${bindParams(e.path, e.params, e.isMock && e.isList)}', queryParameters: params)` : `.post('${bindParams(e.path, e.params, e.isMock && e.isList)}', data: params)`}
-            .then((value) => ApiResponse(${model.name}.fromJson(value.data)))
-            .catchError((error) => ApiResponse(${model.name}.empty(), error: error));
+        ${codePaginate}${codeFilter}${codeSearch}
+        ${postParams(e)}
+        try {
+        return await ApiClient.dio
+            ${e.method == 'GET' ? `.get('${bindParams(e.path, e.params, e.isMock && e.isList)}', queryParameters: params)` : `.${e.method.toLowerCase()}('${bindParams(e.path, e.params, e.isMock && e.isList)}', data: params)`}
+            ${model ? `.then((value) => ApiResponse(${model.name}.fromJson(value.data)));` : '.then((value) => value.data);'}
+                    } catch (error) {
+            ${model ? `return ApiResponse<${model.name}>(${model.name}.empty(), error: error);` : `debugPrint(error.toString()); return error;`}
+        }
       }\n`;
         }
     }).join('\n')}
 }
 `
+}
+
+function postParams(func: ApiFunction) {
+    return `params.addAll({${func.params?.map(param => `"${_.snakeCase(param.name)}": ${param.name}`).join(', ')}});\n`;
 }
 
 function bindParams(path: string, params: ApiFunctionParam[] = [], hasPaginate = false) {
@@ -91,7 +104,7 @@ function bindParams(path: string, params: ApiFunctionParam[] = [], hasPaginate =
 }
 
 function getParamsApiFunction(e: ApiFunction) {
-    const res: string[] = e.params?.map(e => `required ${e.type} ${e.name}`) ?? [];
+    const res: string[] = e.params?.map(e => `required ${e.type} ${e.name},`) ?? [];
 
     if (e.isList) {
         if (e.hasSearch) res.push('String? search,')

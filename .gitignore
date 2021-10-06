@@ -28,6 +28,7 @@ pnpm-debug.log*
 /src/utils/templates/cubit-list/*.js
 /src/utils/templates/cubit-view/*.js
 /src/views/ApiClient/*.js
+/src/store/*.js
 
 /src/*.js.map
 /src/utils/*.js.map
@@ -35,3 +36,4 @@ pnpm-debug.log*
 /src/utils/templates/cubit-list/*.js.map
 /src/utils/templates/cubit-view/*.js.map
 /src/views/ApiClient/*.js.map
+/src/store/*.js.map

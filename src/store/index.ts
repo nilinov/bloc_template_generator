@@ -23,6 +23,7 @@ export enum ACTIONS {
     RESTORE = 'RESTORE',
     LOGIN = 'LOGIN',
     SET_MODEL = 'SET_MODEL',
+    SET_MODELS = 'SET_MODELS',
     REMOVE_MODEL = 'REMOVE_MODEL',
     LOAD_ALL = 'LOAD_ALL',
     SET_PROJECT = 'SET_PROJECT',
@@ -90,14 +91,19 @@ export default new Vuex.Store<RootState>({
         },
         [MUTATIONS.SET_PROJECT](state, uuid: string) {
             state.project_uuid = uuid;
+            localStorage.setItem('project_uuid', uuid);
         },
     },
     actions: {
         async [ACTIONS.RESTORE](ctx) {
+            console.log('ACTIONS.RESTORE')
             ctx.commit(MUTATIONS.UPDATE_PENDING, true);
 
             const db = await unAuthDb();
             ctx.commit(MUTATIONS.SET_DB, db);
+
+            if (localStorage.getItem('project_uuid'))
+                ctx.commit(MUTATIONS.SET_PROJECT, localStorage.getItem('project_uuid'))
 
             await ctx.dispatch(ACTIONS.LOAD_ALL);
 
@@ -113,6 +119,7 @@ export default new Vuex.Store<RootState>({
             ctx.dispatch(ACTIONS.LOAD_ALL);
         },
         async [ACTIONS.LOAD_ALL](ctx) {
+            console.log('ACTIONS.LOAD_ALL')
             if (ctx.state.db) {
                 const [models, apiFunctions] = await Promise.all([
                     await api.getModels(ctx.state.db, ctx.state.project_uuid),
@@ -129,6 +136,12 @@ export default new Vuex.Store<RootState>({
                 api.storeModel(state.db, state.project_uuid, state.models);
             }
         },
+        async [ACTIONS.SET_MODELS]({state, commit}, items: Model[]) {
+            if (state.db) {
+                commit(MUTATIONS.RESTORE_MODELS, items)
+                await api.storeModel(state.db, state.project_uuid, state.models);
+            }
+        },
         async [ACTIONS.REMOVE_MODEL]({state, commit}, uuid: string) {
             if (state.db) {
                 commit(MUTATIONS.REMOVE_MODEL, uuid)
@@ -136,6 +149,7 @@ export default new Vuex.Store<RootState>({
             }
         },
         async [ACTIONS.SET_PROJECT]({state, commit, dispatch, getters, rootGetters}, uuid: string) {
+            console.log('ACTIONS.SET_PROJECT')
             if (state.db) {
                 commit(MUTATIONS.UPDATE_PENDING, true);
                 if (getters.project) {

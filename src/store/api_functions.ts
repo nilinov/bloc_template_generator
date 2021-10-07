@@ -19,6 +19,7 @@ export enum MUTATIONS_API_FUNCTIONS {
 export enum ACTIONS_API_FUNCTIONS {
     RESTORE = 'API_FUNCTIONS/RESTORE',
     SET = 'API_FUNCTIONS/SET',
+    SET_ALL = 'API_FUNCTIONS/SET_ALL',
     REMOVE = 'API_FUNCTIONS/REMOVE',
 }
 
@@ -57,16 +58,26 @@ export const apiFunctionsModule: Module<State, RootState> = {
 
             ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, false);
         },
+        async [ACTIONS_API_FUNCTIONS.SET_ALL](ctx, items: ApiFunction[]) {
+            ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, true);
+
+            if (ctx.rootState.db) {
+                ctx.commit(MUTATIONS_API_FUNCTIONS.RESTORE, items);
+                await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
+            }
+
+            ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, false);
+        },
         async [ACTIONS_API_FUNCTIONS.SET](ctx, item: ApiFunction) {
             if (ctx.rootState.db) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.SET, item);
-                api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
+                await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
             }
         },
         async [ACTIONS_API_FUNCTIONS.REMOVE](ctx, uuid: string) {
             if (ctx.rootState.db) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.REMOVE, uuid);
-                api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
+                await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
             }
         },
     },

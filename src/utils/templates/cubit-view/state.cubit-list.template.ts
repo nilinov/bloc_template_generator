@@ -1,4 +1,4 @@
-import {JsonData} from "../../interfaces.js";
+import {JsonData} from "../../interfaces";
 import {
   camelToSnakeCase,
   getAllFinalVariables,
@@ -7,7 +7,7 @@ import {
   getVariableAndType,
   getVariables,
   toMap
-} from "../../utils.js";
+} from "../../utils";
 import {getVariablesAndDefault} from "../bloc-default/bloc.default.tempalte";
 
 const stateCubitListTemplate = (bloc: JsonData) => `

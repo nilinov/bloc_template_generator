@@ -1,5 +1,5 @@
-import {CaseEvent, JsonData, Prop} from "../../interfaces.js";
-import {camelToSnakeCase, UpperFirstLetter} from "../../utils.js";
+import {CaseEvent, JsonData, Prop} from "../../interfaces";
+import {camelToSnakeCase, UpperFirstLetter} from "../../utils";
 
 export function getFullEventName(blocName: string, eventName: string) {
     return `${blocName}${UpperFirstLetter(eventName)}Event`;

@@ -1,4 +1,4 @@
-import {BlocGetter, JsonData, Prop} from "./interfaces.js";
+import {BlocGetter, JsonData, Prop} from "./interfaces";
 
 export const props = (itemType: string): { [x: string]: Prop } => ({
     items: {

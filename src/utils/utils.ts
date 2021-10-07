@@ -1,4 +1,4 @@
-import {BlocGetter, JsonData, Prop} from "./interfaces.js";
+import {BlocGetter, JsonData, Prop} from "./interfaces";
 import * as _ from 'lodash';
 import {getDefaultValue} from "./templates/bloc-default/bloc.default.tempalte";
 

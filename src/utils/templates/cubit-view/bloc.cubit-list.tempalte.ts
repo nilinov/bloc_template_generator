@@ -1,5 +1,5 @@
-import {BlocEvent, JsonData} from "../../interfaces.js";
-import {camelToSnakeCase, getVariableAndType, UpperFirstLetter} from "../../utils.js";
+import {BlocEvent, JsonData} from "../../interfaces";
+import {camelToSnakeCase, getVariableAndType, UpperFirstLetter} from "../../utils";
 import {getVariablesEvent} from "../bloc-default/bloc.default.tempalte";
 
 const blocCubitListTemplate = (bloc: JsonData) => `

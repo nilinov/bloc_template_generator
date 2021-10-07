@@ -1,11 +1,11 @@
-import {Bloc, BlocEvent, CaseEvent, JsonData} from "../../interfaces.js";
+import {Bloc, BlocEvent, CaseEvent, JsonData} from "../../interfaces";
 import {
     camelToSnakeCase,
     getAllFinalVariables,
     getVariableAndType,
     getVariables,
     UpperFirstLetter
-} from "../../utils.js";
+} from "../../utils";
 import {
     getEventNext,
     getEventsSwitch,

@@ -1,24 +1,15 @@
-import {BlocGetter, JsonData, Prop} from "../../interfaces.js";
-import {
-  camelToSnakeCase,
-  getAllFinalVariables,
-  getCopyWithParams,
-  getGetters,
-  getVariableAndType,
-  getVariables,
-  toMap
-} from "../../utils.js";
-import {getDefaultValue, getVariablesAndDefault} from "../bloc-default/bloc.default.tempalte";
+import {BlocGetter, JsonData, Prop} from "../../interfaces";
+import {camelToSnakeCase, getGetters} from "../../utils";
 import getStateDefaultCode from "../../getStateDefaultCode";
 
-export const EmptyProps: {[name: string]: Prop} = {};
-export const EmptyGetter: {[name: string]: BlocGetter} = {};
+export const EmptyProps: { [name: string]: Prop } = {};
+export const EmptyGetter: { [name: string]: BlocGetter } = {};
 
 const stateCubitListTemplate = (bloc: JsonData, params = {
-  ApiCall: 'ApiCall',
-  hasSearch: true,
-  hasPaginate: true,
-  hasFilter: true,
+    ApiCall: 'ApiCall',
+    hasSearch: true,
+    hasPaginate: true,
+    hasFilter: true,
 }) => `
 part of '${camelToSnakeCase(bloc.name)}_cubit.dart';
 

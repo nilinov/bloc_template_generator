@@ -1,6 +1,6 @@
-import {BlocEvent, JsonData} from "../../interfaces.js";
-import {camelToSnakeCase, getAllFinalVariables, getVariables} from "../../utils.js";
-import {getFullEventName} from "./bloc.default.tempalte.js";
+import {BlocEvent, JsonData} from "../../interfaces";
+import {getFullEventName} from "./bloc.default.tempalte";
+import {camelToSnakeCase, getAllFinalVariables, getVariables} from "../../utils";
 
 
 function getEvents(blocName: string, event: BlocEvent) {

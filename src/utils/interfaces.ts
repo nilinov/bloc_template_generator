@@ -61,3 +61,4 @@ export interface JsonData {
     actionProp: Prop,
 }
 
+export type codeLang = 'dart' | 'ts'

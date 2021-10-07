@@ -31,8 +31,20 @@
           action
       />
 
-      <render-code v-if="!isEnum" :items="items" :name-class="name"/>
-      <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>
+      <el-tabs v-model="codeLang">
+        <el-tab-pane label="Dart" name="dart">
+          <template v-if="codeLang === 'dart'">
+            <render-code v-if="!isEnum" :items="items" :name-class="name"/>
+            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="TypeScript" name="TS">
+          <template v-if="codeLang === 'TS'">
+            <render-code-type-script v-if="!isEnum" :items="items" :name-class="name"/>
+<!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
+          </template>
+        </el-tab-pane>
+      </el-tabs>
     </div>
     <div v-else>
       Не выбрана модель
@@ -49,9 +61,11 @@ import {ACTIONS, MUTATIONS} from "@/store";
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
+import RenderCodeTypeScript from "@/views/ModelEditor/RenderCodeTypeScript.vue";
 
 @Component({
   components: {
+    RenderCodeTypeScript,
     RenderEnumCode,
     SelectBox,
     TextBox,
@@ -66,6 +80,8 @@ export default class ModelEditor extends Vue {
   AdditionalInfo = '';
   isEnum: boolean = false;
   isOpen = true;
+
+  codeLang = 'dart'
 
   @Watch('AdditionalInfo')
   onChildChanged(val: string, oldVal: string) {
@@ -102,7 +118,7 @@ export default class ModelEditor extends Vue {
     }
     if (this.$route.name == 'Model') {
       if (this.allModels.length) {
-        this.$router.push({name: 'ModelEdit', params: { uuid: this.allModels[0].uuid }})
+        this.$router.push({name: 'ModelEdit', params: {uuid: this.allModels[0].uuid}})
       }
     }
   }
@@ -125,7 +141,7 @@ export default class ModelEditor extends Vue {
 
     if (this.$route.name == 'Model') {
       if (this.allModels.length) {
-        this.$router.push({name: 'ModelEdit', params: { uuid: this.allModels[0].uuid }})
+        this.$router.push({name: 'ModelEdit', params: {uuid: this.allModels[0].uuid}})
       }
     }
   }

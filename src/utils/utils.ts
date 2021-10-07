@@ -1,10 +1,30 @@
-import {BlocGetter, JsonData, Prop} from "./interfaces";
+import {BlocGetter, codeLang, JsonData, Prop} from "./interfaces";
 import * as _ from 'lodash';
 import {getDefaultValue} from "./templates/bloc-default/bloc.default.tempalte";
 
-export function getFullType(prop: Prop, params?: { noRequired?: boolean }): string {
-    const afterNoRequired = params?.noRequired ? '?' : '';
+export function getFullType(prop: Prop, params?: { noRequired?: boolean, lang: codeLang }): string {
 
+    if (params?.lang == 'ts') {
+        if (prop.typeTemplate?.array) {
+            return `${prop.typeName}[]`;
+        } else if (prop.typeTemplate?.enum) {
+            return `${prop.typeName}`;
+        } else if (prop.typeTemplate?.double) {
+            return `double`;
+        } else if (prop.typeTemplate?.int) {
+            return `integer`;
+        } else if (prop.typeTemplate?.string) {
+            return `string`;
+        } else if (prop.typeTemplate?.map) {
+            return `{[x: ${prop.typeTemplate.map.key}]: ${prop.typeTemplate.map.value}`
+        } else if (prop.typeTemplate?.dynamic) {
+            return `any`;
+        }
+
+        return `${prop.typeName}`;
+    }
+
+    const afterNoRequired = params?.noRequired ? '?' : '';
     if (prop.typeTemplate?.array) {
         return `List<${prop.typeName}>${afterNoRequired}`;
     } else if (prop.typeTemplate?.enum) {
@@ -151,19 +171,46 @@ export function getFinalVariable(variable: string, type: Prop, params?: {}) {
     return `final ${getFullType(type)}${nullable} ${variable};`
 }
 
-export function getVariableAndType(variables: { [x: string]: Prop }, params?: { required?: boolean, noRequired?: boolean, addAction?: Prop }) {
+export function getVariableAndType(variables: { [x: string]: Prop }, params?: { required?: boolean, noRequired?: boolean, addAction?: Prop, lang?: codeLang }) {
     let res = [];
+    if (params.lang == 'ts') {
+        if (params?.required) {
+            res = Object.keys(variables).map(variable => `\t  ${variable}: ${getFullType(variables[variable], {lang: params.lang})}\n`)
+        } else if (params?.noRequired) {
+            res = Object.keys(variables).map(variable => `\t ${variable}?: ${getFullType(variables[variable], {
+                noRequired: true,
+                lang: params.lang
+            })}\n`)
+        } else {
+            res = Object.keys(variables).map(variable => {
+                const noReq =  variables[variable]?.typeTemplate?.nullable ? '?' : '';
+                return `\t ${variable}${noReq}: ${getFullType(variables[variable], {
+                    lang: params.lang,
+                    noRequired: variables[variable]?.typeTemplate?.nullable,
+                })}\n`;
+            });
+        }
+
+        if (params?.addAction?.name) {
+            res.push(`\t required ${getFullType(params?.addAction, {lang: params.lang})} ${params?.addAction?.name},\n`);
+        }
+
+        return res.join('');
+    }
 
     if (params?.required) {
-        res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable])} ${variable},\n`)
+        res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable], {lang: params.lang})} ${variable},\n`)
     } else if (params?.noRequired) {
-        res = Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], {noRequired: true})} ${variable},\n`)
+        res = Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], {
+            noRequired: true,
+            lang: params.lang
+        })} ${variable},\n`)
     } else {
-        res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable])} ${variable},\n`);
+        res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable], {lang: params.lang})} ${variable},\n`);
     }
 
     if (params?.addAction?.name) {
-        res.push(`\t required ${getFullType(params?.addAction)} ${params?.addAction?.name},\n`);
+        res.push(`\t required ${getFullType(params?.addAction, {lang: params.lang})} ${params?.addAction?.name},\n`);
     }
 
     return res.join('');

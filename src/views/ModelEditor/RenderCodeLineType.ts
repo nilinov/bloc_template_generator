@@ -1,5 +1,6 @@
 /** @type PropItem */
 import {getParamFunction} from "@/utils/utils";
+import {OpenAPIV3} from "openapi-types";
 
 export interface Model {
     uuid: string,
@@ -15,6 +16,26 @@ export interface PropItem {
     type: 'String' | 'int' | 'double' | 'DateTime' | string,
     defaultValue: '' | '0' | 'false' | 'true' | string,
     nullable: boolean,
+}
+
+export function getPropItemTypeFromSwaggerType(type: OpenAPIV3.NonArraySchemaObjectType | OpenAPIV3.ArraySchemaObjectType | "") {
+    switch (type) {
+        case "array":
+            return "List<>";
+        case "boolean":
+            return "bool";
+        case "integer":
+            return "int";
+        case "number":
+            return "double";
+        case "object":
+            return "Object";
+        case "string":
+            return "String";
+        default:
+            return "Object";
+
+    }
 }
 
 const renderCodeLineType = (item: PropItem) => `final ${item.type}${item.nullable ? '?' : ''} ${item.name};`;

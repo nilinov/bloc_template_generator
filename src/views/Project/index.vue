@@ -28,6 +28,7 @@ import {ACTIONS} from "@/store";
 import {ACTIONS_PROJECT} from "@/store/project";
 import {downloadURI} from "@/main";
 import {ACTIONS_API_FUNCTIONS} from "@/store/api_functions";
+import {parseSwagger} from "@/views/Project/parse_swagger";
 
 @Component({})
 export default class Project extends Vue {
@@ -39,7 +40,9 @@ export default class Project extends Vue {
   mounted() {
     this.reset();
 
+    // @ts-ignore
     this.$refs.dropArea.addEventListener('dragover', this.handleDragOver, false);
+    // @ts-ignore
     this.$refs.dropArea.addEventListener('drop', this.handleFileSelect, false);
 
   }
@@ -71,34 +74,40 @@ export default class Project extends Vue {
   }
 
   handleImport() {
+    // @ts-ignore
     this.$refs.files.click()
   }
 
-  handleFileSelect(evt) {
+  handleFileSelect(evt: any) {
     evt.stopPropagation();
     evt.preventDefault();
 
     console.log('handleFileSelect')
     const files = evt.target.files ?? evt.dataTransfer.files; // FileList object.
     const f = files[0];
-
-    if (f.type == "application/json") {
-      console.log(f)
-
+    if (f.type == "application/json" || f.type == '') {
       const reader = new FileReader();
       const _this = this;
-
-      // Closure to capture the file information.
-      reader.onload = (function (theFile) {
-        return function (e) {
-          _this.importProject(JSON.parse(e.target.result))
+      reader.onload = (function (theFile: any) {
+        return function (e: any) {
+          const text = e.target.result
+          try {
+            _this.importProject(JSON.parse(text))
+          } catch (e) {
+            _this.importSwagger(text)
+          }
         }
       })(f);
       reader.readAsText(f);
     }
   }
 
-  async importProject(json) {
+  async importProject(json: any) {
+    if (json.openapi || json.swagger) {
+      this.importSwagger(JSON.stringify(json))
+      return;
+    }
+
     this.message = 'Проект сохраняется'
 
     await this.$store.dispatch(ACTIONS.SET_MODELS, json.models);
@@ -108,7 +117,12 @@ export default class Project extends Vue {
     setTimeout(() => this.message = '', 3600)
   }
 
-  handleDragOver(evt) {
+  async importSwagger(text: string) {
+    const res = await parseSwagger(text);
+    console.log({res})
+  }
+
+  handleDragOver(evt: any) {
     console.log('handleDragOver')
     evt.stopPropagation();
     evt.preventDefault();

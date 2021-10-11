@@ -6,7 +6,7 @@ export const simpleTypes = ['int', 'String', 'bool', ];
 export interface ApiFunctionParam {
     place: 'in-path' | 'query' | 'body',
     name: string
-    type: 'int' | 'String' | 'bool'
+    type: 'int' | 'String' | 'bool' | string
 }
 
 export interface ApiFunction {

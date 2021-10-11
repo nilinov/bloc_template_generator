@@ -78,6 +78,16 @@ function getSwaggerPlace(place: 'in-path' | 'query' | 'body') {
     return place;
 }
 
+export function fromSwaggerPlace(place: 'path' | 'query' | 'body') {
+    switch (place) {
+        case "query":
+            return "query";
+        case 'path':
+            return 'in-path';
+    }
+    return place;
+}
+
 function getSwaggerType(type: any) {
     switch (type) {
         case 'int':

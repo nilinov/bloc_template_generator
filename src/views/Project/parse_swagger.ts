@@ -4,7 +4,9 @@ import {OpenAPIV3} from "openapi-types";
 import yaml from "js-yaml";
 import {getPropItemTypeFromSwaggerType, Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import _ from "lodash";
-import {simpleTypes} from "@/views/ApiClient/generate_code_api_client";
+import {ApiFunction, simpleTypes} from "@/views/ApiClient/generate_code_api_client";
+import {fromSwaggerPlace} from "@/views/ApiClient/generate_swagger_file";
+import {getFullType} from "@/utils/utils";
 
 function wrapName(name: string) {
     return _.camelCase(name);
@@ -20,29 +22,27 @@ function wrapType(type: string, isArray = false) {
     return _type;
 }
 
-function getPropItemFromSwagger(name: string, prop: any, isArray: boolean = false): PropItem {
+function getPropType(prop: any, isArray: boolean = false) {
     if (prop['$ref']) {
         const _items = (prop['$ref'] as string).split('/');
 
-        return {
-            name: wrapName(name),
-            desc: '',
-            type: wrapType(_items[_items.length - 1], isArray),
-            nullable: false,
-            defaultValue: "",
-        }
+        return wrapType(_items[_items.length - 1], isArray);
     } else {
-        return {
-            name: wrapName(name),
-            type: wrapType(getPropItemTypeFromSwaggerType(prop['type']), isArray),
-            defaultValue: "",
-            desc: "",
-            nullable: false,
-        }
+        return wrapType(getPropItemTypeFromSwaggerType(prop['type']), isArray)
     }
 }
 
-export async function parseSwagger(text: string): Promise<{ models: Model[] }> {
+function getPropItemFromSwagger(name: string, prop: any, isArray: boolean = false): PropItem {
+    return {
+        name: wrapName(name),
+        type: getPropType(prop, isArray),
+        defaultValue: "",
+        desc: "",
+        nullable: false,
+    }
+}
+
+export async function parseSwagger(text: string, allModels: Model[] = []): Promise<{ models: Model[], functions: ApiFunction[] }> {
     const resYaml = yaml.load(text);
 
     const res = await SwaggerParser.parse(resYaml as any);
@@ -50,6 +50,73 @@ export async function parseSwagger(text: string): Promise<{ models: Model[] }> {
 
     const yamlModels = Object.values(((res as any).components).schemas ?? {}) as OpenAPIV3.ArraySchemaObject[];
 
+    const apiFunctions: ApiFunction[] = []
+
+
+    Object.keys(((res as any).paths) ?? {}).map((path) => {
+        const pathObj = (res as any).paths[path];
+        const pathsItems = path.split('/');
+
+        if (pathObj.get) {
+            const func = pathObj.get as OpenAPIV3.OperationObject;
+            const name = wrapName(func.operationId ?? pathsItems[pathsItems.length - 1] ?? '');
+
+            const response200 = ((func.responses[200] ?? func.responses['200']) as any)?.content?.['application/json']?.schema;
+            let modelUUID: string = '';
+
+            if (response200.hasOwnProperty('$ref')) {
+                const _response200 = response200 as OpenAPIV3.ReferenceObject;
+                modelUUID = allModels.find(e => e.name == getPropType(_response200))?.uuid ?? ''
+            } else if (!response200.hasOwnProperty('$ref')) {
+                console.error('Не найдена модель ', response200);
+            }
+
+            apiFunctions.push({
+                path: path ?? '',
+                uuid: Math.random().toString(),
+                desc: func.description ?? func.summary ?? '',
+                params: func.parameters?.map((param: OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject) => {
+                    if (!param.hasOwnProperty('$ref')) {
+                        const _params = param as OpenAPIV3.ParameterObject;
+                        const _type = getPropType(_params.schema);
+
+                        return ({
+                            place: fromSwaggerPlace(_params.in as any),
+                            name: _params.name,
+                            type: _type,
+                        });
+                    } else {
+                        const _params = param as OpenAPIV3.ParameterObject & OpenAPIV3.ReferenceObject;
+                        const _type = getPropType(_params);
+
+                        return ({
+                            place: fromSwaggerPlace(_params.in as any),
+                            name: _params.name,
+                            type: _type,
+                        });
+                    }
+                }) ?? [],
+                name: name,
+                method: 'GET',
+                isMock: false,
+                hasPaginate: !!func.parameters?.find((e) => (e as OpenAPIV3.ParameterObject).name == 'page'),
+                hasSearch: !!func.parameters?.find((e) => (e as OpenAPIV3.ParameterObject).name == 'search'),
+                hasFilter: !!func.parameters?.find((e) => ((e as OpenAPIV3.ParameterObject).name).indexOf('filter') != -1),
+                modelUUID: modelUUID,
+                isList: false,
+            });
+        }
+    });
+
+    console.log([...apiFunctions])
+
+    return {
+        models: parseSwaggerModels(yamlModels),
+        functions: apiFunctions,
+    }
+}
+
+function parseSwaggerModels(yamlModels: OpenAPIV3.ArraySchemaObject[]) {
     const enums: Model[] = [];
 
     const yamlModels2: Model[] = yamlModels.map(e => {
@@ -77,7 +144,7 @@ export async function parseSwagger(text: string): Promise<{ models: Model[] }> {
                 props.push({
                     name: wrapName(key),
                     type: wrapType(key),
-                    desc:'',
+                    desc: '',
                     nullable: false,
                     defaultValue: '',
                 })
@@ -95,7 +162,5 @@ export async function parseSwagger(text: string): Promise<{ models: Model[] }> {
         }
     })
 
-    return {
-        models: [...yamlModels2, ...enums],
-    }
+    return [...yamlModels2, ...enums];
 }

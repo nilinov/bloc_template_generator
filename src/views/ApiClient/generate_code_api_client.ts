@@ -1,6 +1,8 @@
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import _ from "lodash";
 
+export const simpleTypes = ['int', 'String', 'bool', ];
+
 export interface ApiFunctionParam {
     place: 'in-path' | 'query' | 'body',
     name: string

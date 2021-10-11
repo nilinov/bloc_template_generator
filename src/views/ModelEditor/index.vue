@@ -44,6 +44,12 @@
 <!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
           </template>
         </el-tab-pane>
+        <el-tab-pane label="VueJS / ElementUI / Table" name="vue_js_element_ui_table">
+          <template v-if="codeLang === 'vue_js_element_ui_table'">
+            <render-code-element-table v-if="!isEnum" :items="items" :name-class="name"/>
+<!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
+          </template>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <div v-else>
@@ -62,9 +68,11 @@ import {Component, Vue, Watch} from 'vue-property-decorator';
 import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
 import RenderCodeTypeScript from "@/views/ModelEditor/RenderCodeTypeScript.vue";
+import RenderCodeElementTable from "@/views/ModelEditor/RenderCodeElementTable.vue";
 
 @Component({
   components: {
+    RenderCodeElementTable,
     RenderCodeTypeScript,
     RenderEnumCode,
     SelectBox,

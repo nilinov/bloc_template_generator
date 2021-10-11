@@ -3,7 +3,7 @@
     <span class="fileName">{{ fileName }}</span>
     <div class="codeForSave">
       <!--      <span>import '../_imports.dart';</span><br><br>-->
-      <pre v-text="getInterfaceTS(bloc, {postfix: ''})"></pre>
+      <pre v-text="getElementUiTable(bloc, {postfix: ''})"></pre>
     </div>
   </div>
 </template>
@@ -14,6 +14,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {JsonData, Prop} from "@/utils/interfaces";
 import _ from "lodash";
 import {getInterfaceTS} from "@/utils/getInterfaceTS";
+import {getElementUiTable} from "@/utils/getElementUiTable";
 
 const VueBase = Vue.extend({
   props: {
@@ -26,7 +27,7 @@ const VueBase = Vue.extend({
 })
 
 @Component({})
-export default class RenderCodeTypeScript extends VueBase {
+export default class RenderCodeElementTable extends VueBase {
   nameClass!: string
   items!: PropItem[]
 
@@ -52,7 +53,7 @@ export default class RenderCodeTypeScript extends VueBase {
 
   get bloc(): JsonData {
     return {
-      name: this.nameClass,
+      name: this.nameClass + 'Table',
       state: {
         props: this.stateProps,
       },
@@ -69,10 +70,10 @@ export default class RenderCodeTypeScript extends VueBase {
   }
 
   get fileName() {
-    return _.snakeCase(this.nameClass) + '.ts'
+    return _.snakeCase(this.nameClass) + '_table.vue'
   }
 
-  getInterfaceTS = getInterfaceTS;
+  getElementUiTable = getElementUiTable;
 }
 </script>
 

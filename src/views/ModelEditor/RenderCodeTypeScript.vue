@@ -3,7 +3,8 @@
     <span class="fileName">{{ fileName }}</span>
     <div class="codeForSave">
       <!--      <span>import '../_imports.dart';</span><br><br>-->
-      <pre v-text="getInterfaceTS(bloc, {postfix: ''})"></pre>
+      <pre v-if="!isEnum" v-text="getInterfaceTS(bloc, {postfix: ''})"></pre>
+      <pre v-if="isEnum" v-text="getEnumTS(bloc, {postfix: ''})"></pre>
     </div>
   </div>
 </template>
@@ -13,7 +14,7 @@ import {PropItem} from "./RenderCodeLineType";
 import {Component, Vue} from 'vue-property-decorator';
 import {JsonData, Prop} from "@/utils/interfaces";
 import _ from "lodash";
-import {getInterfaceTS} from "@/utils/getInterfaceTS";
+import {getEnumTS, getInterfaceTS} from "@/utils/getInterfaceTS";
 
 const VueBase = Vue.extend({
   props: {
@@ -25,10 +26,18 @@ const VueBase = Vue.extend({
   },
 })
 
-@Component({})
+@Component({
+  props: {
+    isEnum: {
+      type:Boolean,
+      default: false,
+    }
+  }
+})
 export default class RenderCodeTypeScript extends VueBase {
   nameClass!: string
   items!: PropItem[]
+  isEnum!: boolean
 
   get stateProps() {
     const res: { [x: string]: Prop } = {};
@@ -73,6 +82,7 @@ export default class RenderCodeTypeScript extends VueBase {
   }
 
   getInterfaceTS = getInterfaceTS;
+  getEnumTS = getEnumTS;
 }
 </script>
 

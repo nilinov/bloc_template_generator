@@ -34,20 +34,19 @@
       <el-tabs v-model="codeLang">
         <el-tab-pane label="Dart" name="dart">
           <template v-if="codeLang === 'dart'">
-            <render-code v-if="!isEnum" :items="items" :name-class="name"/>
-            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>
+            <render-code class="code" v-if="!isEnum" :items="items" :name-class="name"/>
+            <render-enum-code class="code" v-if="isEnum" :items="items" :name-class="name"/>
           </template>
         </el-tab-pane>
         <el-tab-pane label="TypeScript" name="TS">
           <template v-if="codeLang === 'TS'">
-            <render-code-type-script v-if="!isEnum" :items="items" :name-class="name"/>
-<!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
+            <render-code-type-script class="code" :items="items" :name-class="name" :is-enum="isEnum"/>
           </template>
         </el-tab-pane>
         <el-tab-pane label="VueJS / ElementUI / Table" name="vue_js_element_ui_table">
           <template v-if="codeLang === 'vue_js_element_ui_table'">
-            <render-code-element-table v-if="!isEnum" :items="items" :name-class="name"/>
-<!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
+            <render-code-element-table class="code" v-if="!isEnum" :items="items" :name-class="name"/>
+            <!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
           </template>
         </el-tab-pane>
       </el-tabs>
@@ -287,6 +286,10 @@ export default class ModelEditor extends Vue {
       select {
         width: 500px;
       }
+    }
+
+    .code {
+      min-height: 100vh;
     }
   }
 

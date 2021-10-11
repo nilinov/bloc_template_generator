@@ -1,8 +1,9 @@
-import {BlocGetter, codeLang, JsonData, Prop} from "./interfaces";
+import {BlocGetter, CodeLang, JsonData, Prop} from "./interfaces";
 import * as _ from 'lodash';
 import {getDefaultValue} from "./templates/bloc-default/bloc.default.tempalte";
+import {PropItem} from "../views/ModelEditor/RenderCodeLineType";
 
-export function getFullType(prop: Prop, params?: { noRequired?: boolean, lang: codeLang }): string {
+export function getFullType(prop: Prop, params?: { noRequired?: boolean, lang: CodeLang }): string {
 
     if (params?.lang == 'ts') {
         if (prop.typeTemplate?.array) {
@@ -171,8 +172,8 @@ export function getFinalVariable(variable: string, type: Prop, params?: {}) {
     return `final ${getFullType(type)}${nullable} ${variable};`
 }
 
-export function getVariableAndType(variables: { [x: string]: Prop }, params?: { required?: boolean, noRequired?: boolean, addAction?: Prop, lang?: codeLang }) {
-    const lang: codeLang = params?.lang ?? 'dart';
+export function getVariableAndType(variables: { [x: string]: Prop }, params?: { required?: boolean, noRequired?: boolean, addAction?: Prop, lang?: CodeLang }) {
+    const lang: CodeLang = params?.lang ?? 'dart';
     const addActionName = params?.addAction?.name ?? ''
     let res = [];
 
@@ -233,10 +234,18 @@ export const camelToSnakeCase = (str: string = '  ') => str.replace(/[A-Z]/g, le
 
 export const UpperFirstLetter = (str: string = '  ') => str[0].toUpperCase() + str.slice(1);
 
-export function getParamFunction(name = '', nullable = false) {
-    if (nullable)
-        return `\tthis.${name},\n`
-    return `\t required this.${name},\n`;
+export function getParamFunction(name = '', nullable = false, params?: { lang: CodeLang }) {
+    const lang: CodeLang = params?.lang ?? 'dart';
+
+    if (lang == 'dart') {
+        if (nullable)
+            return `\tthis.${name},\n`
+        return `\t required this.${name},\n`;
+    } else if (lang == 'ts') {
+        if (nullable)
+            return `${name}?`
+        return `${name}`;
+    }
 }
 
 export function getVariables(props: { [x: string]: Prop }, params?: { required: boolean, addAction?: Prop }) {
@@ -245,7 +254,6 @@ export function getVariables(props: { [x: string]: Prop }, params?: { required: 
         res = Object.keys(props).map(name => getParamFunction(name, props[name]?.typeTemplate?.nullable ?? false));
     } else {
         res = Object.keys(props).map(name => {
-            console.log(`${name}`)
             return getParamFunction(name, props[name]?.typeTemplate?.nullable ?? true);
         });
     }
@@ -255,6 +263,29 @@ export function getVariables(props: { [x: string]: Prop }, params?: { required: 
     }
 
     return `{ \n${res.join('')} }`;
+}
+
+function getNullableProp(prop: Prop, defValue: boolean = false) {
+    return prop.typeTemplate?.nullable ?? false
+}
+
+export function getVariablesNames(props: { [x: string]: Prop }, params?: { required: boolean, addAction?: Prop, lang: CodeLang }) {
+    const lang: CodeLang = params?.lang ?? 'dart';
+
+    let res = [];
+    if (params?.required) {
+        res = Object.keys(props).map(name => getParamFunction(name, getNullableProp(props[name]), {lang: lang}));
+    } else {
+        res = Object.keys(props).map(name => {
+            return getParamFunction(name, getNullableProp(props[name], true), {lang: lang});
+        });
+    }
+
+    if (params?.addAction?.name) {
+        res.push(getParamFunction(params.addAction.name, false, {lang: lang}))
+    }
+
+    return res;
 }
 
 export function getCopyWithParams(bloc: JsonData, params?: { addAction?: Prop }) {

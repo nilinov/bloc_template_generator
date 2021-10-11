@@ -119,7 +119,8 @@ export default class Project extends Vue {
 
   async importSwagger(text: string) {
     const res = await parseSwagger(text);
-    console.log({res})
+
+    await this.$store.dispatch(ACTIONS.SET_MODELS, res.models);
   }
 
   handleDragOver(evt: any) {

@@ -172,45 +172,48 @@ export function getFinalVariable(variable: string, type: Prop, params?: {}) {
 }
 
 export function getVariableAndType(variables: { [x: string]: Prop }, params?: { required?: boolean, noRequired?: boolean, addAction?: Prop, lang?: codeLang }) {
+    const lang: codeLang = params?.lang ?? 'dart';
+    const addActionName = params?.addAction?.name ?? ''
     let res = [];
-    if (params.lang == 'ts') {
+
+    if (params?.lang == 'ts') {
         if (params?.required) {
-            res = Object.keys(variables).map(variable => `\t  ${variable}: ${getFullType(variables[variable], {lang: params.lang})}\n`)
+            res = Object.keys(variables).map(variable => `\t  ${variable}: ${getFullType(variables[variable], {lang: lang})}\n`)
         } else if (params?.noRequired) {
             res = Object.keys(variables).map(variable => `\t ${variable}?: ${getFullType(variables[variable], {
                 noRequired: true,
-                lang: params.lang
+                lang: lang
             })}\n`)
         } else {
             res = Object.keys(variables).map(variable => {
                 const noReq =  variables[variable]?.typeTemplate?.nullable ? '?' : '';
                 return `\t ${variable}${noReq}: ${getFullType(variables[variable], {
-                    lang: params.lang,
+                    lang: lang,
                     noRequired: variables[variable]?.typeTemplate?.nullable,
                 })}\n`;
             });
         }
 
-        if (params?.addAction?.name) {
-            res.push(`\t required ${getFullType(params?.addAction, {lang: params.lang})} ${params?.addAction?.name},\n`);
+        if (params?.addAction && addActionName) {
+            res.push(`\t required ${getFullType(params?.addAction, {lang: lang})} ${addActionName},\n`);
         }
 
         return res.join('');
     }
 
     if (params?.required) {
-        res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable], {lang: params.lang})} ${variable},\n`)
+        res = Object.keys(variables).map(variable => `\t required ${getFullType(variables[variable], {lang: lang})} ${variable},\n`)
     } else if (params?.noRequired) {
         res = Object.keys(variables).map(variable => `\t ${getFullType(variables[variable], {
             noRequired: true,
-            lang: params.lang
+            lang: lang
         })} ${variable},\n`)
     } else {
-        res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable], {lang: params.lang})} ${variable},\n`);
+        res = Object.keys(variables).map(variable => `\t${getFullType(variables[variable], {lang: lang})} ${variable},\n`);
     }
 
-    if (params?.addAction?.name) {
-        res.push(`\t required ${getFullType(params?.addAction, {lang: params.lang})} ${params?.addAction?.name},\n`);
+    if (params?.addAction && addActionName) {
+        res.push(`\t required ${getFullType(params?.addAction, {lang: lang})} ${addActionName},\n`);
     }
 
     return res.join('');

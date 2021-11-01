@@ -6,10 +6,9 @@ import {getPropItemTypeFromSwaggerType, Model, PropItem} from "@/views/ModelEdit
 import _ from "lodash";
 import {ApiFunction, simpleTypes} from "@/views/ApiClient/generate_code_api_client";
 import {fromSwaggerPlace} from "@/views/ApiClient/generate_swagger_file";
-import {getFullType} from "@/utils/utils";
 
 function wrapName(name: string) {
-    return _.camelCase(name);
+    return _.camelCase(name).split('Api').join('').split('Admin').join('').split('V1').join('');
 }
 
 function wrapType(type: string, isArray = false) {

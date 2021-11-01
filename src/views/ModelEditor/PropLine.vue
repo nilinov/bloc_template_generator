@@ -17,6 +17,7 @@
     <TextBox v-if="!isEnum" class="text-box" placeholder="Default value" v-model="item.defaultValue"
              :disabled="item.nullable"/>
     <TextBox class="text-box" placeholder="Desc" v-model="item.desc"/>
+    <TextBox class="text-box" placeholder="JSON field" v-model="item.jsonField"/>
     <input v-if="!isEnum" type="checkbox" v-model="item.nullable">
     <button :disabled="disabled" v-if="action" @click="AddItem">Добавить</button>
     <button v-else @click="$emit('remove')">Удалить</button>
@@ -40,6 +41,7 @@ import {fuzzy} from "@/main";
         type: 'int',
         defaultValue: '0',
         nullable: false,
+        jsonField: null,
       }),
     },
     allTypes: Array,
@@ -100,7 +102,7 @@ export default class ModelEditor extends Vue {
 .ModelEditor {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: auto auto auto auto 20px 150px;
+  grid-template-columns: auto auto auto auto auto 20px 150px;
   align-items: center;
 
   &.isEnum {

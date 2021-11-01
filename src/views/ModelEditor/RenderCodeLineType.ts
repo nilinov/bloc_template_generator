@@ -16,6 +16,7 @@ export interface PropItem {
     type: 'String' | 'int' | 'double' | 'DateTime' | string,
     defaultValue: '' | '0' | 'false' | 'true' | string,
     nullable: boolean,
+    jsonField?: string
 }
 
 export function getPropItemTypeFromSwaggerType(type: OpenAPIV3.NonArraySchemaObjectType | OpenAPIV3.ArraySchemaObjectType | "") {

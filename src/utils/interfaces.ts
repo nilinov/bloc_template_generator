@@ -17,6 +17,7 @@ export interface Prop {
         bool?: boolean
     }
     default?: string
+    jsonField?: string
 }
 
 export interface BlocEvent {

@@ -1,7 +1,6 @@
 import {BlocGetter, CodeLang, JsonData, Prop} from "./interfaces";
 import * as _ from 'lodash';
 import {getDefaultValue} from "./templates/bloc-default/bloc.default.tempalte";
-import {PropItem} from "../views/ModelEditor/RenderCodeLineType";
 
 export function getFullType(prop: Prop, params?: { noRequired?: boolean, lang: CodeLang }): string {
 
@@ -50,35 +49,36 @@ export function toMap(props: { [name: string]: Prop }) {
 
     return '{\n' + Object.keys(props).map((key) => {
         const prop = props[key];
+        const field = prop.jsonField ?? key;
         const nullable = prop.typeTemplate?.nullable ? '?' : '';
 
         if (prop.typeTemplate?.array) {
-            return `"${key}": '[' + (${key}${prop.typeTemplate?.nullable ? ' ?? []' : ''}).map((e) => e.toJson()).join(', ') + ']'`;
+            return `"${field}": '[' + (${key}${prop.typeTemplate?.nullable ? ' ?? []' : ''}).map((e) => e.toJson()).join(', ') + ']'`;
         } else if (prop.typeTemplate?.enum) {
-            return `"${key}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
+            return `"${field}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
         } else if (prop.typeTemplate?.double) {
-            return `"${key}": ${key}`;
+            return `"${field}": ${key}`;
         } else if (prop.typeTemplate?.int) {
-            return `"${key}": ${key}`;
+            return `"${field}": ${key}`;
         } else if (prop.typeTemplate?.string) {
-            return `"${key}": ${key}`;
+            return `"${field}": ${key}`;
         } else if (prop.typeTemplate?.bool) {
-            return `"${key}": ${key}`;
+            return `"${field}": ${key}`;
         } else if (prop.typeTemplate?.map) {
-            return `"${key}": ${key}`;
+            return `"${field}": ${key}`;
         } else if (prop.typeTemplate?.class) {
-            return `"${key}": ${key}${nullable}.toJson()`;
+            return `"${field}": ${key}${nullable}.toJson()`;
         } else if (prop.typeTemplate?.dynamic) {
-            return `"${key}": ${key}`;
+            return `"${field}": ${key}`;
         } else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
-                return `"${key}": ${key}${nullable}.toIso8601String()`;
+                return `"${field}": ${key}${nullable}.toIso8601String()`;
             } else if (prop.typeName == 'bool') {
-                return `"${key}": ${key}`;
+                return `"${field}": ${key}`;
             } else if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') != -1) {
-                return `"${key}": ${key}`;
+                return `"${field}": ${key}`;
             } else {
-                return `"${key}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
+                return `"${field}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
             }
         } else {
             console.error(`Не могу вывести свойство ${key}`, prop)
@@ -97,40 +97,41 @@ export function fromMap(props: { [name: string]: Prop }, params?: { addAction?: 
 
     const keys = Object.keys(props).map((key) => {
         const prop = props[key];
+        const field = prop.jsonField ?? key;
         const isNullable = prop.typeTemplate?.nullable;
         const nullable = isNullable ? '?' : '';
 
         if (prop.typeTemplate?.array) {
-            return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${key}"])`;
+            return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${field}"])`;
         } else if (prop.typeTemplate?.enum) {
-            return `${key}: ${key}FromJson(json["${key}"])`;
+            return `${key}: ${key}FromJson(json["${field}"])`;
         } else if (prop.typeTemplate?.double) {
             if (isNullable)
-                return `${key}: json["${key}"] != null ? (json["${key}"] as num).toDouble() : null`;
+                return `${key}: json["${field}"] != null ? (json["${field}"] as num).toDouble() : null`;
 
-            return `${key}: (json["${key}"] as num).toDouble()`;
+            return `${key}: (json["${field}"] as num).toDouble()`;
         } else if (prop.typeTemplate?.int) {
-            return `${key}: json["${key}"] as int${nullable}`;
+            return `${key}: json["${field}"] as int${nullable}`;
         } else if (prop.typeTemplate?.string) {
-            return `${key}: json["${key}"] as String${nullable}`;
+            return `${key}: json["${field}"] as String${nullable}`;
         } else if (prop.typeTemplate?.map) {
-            return `${key}: ${key}FromJson(json["${key}"])`;
+            return `${key}: ${key}FromJson(json["${field}"])`;
         } else if (prop.typeTemplate?.class) {
-            return `${key}: ${prop.typeName}.fromJson(json["${key}"]) as ${prop.typeName}`;
+            return `${key}: ${prop.typeName}.fromJson(json["${field}"]) as ${prop.typeName}`;
         } else if (prop.typeTemplate?.dynamic) {
-            return `${key}: json["${key}"]`;
+            return `${key}: json["${field}"]`;
         } else if (prop.typeName) {
             if (prop.typeName == 'DateTime') {
                 if (isNullable)
-                    return `${key}: json["${key}"] == null ? null : DateTime.parse(json["${key}"])`;
+                    return `${key}: json["${field}"] == null ? null : DateTime.parse(json["${field}"])`;
 
-                return `${key}: DateTime.parse(json["${key}"])`;
+                return `${key}: DateTime.parse(json["${field}"])`;
             } else if (prop.typeName == 'bool') {
-                return `${key}: json["${key}"] as bool${nullable}`;
+                return `${key}: json["${field}"] as bool${nullable}`;
             } else if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') != -1) {
-                return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${key}"])`;
+                return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${field}"])`;
             } else {
-                return `${key}: ${_.camelCase(prop.typeName)}FromJson(json["${key}"])`;
+                return `${key}: ${_.camelCase(prop.typeName)}FromJson(json["${field}"])`;
             }
         } else {
             console.error(`Не могу вывести свойство ${key}`, prop)
@@ -187,7 +188,7 @@ export function getVariableAndType(variables: { [x: string]: Prop }, params?: { 
             })}\n`)
         } else {
             res = Object.keys(variables).map(variable => {
-                const noReq =  variables[variable]?.typeTemplate?.nullable ? '?' : '';
+                const noReq = variables[variable]?.typeTemplate?.nullable ? '?' : '';
                 return `\t ${variable}${noReq}: ${getFullType(variables[variable], {
                     lang: lang,
                     noRequired: variables[variable]?.typeTemplate?.nullable,

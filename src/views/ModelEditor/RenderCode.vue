@@ -53,6 +53,7 @@ export default class RenderCode extends VueBase {
           nullable: e.nullable,
         },
         default: e.defaultValue,
+        jsonField: e.jsonField
       }
     })
 

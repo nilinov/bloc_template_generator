@@ -41,6 +41,55 @@ function getPropItemFromSwagger(name: string, prop: any, isArray: boolean = fals
     }
 }
 
+function extractFunction(path: string, func: OpenAPIV3.OperationObject, props: { allModels: Model[], pathsItems: any[], method: string } = {allModels: [], pathsItems: [], method: 'GET'}) : ApiFunction {
+    const name = wrapName(func.operationId ?? props.pathsItems[props.pathsItems.length - 1] ?? '');
+
+    const response200 = ((func.responses[200] ?? func.responses['200']) as any)?.content?.['application/json']?.schema;
+    let modelUUID: string = '';
+
+    if (response200.hasOwnProperty('$ref')) {
+        const _response200 = response200 as OpenAPIV3.ReferenceObject;
+        modelUUID = props.allModels.find(e => e.name == getPropType(_response200))?.uuid ?? ''
+    } else if (!response200.hasOwnProperty('$ref')) {
+        console.error('Не найдена модель ', response200);
+    }
+
+    return {
+        path: path ?? '',
+        uuid: Math.random().toString(),
+        desc: func.description ?? func.summary ?? '',
+        params: func.parameters?.map((param: OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject) => {
+            if (!param.hasOwnProperty('$ref')) {
+                const _params = param as OpenAPIV3.ParameterObject;
+                const _type = getPropType(_params.schema);
+
+                return ({
+                    place: fromSwaggerPlace(_params.in as any),
+                    name: _params.name,
+                    type: _type,
+                });
+            } else {
+                const _params = param as OpenAPIV3.ParameterObject & OpenAPIV3.ReferenceObject;
+                const _type = getPropType(_params);
+
+                return ({
+                    place: fromSwaggerPlace(_params.in as any),
+                    name: _params.name,
+                    type: _type,
+                });
+            }
+        }) ?? [],
+        name: name,
+        method: props.method as "GET" | "POST" | "PUT" | "DELETE",
+        isMock: false,
+        hasPaginate: !!func.parameters?.find((e) => (e as OpenAPIV3.ParameterObject).name == 'page'),
+        hasSearch: !!func.parameters?.find((e) => (e as OpenAPIV3.ParameterObject).name == 'search'),
+        hasFilter: !!func.parameters?.find((e) => ((e as OpenAPIV3.ParameterObject).name).indexOf('filter') != -1),
+        modelUUID: modelUUID,
+        isList: false,
+    }
+}
+
 export async function parseSwagger(text: string, allModels: Model[] = []): Promise<{ models: Model[], functions: ApiFunction[] }> {
     const resYaml = yaml.load(text);
 
@@ -58,52 +107,19 @@ export async function parseSwagger(text: string, allModels: Model[] = []): Promi
 
         if (pathObj.get) {
             const func = pathObj.get as OpenAPIV3.OperationObject;
-            const name = wrapName(func.operationId ?? pathsItems[pathsItems.length - 1] ?? '');
-
-            const response200 = ((func.responses[200] ?? func.responses['200']) as any)?.content?.['application/json']?.schema;
-            let modelUUID: string = '';
-
-            if (response200.hasOwnProperty('$ref')) {
-                const _response200 = response200 as OpenAPIV3.ReferenceObject;
-                modelUUID = allModels.find(e => e.name == getPropType(_response200))?.uuid ?? ''
-            } else if (!response200.hasOwnProperty('$ref')) {
-                console.error('Не найдена модель ', response200);
-            }
-
-            apiFunctions.push({
-                path: path ?? '',
-                uuid: Math.random().toString(),
-                desc: func.description ?? func.summary ?? '',
-                params: func.parameters?.map((param: OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject) => {
-                    if (!param.hasOwnProperty('$ref')) {
-                        const _params = param as OpenAPIV3.ParameterObject;
-                        const _type = getPropType(_params.schema);
-
-                        return ({
-                            place: fromSwaggerPlace(_params.in as any),
-                            name: _params.name,
-                            type: _type,
-                        });
-                    } else {
-                        const _params = param as OpenAPIV3.ParameterObject & OpenAPIV3.ReferenceObject;
-                        const _type = getPropType(_params);
-
-                        return ({
-                            place: fromSwaggerPlace(_params.in as any),
-                            name: _params.name,
-                            type: _type,
-                        });
-                    }
-                }) ?? [],
-                name: name,
-                method: 'GET',
-                isMock: false,
-                hasPaginate: !!func.parameters?.find((e) => (e as OpenAPIV3.ParameterObject).name == 'page'),
-                hasSearch: !!func.parameters?.find((e) => (e as OpenAPIV3.ParameterObject).name == 'search'),
-                hasFilter: !!func.parameters?.find((e) => ((e as OpenAPIV3.ParameterObject).name).indexOf('filter') != -1),
-                modelUUID: modelUUID,
-                isList: false,
-            });
+            apiFunctions.push(extractFunction(path, func, {allModels: allModels, pathsItems: pathsItems, method: 'GET'}));
+        }
+        if (pathObj.post) {
+            const func = pathObj.post as OpenAPIV3.OperationObject;
+            apiFunctions.push(extractFunction(path, func, {allModels: allModels, pathsItems: pathsItems, method: "POST"}));
+        }
+        if (pathObj.put) {
+            const func = pathObj.get as OpenAPIV3.OperationObject;
+            apiFunctions.push(extractFunction(path, func, {allModels: allModels, pathsItems: pathsItems, method: "PUT"}));
+        }
+        if (pathObj.delete) {
+            const func = pathObj.get as OpenAPIV3.OperationObject;
+            apiFunctions.push(extractFunction(path, func, {allModels: allModels, pathsItems: pathsItems, method: "DELETE"}));
         }
     });
 

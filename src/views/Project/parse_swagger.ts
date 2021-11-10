@@ -42,16 +42,17 @@ function getPropItemFromSwagger(name: string, prop: any, isArray: boolean = fals
 }
 
 function extractFunction(path: string, func: OpenAPIV3.OperationObject, props: { allModels: Model[], pathsItems: any[], method: string } = {allModels: [], pathsItems: [], method: 'GET'}) : ApiFunction {
+    console.log(path, func)
     const name = wrapName(func.operationId ?? props.pathsItems[props.pathsItems.length - 1] ?? '');
 
     const response200 = ((func.responses[200] ?? func.responses['200']) as any)?.content?.['application/json']?.schema;
     let modelUUID: string = '';
 
-    if (response200.hasOwnProperty('$ref')) {
+    if (response200?.hasOwnProperty('$ref')) {
         const _response200 = response200 as OpenAPIV3.ReferenceObject;
         modelUUID = props.allModels.find(e => e.name == getPropType(_response200))?.uuid ?? ''
-    } else if (!response200.hasOwnProperty('$ref')) {
-        console.error('Не найдена модель ', response200);
+    } else {
+        console.error('Не найдена модель ', response200, (func.responses[200] ?? func.responses['200']));
     }
 
     return {
@@ -114,11 +115,11 @@ export async function parseSwagger(text: string, allModels: Model[] = []): Promi
             apiFunctions.push(extractFunction(path, func, {allModels: allModels, pathsItems: pathsItems, method: "POST"}));
         }
         if (pathObj.put) {
-            const func = pathObj.get as OpenAPIV3.OperationObject;
+            const func = pathObj.put as OpenAPIV3.OperationObject;
             apiFunctions.push(extractFunction(path, func, {allModels: allModels, pathsItems: pathsItems, method: "PUT"}));
         }
         if (pathObj.delete) {
-            const func = pathObj.get as OpenAPIV3.OperationObject;
+            const func = pathObj.delete as OpenAPIV3.OperationObject;
             apiFunctions.push(extractFunction(path, func, {allModels: allModels, pathsItems: pathsItems, method: "DELETE"}));
         }
     });

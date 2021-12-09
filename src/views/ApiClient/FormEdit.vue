@@ -31,15 +31,14 @@
     <el-checkbox v-model="localItem.hasSearch" v-if="localItem.isList">Есть поиск</el-checkbox>
     <el-checkbox v-model="localItem.hasFilter" v-if="localItem.isList">Есть фильтры</el-checkbox>
 
-    <div v-for="(item, index) of localItem.params" class="form-variable"
-         :key="`variable-${localItem.uuid}-${item.name}`">
-      <el-select v-model="item.place" placeholder="Способ">
+    <div v-for="(item, index) of localItem.params" @input="handleUpdateVariable" class="form-variable">
+      <el-select v-model="localItem.params[index].place" placeholder="Способ">
         <el-option v-for="item in optionsPlaceVariable" :key="item" :label="item" :value="item"></el-option>
       </el-select>
-      <el-select v-model="item.type" placeholder="Тип">
+      <el-select v-model="localItem.params[index].type" @input="handleUpdateVariable" placeholder="Тип">
         <el-option v-for="item in optionsTypeVariable" :key="item" :label="item" :value="item"></el-option>
       </el-select>
-      <el-input v-model="item.name" placeholder="Имя переменной"></el-input>
+      <el-input v-model="localItem.params[index].name" @input="handleUpdateVariable" placeholder="Имя переменной"></el-input>
       <div @click="handleRemoveVariable(index)">
         <el-icon name="minus"></el-icon>
       </div>
@@ -65,7 +64,9 @@ import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
 import {fuzzy} from "@/main";
 
-@Component({props: {item: Object}})
+@Component({
+  props: {item: Object},
+})
 export default class FormEdit extends Vue {
   item!: ApiFunction
 
@@ -180,11 +181,23 @@ export default class FormEdit extends Vue {
 
   handleAddVariable() {
     this.localItem.params?.push({...this.localVariable})
-    this.localVariable = this.emptyVariable;
+    this.updateEmptyValue()
+    this.sendUpdate();
+  }
+
+  handleUpdateVariable() {
+    this.sendUpdate();
   }
 
   handleRemoveVariable(index: number) {
     this.localItem.params?.splice(index, 1)
+    this.sendUpdate();
+  }
+
+  updateEmptyValue() {
+    this.localVariable.name = this.emptyVariable.name;
+    this.localVariable.place = this.emptyVariable.place;
+    this.localVariable.type = this.emptyVariable.type;
   }
 
   get emptyVariable(): ApiFunctionParam {

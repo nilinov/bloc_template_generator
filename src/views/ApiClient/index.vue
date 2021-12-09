@@ -10,7 +10,12 @@
       </el-col>
       <el-col :span="8">
         <template v-for="(item, index) of allFunctions">
-          <FormEdit :item="item" @remove="handleRemove" @update="handleUpdate" :key="`form-${item.uuid}`"/>
+          <FormEdit
+              :item="item"
+              @remove="handleRemove"
+              @update="handleUpdate"
+              :key="`form-${item.uuid}`"
+          />
           <br>
           <hr>
           <br>

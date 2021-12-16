@@ -1,6 +1,6 @@
 <template>
   <div class="ModelEditor" :class="{isEnum}">
-    <TextBox class="text-box" placeholder="Name property" v-model="item.name"/>
+    <TextBox class="text-box" placeholder="Name property" v-model="item.name" @input="updateJsonField"/>
 
     <!--    <SelectBox v-if="!isEnum" class="select-box" placeholder="Select type" :options="options" v-model="item.type"/>-->
 
@@ -30,6 +30,7 @@ import Component from "vue-class-component";
 import {Vue} from "vue-property-decorator";
 import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import {fuzzy} from "@/main";
+import _ from "lodash";
 
 @Component({
   props: {
@@ -80,8 +81,13 @@ export default class ModelEditor extends Vue {
     this.item.type = item.item;
   }
 
+  updateJsonField() {
+    console.log('updateJsonField')
+    this.item.jsonField = _.snakeCase(this.item.name);
+  }
+
   get options() {
-    return ['String', 'int', 'double', 'DateTime', 'bool', ...this.$store.getters.allModels]
+    return ['String', 'int', 'double', 'DateTime', 'bool', ...this.$store.getters.allModels, 'List<String>', 'List<int>', 'List<double>', 'List<DateTime>', 'List<bool>']
   };
 
   get disabled() {
@@ -106,7 +112,7 @@ export default class ModelEditor extends Vue {
   align-items: center;
 
   &.isEnum {
-    grid-template-columns: 1fr auto 150px;
+    grid-template-columns: 1fr 1fr auto 150px;
   }
 }
 </style>

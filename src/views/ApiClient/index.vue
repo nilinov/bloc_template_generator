@@ -62,9 +62,9 @@ import {emptyApiFunction} from "@/utils/emptyApiFunction";
 })
 export default class ApiClient extends Vue {
 
-  // lang = 'swagger'
+  lang = 'swagger'
   // lang = 'dart'
-  lang = 'laravel'
+  // lang = 'laravel'
 
   get allFunctions(): ApiFunction[] {
     return this.$store.getters.allApiFunctions ?? [];

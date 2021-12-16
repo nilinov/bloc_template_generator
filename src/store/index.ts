@@ -51,7 +51,8 @@ export default new Vuex.Store<RootState>({
             return [getters.allModels];
         },
         allModelsClasses(state): string[] {
-            return [...state.models.filter(e => e.isEnum == false).map(e => e.name)]
+            const onlyModels = state.models.filter(e => e.isEnum == false).map(e => e.name)
+            return [...onlyModels, ...onlyModels.map(e => `List<${e}>`) ]
         },
     },
     state: {

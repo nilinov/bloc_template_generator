@@ -44,7 +44,7 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
                 "responses": {
                     "200": {
                         "description": "Успешное выполнение запроса",
-                        "schema": getSchemaLinkByClass(model)
+                        "schema": getSchemaLinkByClass(model, func.isList)
                     }
                 },
             }
@@ -166,13 +166,13 @@ function getNameClassSingle(name: string) {
     return name;
 }
 
-export function getSchemaLinkByClass(model?: Model) {
+export function getSchemaLinkByClass(model?: Model, isArray: boolean = false) {
     if (model?.isEnum) return {
         "type": "string",
         "enum": model.props.map(e => e.name),
     }
 
-    if (model?.name?.indexOf('List<') == 0) {
+    if (model && (model.name?.indexOf('List<') == 0 || isArray)) {
         return {
             "type": "array",
             "items": `$ref: '#/definitions/${getNameClassSingle(model.name ?? '')}`

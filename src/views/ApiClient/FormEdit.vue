@@ -15,6 +15,8 @@
     <el-input v-model="localItem.name" placeholder="Имя функции"></el-input>
     <el-input v-model="localItem.path" placeholder="Путь запроса"></el-input>
     <el-input v-model="localItem.desc" placeholder="Описание функции"></el-input>
+    <el-input v-model="localItem.tag" placeholder="Тег"></el-input>
+
     <el-autocomplete
         class="inline-input"
         v-model="labelSelectModel"
@@ -83,6 +85,7 @@ export default class FormEdit extends Vue {
     hasPaginate: false,
     hasSearch: false,
     params: [],
+    tag: '',
   }
 
   models: Model[] = [];
@@ -144,6 +147,7 @@ export default class FormEdit extends Vue {
     this.localItem.hasSearch = this.item.hasSearch;
     this.localItem.hasFilter = this.item.hasFilter;
     this.localItem.params = this.item.params;
+    this.localItem.tag = this.item.tag;
 
     this.selectModel = this.allModels.find(e => e.uuid == this.item.modelUUID)
     this.labelSelectModel = this.selectModel?.name ?? '';

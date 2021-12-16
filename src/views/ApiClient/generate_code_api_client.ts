@@ -14,6 +14,7 @@ export interface ApiFunction {
     name: string
     path: string
     desc: string
+    tag: string
     method: 'GET' | 'POST' | 'PUT' | 'DELETE'
     modelUUID: string
     isList: boolean

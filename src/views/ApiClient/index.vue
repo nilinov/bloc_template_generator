@@ -36,6 +36,11 @@
               <pre class="codeForSave" v-text="code"></pre>
             </template>
           </el-tab-pane>
+          <el-tab-pane label="Laravel" name="laravel">
+            <template v-if="lang === 'laravel'">
+              <LaravelTabContent/>
+            </template>
+          </el-tab-pane>
         </el-tabs>
       </el-col>
     </el-row>
@@ -49,14 +54,17 @@ import FormEdit from "@/views/ApiClient/FormEdit.vue";
 import {ApiFunction, generateCodeApiClient} from "@/views/ApiClient/generate_code_api_client";
 import {ACTIONS_API_FUNCTIONS} from "@/store/api_functions";
 import {generateSwaggerFile} from "@/views/ApiClient/generate_swagger_file";
+import LaravelTabContent from "@/views/ApiClient/components/LaravelTabContent.vue";
+import {emptyApiFunction} from "@/utils/emptyApiFunction";
 
 @Component({
-  components: {FormEdit}
+  components: {LaravelTabContent, FormEdit}
 })
 export default class ApiClient extends Vue {
 
   // lang = 'swagger'
-  lang = 'dart'
+  // lang = 'dart'
+  lang = 'laravel'
 
   get allFunctions(): ApiFunction[] {
     return this.$store.getters.allApiFunctions ?? [];
@@ -70,20 +78,7 @@ export default class ApiClient extends Vue {
   }
 
   get emptyApiFunction(): ApiFunction {
-    return {
-      uuid: Math.random().toString(),
-      desc: '',
-      name: '',
-      path: '/',
-      method: 'GET',
-      modelUUID: '',
-      isList: false,
-      isMock: true,
-      hasFilter: false,
-      hasPaginate: false,
-      hasSearch: false,
-      params: [],
-    }
+    return emptyApiFunction();
   }
 
   get allModels(): Model[] {
@@ -109,6 +104,8 @@ export default class ApiClient extends Vue {
     console.log(this.allModels)
     if (this.lang == 'dart') {
       this.code = generateCodeApiClient(this.allFunctions, this.allModels);
+    } else if (this.lang == 'laravel') {
+      this.code = "";
     } else {
       this.code = generateSwaggerFile(this.allModels, this.allFunctions);
     }

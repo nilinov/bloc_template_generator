@@ -106,7 +106,7 @@ function getSwaggerType(type: any) {
     return type;
 }
 
-function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
+export function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
     const props: { [x: string]: any } = {};
 
     for (const prop of model?.props ?? []) {
@@ -166,7 +166,7 @@ function getNameClassSingle(name: string) {
     return name;
 }
 
-function getSchemaLinkByClass(model?: Model) {
+export function getSchemaLinkByClass(model?: Model) {
     if (model?.isEnum) return {
         "type": "string",
         "enum": model.props.map(e => e.name),

@@ -1,9 +1,16 @@
 <template>
   <div class="index">
     <div class="all-models">
-      <div class="model" v-for="item of allModels" :class="{active: uuid === item.uuid}"
-           @click="$router.push(`/Model/${item.uuid}`)">{{ item.name }}
-      </div>
+
+      <ListModel />
+
+<!--      <div-->
+<!--          class="model" v-for="item of allModels"-->
+<!--          :class="{active: uuid === item.uuid}"-->
+<!--          @click="$router.push(`/Model/${item.uuid}`)"-->
+<!--      >-->
+<!--        {{ item.name }}-->
+<!--      </div>-->
       <div class="model" @click="$router.push(`/Model/Add`)">Добавить</div>
     </div>
     <div class="content" v-if="isOpen">
@@ -68,9 +75,11 @@ import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
 import RenderCodeTypeScript from "@/views/ModelEditor/RenderCodeTypeScript.vue";
 import RenderCodeElementTable from "@/views/ModelEditor/RenderCodeElementTable.vue";
+import ListModel from "@/views/ModelEditor/ListModel.vue";
 
 @Component({
   components: {
+    ListModel,
     RenderCodeElementTable,
     RenderCodeTypeScript,
     RenderEnumCode,

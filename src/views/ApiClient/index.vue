@@ -9,7 +9,25 @@
         </div>
       </el-col>
       <el-col :span="8">
-        <template v-for="(item, index) of allFunctions">
+        <div>
+          <el-tag
+              v-for="item of tags"
+              @click="selectTag !== item ? selectTag = item : selectTag = ''"
+              style="margin-right: .5rem; cursor: pointer;"
+              :type="item === selectTag ? `success` : ''"
+          >
+            {{ item }}
+          </el-tag>
+
+        </div>
+        <br>
+        <hr>
+        <br>
+
+        <template
+            v-for="(item, index) of allFunctions"
+            v-if="selectTag !== '' ? item.tag === selectTag : true"
+        >
           <FormEdit
               :item="item"
               @remove="handleRemove"
@@ -98,6 +116,18 @@ export default class ApiClient extends Vue {
   @Watch('lang')
   handleChange3() {
     this.updateCode();
+  }
+
+  selectTag = '';
+
+  get tags() {
+    const tags = this.allFunctions.map(e => e.tag).filter(e => e);
+
+    const res: {[x: string]: boolean} = {}
+
+    for(const tag of tags) res[tag] = true;
+
+    return Object.keys(res);
   }
 
   updateCode() {

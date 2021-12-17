@@ -15,8 +15,6 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
     for (const func of allFunctions) {
         const model = allModels.find(model => model.uuid == func.modelUUID);
 
-        console.log({func})
-
         const params = [];
         const paramsBody = [];
 
@@ -40,10 +38,6 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
         const resPath = func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/');
 
         console.log(`${resPath}`)
-
-        if (resPath == `/taskmanager`) {
-            console.log('111')
-        }
 
         path[resPath] = {
             "parameters": params,
@@ -116,6 +110,8 @@ function getSwaggerType(type: any) {
 }
 
 export function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
+    console.log(`${model?.name}`)
+
     const props: { [x: string]: any } = {};
 
     for (const prop of model?.props ?? []) {
@@ -145,7 +141,7 @@ export function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
                         }
                     }
 
-                    return type;
+                    // return type;
                 } else {
                     type = {
                         "type": "array",
@@ -251,7 +247,7 @@ function wrapPaginate(obj: any) {
         "properties": {
             "data": obj,
             "meta": {
-                "$ref": "#/components/schemas/PaginationMeta"
+                "$ref": "#/definitions/PaginationMeta"
             }
         }
     }

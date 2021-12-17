@@ -40,6 +40,21 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
 
         console.log(`${resPath}`)
 
+        for (const param of func.params ?? []) {
+            if (param.place === 'body') {
+                const model = allModels.find(e => e.name == param.type);
+                const schema = model ? getSchemaLinkByClass(model, {isArray: false, paginate: false}) : {}
+
+                paramsBody.push({
+                    name: param.name,
+                    in: 'body',
+                    required: true,
+                    "schema": schema,
+                })
+            }
+
+        }
+
         path[resPath] = {
             "parameters": params,
             [func.method.toLowerCase()]: {
@@ -52,6 +67,10 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
                     }
                 },
             }
+        };
+
+        if (func.method.toLowerCase() != 'get') {
+            path[resPath][func.method.toLowerCase()]["parameters"] = paramsBody;
         }
     }
 

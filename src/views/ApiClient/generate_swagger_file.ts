@@ -37,7 +37,15 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
             localPath.push('page', ':page')
         }
 
-        path[func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')] = {
+        const resPath = func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/');
+
+        console.log(`${resPath}`)
+
+        if (resPath == `/taskmanager`) {
+            console.log('111')
+        }
+
+        path[resPath] = {
             "parameters": params,
             [func.method.toLowerCase()]: {
                 "tags": [func.tag],
@@ -45,7 +53,7 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
                 "responses": {
                     "200": {
                         "description": "Успешное выполнение запроса",
-                        "schema": getSchemaLinkByClass(model, func.isList)
+                        "schema": getSchemaLinkByClass(model, {isArray: func.isList, paginate: func.hasPaginate})
                     }
                 },
             }
@@ -57,10 +65,10 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
         "swagger": "2.0",
         "info": {
             "version": "1.0.0",
-            "title": "Mad Team swagger",
+            "title": `Api documentation`,
             "description": ""
         },
-        "host": "ovz5.j1121565.m719m.vps.myjino.ru",
+        "host": "sample.com",
         "schemes": ["http"],
         "consumes": ["application/json"],
         "produces": ["application/json"],
@@ -128,15 +136,16 @@ export function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
             }
 
             if (prop.type.indexOf('List<') == 0) {
-                console.log(`model.name: ${prop.type}`)
 
-                if (['int', 'String', 'bool'].find( e => prop.type.indexOf(e) != -1)) {
-                    return {
+                if (['int', 'String', 'bool'].find(e => prop.type.indexOf(e) != -1)) {
+                    type = {
                         "type": "array",
                         "items": {
                             "type": `${getPropName(getNameClassSingle(prop.type ?? ''))}`
                         }
                     }
+
+                    return type;
                 } else {
                     type = {
                         "type": "array",
@@ -178,9 +187,12 @@ function getPropName(name: string) {
     if (name?.indexOf('List<') == 0) _name = name?.substr(5, name?.length - 6)
 
     switch (_name) {
-        case 'String': return 'string';
-        case 'int': return 'integer';
-        default: return _name;
+        case 'String':
+            return 'string';
+        case 'int':
+            return 'integer';
+        default:
+            return _name;
     }
 }
 
@@ -190,30 +202,57 @@ function getNameClassSingle(name: string) {
     return name;
 }
 
-export function getSchemaLinkByClass(model?: Model, isArray: boolean = false) {
+export function getSchemaLinkByClass(model?: Model, {
+    isArray,
+    paginate
+}: { isArray: boolean, paginate: boolean } = {isArray: false, paginate: false,}) {
     if (model?.isEnum) return {
         "type": "string",
         "enum": model.props.map(e => e.name),
     }
 
+    let res = {};
+
     if (model && (model.name?.indexOf('List<') == 0 || isArray)) {
         if (['int', 'String', 'bool'].includes(model.name)) {
-            return {
+            res = {
                 "type": "array",
                 "items": {
                     "type": `${model.name}`
                 }
             }
-        }
+        } else {
 
-        return {
-            "type": "array",
-            "items": {
-                $ref: `#/definitions/${getPropName(getNameClassSingle(model.name ?? ''))}`
+            res = {
+                "type": "array",
+                "items": {
+                    $ref: `#/definitions/${getPropName(getNameClassSingle(model.name ?? ''))}`
+                }
             }
         }
+
+        if (paginate) {
+            res = wrapPaginate(res);
+        }
+
+        return res;
+    }
+
+    if (paginate) {
+        return wrapPaginate({"$ref": `#/definitions/${model?.name}`})
     }
 
     return {"$ref": `#/definitions/${model?.name}`}
 }
-1
+
+function wrapPaginate(obj: any) {
+    return {
+        "type": "object",
+        "properties": {
+            "data": obj,
+            "meta": {
+                "$ref": "#/components/schemas/PaginationMeta"
+            }
+        }
+    }
+}

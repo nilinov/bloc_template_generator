@@ -88,6 +88,7 @@ function extractFunction(path: string, func: OpenAPIV3.OperationObject, props: {
         hasFilter: !!func.parameters?.find((e) => ((e as OpenAPIV3.ParameterObject).name).indexOf('filter') != -1),
         modelUUID: modelUUID,
         isList: false,
+        tag: func.tags?.[0] ?? '',
     }
 }
 

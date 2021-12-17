@@ -1,5 +1,5 @@
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
-import {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
+import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 
 export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunction[]) {
     console.log(`generateSwaggerFile`, allModels, allFunctions)
@@ -20,13 +20,13 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
         const params = [];
         const paramsBody = [];
 
-         for (const param of func.params ?? []) {
+        for (const param of func.params ?? []) {
             if (param.place != 'body') {
                 params.push({
                     name: param.name,
                     in: getSwaggerPlace(param.place),
                     required: true,
-                    type: getSwaggerType(param.type)
+                    type: getPropName(getSwaggerType(param.type))
                 })
             }
         }
@@ -40,6 +40,7 @@ export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunctio
         path[func.path.split('/').map(e => e[0] === ':' ? `{${e.replace(':', '')}}` : e).join('/')] = {
             "parameters": params,
             [func.method.toLowerCase()]: {
+                "tags": [func.tag],
                 "summary": func.desc,
                 "responses": {
                     "200": {
@@ -127,12 +128,23 @@ export function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
             }
 
             if (prop.type.indexOf('List<') == 0) {
-                type = {
-                    "type": "array",
-                    "items": {
-                        "$ref": `#/definitions/${getNameClassSingle(prop.type ?? '')}`
+                console.log(`model.name: ${prop.type}`)
+
+                if (['int', 'String', 'bool'].find( e => prop.type.indexOf(e) != -1)) {
+                    return {
+                        "type": "array",
+                        "items": {
+                            "type": `${getPropName(getNameClassSingle(prop.type ?? ''))}`
+                        }
                     }
-                };
+                } else {
+                    type = {
+                        "type": "array",
+                        "items": {
+                            "$ref": `#/definitions/${getNameClassSingle(prop.type ?? '')}`
+                        }
+                    };
+                }
                 isModel = true;
             }
             type = getSwaggerType(type);
@@ -160,6 +172,18 @@ export function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
     }
 }
 
+function getPropName(name: string) {
+    let _name = name;
+
+    if (name?.indexOf('List<') == 0) _name = name?.substr(5, name?.length - 6)
+
+    switch (_name) {
+        case 'String': return 'string';
+        case 'int': return 'integer';
+        default: return _name;
+    }
+}
+
 function getNameClassSingle(name: string) {
     if (name?.indexOf('List<') == 0) return name?.substr(5, name?.length - 6)
 
@@ -173,11 +197,23 @@ export function getSchemaLinkByClass(model?: Model, isArray: boolean = false) {
     }
 
     if (model && (model.name?.indexOf('List<') == 0 || isArray)) {
+        if (['int', 'String', 'bool'].includes(model.name)) {
+            return {
+                "type": "array",
+                "items": {
+                    "type": `${model.name}`
+                }
+            }
+        }
+
         return {
             "type": "array",
-            "items": `$ref: '#/definitions/${getNameClassSingle(model.name ?? '')}`
+            "items": {
+                $ref: `#/definitions/${getPropName(getNameClassSingle(model.name ?? ''))}`
+            }
         }
     }
 
     return {"$ref": `#/definitions/${model?.name}`}
 }
+1

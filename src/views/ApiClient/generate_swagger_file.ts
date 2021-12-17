@@ -1,5 +1,6 @@
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
+import _ from "lodash";
 
 export function generateSwaggerFile(allModels: Model[], allFunctions: ApiFunction[]) {
     console.log(`generateSwaggerFile`, allModels, allFunctions)
@@ -117,7 +118,7 @@ export function getSchemaDescByClass(model?: Model, allModels: Model[] = []) {
     for (const prop of model?.props ?? []) {
         const _name = getNameClassSingle(prop.name);
         const model = allModels.find(e => e.name == prop.type);
-        const name = model?.name || _name;
+        const name = _.snakeCase(model?.name || _name);
 
         const isArray = name?.indexOf('List<') == 0;
 

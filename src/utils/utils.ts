@@ -45,7 +45,7 @@ export function getFullType(prop: Prop, params?: { noRequired?: boolean, lang: C
 }
 
 export function toMap(props: { [name: string]: Prop }) {
-    // console.log(`toMap()`, props)
+    console.log(`toMap()`, props)
 
     return '{\n' + Object.keys(props).map((key) => {
         const prop = props[key];

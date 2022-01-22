@@ -8,6 +8,7 @@
         <el-menu-item index="/MockEditor">Mock</el-menu-item>
         <el-menu-item index="/Proxy">KrakenD</el-menu-item>
         <el-menu-item index="/Project">Проект</el-menu-item>
+        <el-menu-item index="/Admin">Admin</el-menu-item>
       </el-menu>
     </el-header>
     <el-main v-loading="isLoading">

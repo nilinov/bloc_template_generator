@@ -75,7 +75,10 @@ export const projectsModule: Module<State, RootState> = {
     },
     getters: {
         allProjects(state): IProject[] {
-            return state.items ?? [];
+            const items = state.items ?? [];
+            items.sort((e1, e2) => e1.version > e2.version ? -1 : 1)
+            items.sort((e1, e2) => e1.name > e2.name ? 1 : -1)
+            return items;
         },
         project(state, getters, rootState): IProject | undefined {
             return (state.items ?? []).find(project => project.uuid == rootState.project_uuid);

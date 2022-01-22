@@ -4,8 +4,9 @@ import {authInApp, unAuthDb} from "@/main";
 import {Model, User} from "@/views/ModelEditor/RenderCodeLineType";
 import api from "@/api";
 import firebase from "firebase/compat";
-import {apiFunctionsModule, MUTATIONS_API_FUNCTIONS} from "@/store/api_functions";
+import {ACTIONS_API_FUNCTIONS, apiFunctionsModule, MUTATIONS_API_FUNCTIONS} from "@/store/api_functions";
 import {ACTIONS_PROJECT, projectsModule} from "@/store/project";
+import {IProject} from "@/views/ApiClient/generate_code_api_client";
 
 Vue.use(Vuex)
 
@@ -27,6 +28,7 @@ export enum ACTIONS {
     REMOVE_MODEL = 'REMOVE_MODEL',
     LOAD_ALL = 'LOAD_ALL',
     SET_PROJECT = 'SET_PROJECT',
+    CLONE_PROJECT = 'CLONE_PROJECT',
 }
 
 export interface RootState {
@@ -52,7 +54,7 @@ export default new Vuex.Store<RootState>({
         },
         allModelsClasses(state): string[] {
             const onlyModels = state.models.filter(e => e.isEnum == false).map(e => e.name)
-            return [...onlyModels, ...onlyModels.map(e => `List<${e}>`) ]
+            return [...onlyModels, ...onlyModels.map(e => `List<${e}>`)]
         },
     },
     state: {
@@ -153,8 +155,8 @@ export default new Vuex.Store<RootState>({
             console.log('ACTIONS.SET_PROJECT')
             if (state.db) {
                 commit(MUTATIONS.UPDATE_PENDING, true);
+                commit(MUTATIONS.SET_PROJECT, uuid)
                 if (getters.project) {
-                    commit(MUTATIONS.SET_PROJECT, uuid)
                     const [models, apiFunctions] = await Promise.all([
                         await api.getModels(state.db, state.project_uuid),
                         await api.getApiFunctions(state.db, state.project_uuid),
@@ -163,6 +165,38 @@ export default new Vuex.Store<RootState>({
                     commit(MUTATIONS_API_FUNCTIONS.RESTORE, apiFunctions);
                     commit(MUTATIONS.UPDATE_PENDING, false);
                 }
+            }
+        },
+        async [ACTIONS.CLONE_PROJECT]({state, commit, dispatch, getters, rootGetters}, {
+            uuid,
+            version
+        }: { uuid: string, version: number }) {
+            console.log('ACTIONS.CLONE_PROJECT', {uuid, version})
+            if (state.db) {
+                commit(MUTATIONS.UPDATE_PENDING, true);
+                commit(MUTATIONS.SET_PROJECT, uuid);
+
+                const projects = [...getters.allProjects] as IProject[]
+                const selectProject = projects.find(e => e.uuid == uuid) as IProject;
+                const uuids = (getters.allProjects as IProject[]).map(e => Number(e.uuid));
+                uuids.sort((e1, e2) => e1 > e2 ? 1 : -1);
+                const newUuid = Number(uuids.pop()) + 1;
+
+                projects.push({...selectProject, version, uuid: `${newUuid}`})
+
+                await api.storeProjects(state.db, projects)
+
+                await dispatch(ACTIONS_PROJECT.RESTORE)
+
+                commit(MUTATIONS.SET_PROJECT, newUuid);
+
+                const [models, apiFunctions] = await Promise.all([
+                    await api.getModels(state.db, uuid),
+                    await api.getApiFunctions(state.db, uuid),
+                ]);
+                await dispatch(ACTIONS.SET_MODELS, models);
+                await dispatch(ACTIONS_API_FUNCTIONS.SET_ALL, apiFunctions);
+                commit(MUTATIONS.UPDATE_PENDING, false);
             }
         },
     },

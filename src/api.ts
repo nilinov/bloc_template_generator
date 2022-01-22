@@ -11,6 +11,7 @@ const api = {
     getAllData: getAllData,
     getModels: getModels,
     getApiFunctions: getApiFunctions,
+    getAllProjects: getAllProjects,
     storeData: storeData,
     storeApiFunction: storeApiFunction,
     storeModel: storeModel,
@@ -50,6 +51,10 @@ async function storeModel(db: firebase.database.Database, project: string, value
         if (e.desc == undefined) e.desc = ''
         return e;
     }))
+}
+
+async function getAllProjects(db: firebase.database.Database): Promise<IProject[]> {
+    return (((await (await db.ref(getProjectsPath()).get()).val()) as IProject[]) ?? []);
 }
 
 function getProjectApiFunctions(project: string) {

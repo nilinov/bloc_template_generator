@@ -6,6 +6,7 @@ import ModelEditor from '../views/ModelEditor/index.vue'
 import ApiClient from "@/views/ApiClient/index.vue";
 import MockEditor from "@/views/Mock/index.vue";
 import Proxy from "@/views/Proxy/index.vue";
+import Admin from "@/views/Admin/index.vue";
 
 Vue.use(VueRouter)
 
@@ -50,6 +51,11 @@ const routes: Array<RouteConfig> = [
     path: '/Project',
     name: 'Project',
     component: Project
+  },
+  {
+    path: '/Admin',
+    name: 'Admin',
+    component: Admin
   },
   {
     path: '/Proxy',

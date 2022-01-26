@@ -24,9 +24,11 @@ part '${camelToSnakeCase(bloc.name)}_state.dart';
 
 const key${UpperFirstLetter(bloc.name)}State = '${UpperFirstLetter(bloc.name)}';
 
+final ${bloc.name}Cubit cubit${bloc.name} = ${bloc.name}Cubit();
+
 class ${bloc.name}Cubit extends Cubit<${bloc.name}State> {
   ${bloc.name}Cubit() : super(${bloc.name}State.empty());
-
+ß
   ${bloc.events.filter(e => {
     if (!params.hasSearch) if (e.tags?.includes('search')) return false;
     if (!params.hasPaginate) if (e.tags?.includes('paginate')) return false;

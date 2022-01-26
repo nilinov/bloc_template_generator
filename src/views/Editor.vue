@@ -19,11 +19,11 @@
     </div>
     <div class="areas">
       <div class="area-event">
-        <p class="area-title">Bloc</p>
+        <div class="area-title">Bloc <span @click="download(fileNameBloc, code.bloc)">Скачать</span></div>
         <pre class="code" v-text="code.bloc"></pre>
       </div>
       <div class="area-event">
-        <p class="area-title">State</p>
+        <div class="area-title">State <span @click="download(fileNameState, code.state)">Скачать</span></div>
         <pre class="code" v-text="code.state"></pre>
       </div>
       <div class="area-event" v-if="code.event">
@@ -47,6 +47,9 @@ import {sampleLoadView} from "@/utils/sample.load.view";
 import {Component, Vue} from "vue-property-decorator";
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
+import {UpperFirstLetter} from "@/utils/utils";
+import {snakeCase} from "lodash";
+import {downloadURI} from "@/main";
 
 @Component({components: {TextBox, SelectBox}})
 export default class GenerateScreen extends Vue {
@@ -87,6 +90,14 @@ export default class GenerateScreen extends Vue {
 
   apiFunctionUUID = '';
 
+  get fileNameBloc() {
+    return `${snakeCase(this.nameBloc)}_cubit.dart`
+  }
+
+  get fileNameState() {
+    return `${snakeCase(this.nameBloc)}_state.dart`
+  }
+
   get apiFunction() {
     return this.allApiFunctions.find(e => e.uuid == this.apiFunctionUUID);
   }
@@ -103,7 +114,7 @@ export default class GenerateScreen extends Vue {
     if (this.apiFunction) {
       const nameClass = (this.$store.getters.allModelsItems as Model[]).find(e => e.uuid == this.apiFunction?.modelUUID);
       this.nameClassEntity = nameClass?.name ?? '';
-      this.nameBloc = this.apiFunction.name.replace('get', '').replace('post', '');
+      this.nameBloc = UpperFirstLetter(this.apiFunction.name.replace('get', '').replace('post', ''));
 
       this.typeTemplate = 'cubit-list';
 
@@ -117,6 +128,10 @@ export default class GenerateScreen extends Vue {
     } else {
 
     }
+  }
+
+  download(name, text) {
+    downloadURI(name, text);
   }
 
   updateCode() {
@@ -212,6 +227,17 @@ export default class GenerateScreen extends Vue {
   align-self: stretch;
   margin-bottom: 10px;
   @include roboto-18-bold;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  span {
+    font-size: 80%;
+    font-weight: normal;
+
+    cursor: pointer;
+  }
 }
 
 .code {

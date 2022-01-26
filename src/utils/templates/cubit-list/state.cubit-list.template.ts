@@ -11,7 +11,7 @@ const stateCubitListTemplate = (bloc: JsonData, params = {
     hasPaginate: true,
     hasFilter: true,
 }) => `
-part of '${camelToSnakeCase(bloc.name)}_cubit.dart';
+import '../../_imports.dart';
 
 class ${bloc.name}State {
   ${getStateDefaultCode(bloc)}

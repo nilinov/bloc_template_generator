@@ -52,7 +52,7 @@ export function toMap(props: { [name: string]: Prop }) {
         const field = prop.jsonField ?? key;
         const nullable = prop.typeTemplate?.nullable ? '?' : '';
 
-        if (prop.typeTemplate?.array) {
+        if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') == 0) {
             return `"${field}": '[' + (${key}${prop.typeTemplate?.nullable ? ' ?? []' : ''}).map((e) => e.toJson()).join(', ') + ']'`;
         } else if (prop.typeTemplate?.enum) {
             return `"${field}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
@@ -101,7 +101,7 @@ export function fromMap(props: { [name: string]: Prop }, params?: { addAction?: 
         const isNullable = prop.typeTemplate?.nullable;
         const nullable = isNullable ? '?' : '';
 
-        if (prop.typeTemplate?.array) {
+        if (prop.typeTemplate?.array || prop.typeName.indexOf('List<') == 0) {
             return `${key}: ${getPropNameFromList(prop)}.listFromJson(json["${field}"])`;
         } else if (prop.typeTemplate?.enum) {
             return `${key}: ${key}FromJson(json["${field}"])`;

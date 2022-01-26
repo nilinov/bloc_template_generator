@@ -3,7 +3,7 @@ import {
     camelToSnakeCase,
     getAllFinalVariables,
     getVariableAndType,
-    getVariables,
+    getVariables, lowercaseFirstLetter,
     UpperFirstLetter
 } from "../../utils";
 import {
@@ -24,7 +24,7 @@ import '../../_imports.dart';
 
 const key${UpperFirstLetter(bloc.name)}State = '${UpperFirstLetter(bloc.name)}';
 
-final ${bloc.name}Cubit cubit${bloc.name} = ${bloc.name}Cubit();
+final ${bloc.name}Cubit ${lowercaseFirstLetter(bloc.name)}Cubit = ${bloc.name}Cubit();
 
 class ${bloc.name}Cubit extends Cubit<${bloc.name}State> {
   ${bloc.name}Cubit() : super(${bloc.name}State.empty());

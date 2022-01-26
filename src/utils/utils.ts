@@ -235,6 +235,8 @@ export const camelToSnakeCase = (str: string = '  ') => str.replace(/[A-Z]/g, le
 
 export const UpperFirstLetter = (str: string = '  ') => str[0].toUpperCase() + str.slice(1);
 
+export const lowercaseFirstLetter = (string) =>string.charAt(0).toLowerCase() + string.slice(1);
+
 export function getParamFunction(name = '', nullable = false, params?: { lang: CodeLang }) {
     const lang: CodeLang = params?.lang ?? 'dart';
 

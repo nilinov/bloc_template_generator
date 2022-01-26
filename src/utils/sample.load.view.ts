@@ -79,16 +79,16 @@ const sampleLoadView = (name: string, itemType: string, params = {ApiCall: 'ApiC
                 },
                 content: `final res = await ${params.ApiCall}(id: id);`,
                 nextEvent: eventName.loaded,
-                nextEventPayload: "item: res",
+                nextEventPayload: "item: res.payload",
             },
             [eventName.refresh]: {
                 stateUpdate: {
                     loadStatusEnum: "LoadStatusEnum.REFRESH",
                     error: "null",
                 },
-                content: `final res = ${params.ApiCall}(id: state.id ?? 1);`,
+                content: `final res = await ${params.ApiCall}(id: state.id ?? 1);`,
                 nextEvent: eventName.loaded,
-                nextEventPayload: "item: res",
+                nextEventPayload: "item: res.payload",
             },
             [eventName.loaded]: {
                 stateUpdate: {

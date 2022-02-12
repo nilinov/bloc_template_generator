@@ -9,6 +9,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * {{model.desc}}
+ *
+ * {{ [...simpleItems, ...enumItems].map(e => `@property ${getPhpType(e)} ${e.name} - ${e.desc}`).join('\n * ') }}
+ * {{ referenceItemsList.map(e => `@property mixed[] ${e.name} - ${e.desc}`).join('\n *') }}
+ * {{ referenceItems.map(e => `@property mixed ${e.name} - ${e.desc}`).join('\n *') }}
+*/
 class {{className}} extends Model
 {
     use HasFactory;
@@ -58,6 +65,10 @@ import {simpleTypes} from "@/views/ApiClient/generate_code_api_client";
 const VueBase = Vue.extend({
   props: {
     nameClass: {type: String, default: ''},
+    model: {
+      type: Object,
+      default: () => ({}),
+    },
     items: {
       type: Array,
       default: () => [],
@@ -65,10 +76,21 @@ const VueBase = Vue.extend({
   },
 })
 
+export function getPhpType(item: PropItem) {
+  switch (item.type) {
+    case 'String': return 'string';
+    case 'int': return 'integer';
+    case 'double': return 'float';
+    case 'DateTime': return '\\DateTime';
+    default: return 'mixed';
+  }
+}
+
 @Component({})
 export default class LaravelModel extends VueBase {
   nameClass!: string
   items!: PropItem[]
+  model!: Model
 
   get fileName() {
     return _.snakeCase(this.nameClass) + '.php'
@@ -109,6 +131,8 @@ export default class LaravelModel extends VueBase {
   getNameClass(name: string) {
     return UpperFirstLetter(_.camelCase(name.replace('List<', '')))
   }
+
+  getPhpType = getPhpType
 }
 </script>
 

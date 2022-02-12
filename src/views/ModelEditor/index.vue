@@ -57,7 +57,7 @@
         </el-tab-pane>
         <el-tab-pane label="Laravel / Model" name="laravel_model">
           <template v-if="codeLang === 'laravel_model'">
-            <laravel-model class="code" :items="items" :name-class="name"/>
+            <laravel-model class="code" :items="items" :model="model" :name-class="name"/>
           </template>
         </el-tab-pane>
       </el-tabs>

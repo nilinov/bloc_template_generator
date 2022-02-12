@@ -21,7 +21,7 @@ class {{className}} extends Model
      * @var array
      */
     protected $fillable = [
-        {{ [...simpleItems, ...enumItems].map(e => e.name).filter(e => e != 'id').join(',\n\t') }}
+        {{ [...simpleItems, ...enumItems].map(e => e.name).filter(e => e != 'id').map(e => `"${e}"`).join(',\n\t') }}
     ];
 
     {{ referenceItemsList.map(e => `public function ${e.name}()

@@ -5,6 +5,7 @@
            @click="$router.push(`/Model/${item.uuid}`)">{{ item.name }}
       </div>
       <div class="model" @click="$router.push(`/Model/Add`)">Добавить</div>
+      <div class="model" @click="importModel">Import</div>
     </div>
     <div class="content" v-if="isOpen">
       <h4>Edit model {{ name }}
@@ -49,11 +50,18 @@
             <!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
           </template>
         </el-tab-pane>
+        <el-tab-pane label="Export" name="export">
+          <template v-if="codeLang === 'export'">
+            <export-code class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <div v-else>
       Не выбрана модель
     </div>
+    <input type="file" id="files" ref="files" @change="handleFileSelect"/>
+
   </div>
 </template>
 
@@ -68,6 +76,7 @@ import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
 import RenderCodeTypeScript from "@/views/ModelEditor/RenderCodeTypeScript.vue";
 import RenderCodeElementTable from "@/views/ModelEditor/RenderCodeElementTable.vue";
+import ExportCode from "@/views/ModelEditor/ExportCode.vue";
 
 @Component({
   components: {
@@ -78,6 +87,7 @@ import RenderCodeElementTable from "@/views/ModelEditor/RenderCodeElementTable.v
     TextBox,
     RenderCode,
     PropLine,
+    ExportCode,
   },
 })
 export default class ModelEditor extends Vue {
@@ -245,10 +255,47 @@ export default class ModelEditor extends Vue {
     this.$store.dispatch(ACTIONS.LOGIN)
   };
 
-  handleRemove() {
+  async handleRemove() {
     this.$store.commit(MUTATIONS.REMOVE_MODEL, this.uuid)
     this.$router.push({name: 'Model'})
+    await this.$store.dispatch(ACTIONS.SET_MODELS, this.allModels);
+    await this.$notify({message: 'Модель удалена', title: ''})
   }
+
+  importModel() {
+    (this.$refs?.files as any)?.click()
+  }
+
+  handleFileSelect(evt: any) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    console.log('handleFileSelect')
+    const files = evt.target.files ?? evt.dataTransfer.files; // FileList object.
+    const f = files[0];
+    if (f.type == "application/json" || f.type == '') {
+      const reader = new FileReader();
+      const _this = this;
+      reader.onload = (function (theFile: any) {
+        return function (e: any) {
+          const text = e.target.result
+          try {
+            _this.importProject(JSON.parse(text))
+          } catch (e) {
+          }
+        }
+      })(f);
+      reader.readAsText(f);
+    }
+  }
+
+  async importProject(json: any) {
+
+    this.$store.commit(MUTATIONS.ADD_MODEL, json)
+    await this.$store.dispatch(ACTIONS.SET_MODELS, this.allModels);
+    await this.$notify({message: 'Модель импортирована', title: ''})
+  }
+
 }
 
 </script>

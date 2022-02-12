@@ -16,6 +16,7 @@ export enum MUTATIONS {
     RESTORE_MODELS = 'RESTORE_MODELS',
     SET_MODEL = 'SET_MODEL',
     REMOVE_MODEL = 'REMOVE_MODEL',
+    ADD_MODEL = 'ADD_MODEL',
     UPDATE_PENDING = 'UPDATE_PENDING',
     SET_PROJECT = 'SET_PROJECT',
 }
@@ -91,6 +92,13 @@ export default new Vuex.Store<RootState>({
             if (index != -1) {
                 state.models.splice(index, 1);
             }
+        },
+        [MUTATIONS.ADD_MODEL](state, model: Model) {
+            const index = state.models.findIndex(e => e.uuid == model.uuid);
+            if (index != -1) {
+                state.models.splice(index, 1);
+            }
+            state.models.push(model);
         },
         [MUTATIONS.SET_PROJECT](state, uuid: string) {
             state.project_uuid = uuid;

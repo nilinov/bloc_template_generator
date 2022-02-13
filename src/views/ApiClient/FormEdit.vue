@@ -148,6 +148,7 @@ export default class FormEdit extends Vue {
     this.localItem.hasFilter = this.item.hasFilter;
     this.localItem.params = this.item.params;
     this.localItem.tag = this.item.tag;
+      this.localItem.isMock = this.item.isMock;
 
     this.selectModel = this.allModels.find(e => e.uuid == this.item.modelUUID)
     this.labelSelectModel = this.selectModel?.name ?? '';

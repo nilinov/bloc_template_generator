@@ -29,8 +29,8 @@ class {{className}}Resource extends JsonResource
     {
         return [
             {{ simpleItems.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => $this->${getJsonName(e)},`).join('\n\t    ') }}
-            {{ referenceItemsList.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => ${getClassName(e)}Resource::collection($this->${getJsonName(e)}),`).join('\n\t    ') }}
-            {{ referenceItems.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => ${getClassName(e)}Resource::collection($this->${getJsonName(e)}),`).join('\n\t    ') }}
+            {{ referenceItemsList.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => ${getClassName(e)}Resource::collection($this->whenLoaded('${getJsonName(e)}')),`).join('\n\t    ') }}
+            {{ referenceItems.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => ${getClassName(e)}Resource::collection($this->whenLoaded('${getJsonName(e)}')),`).join('\n\t    ') }}
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

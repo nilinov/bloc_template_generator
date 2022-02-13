@@ -81,6 +81,7 @@ export function getPhpType(item: PropItem) {
     case 'String': return 'string';
     case 'int': return 'integer';
     case 'double': return 'float';
+    case 'bool': return 'boolean';
     case 'DateTime': return '\\DateTime';
     default: return 'mixed';
   }

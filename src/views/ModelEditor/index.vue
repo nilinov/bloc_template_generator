@@ -60,6 +60,11 @@
             <laravel-model class="code" :items="items" :model="model" :name-class="name"/>
           </template>
         </el-tab-pane>
+        <el-tab-pane label="Laravel / Migration" name="laravel_migration">
+          <template v-if="codeLang === 'laravel_migration'">
+            <laravel-migration class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <div v-else>
@@ -83,9 +88,11 @@ import RenderCodeTypeScript from "@/views/ModelEditor/RenderCodeTypeScript.vue";
 import RenderCodeElementTable from "@/views/ModelEditor/RenderCodeElementTable.vue";
 import ExportCode from "@/views/ModelEditor/ExportCode.vue";
 import LaravelModel from "@/views/ModelEditor/LaravelModel.vue";
+import LaravelMigration from "@/views/ModelEditor/LaravelMigration.vue";
 
 @Component({
   components: {
+    LaravelMigration,
     LaravelModel,
     RenderCodeElementTable,
     RenderCodeTypeScript,

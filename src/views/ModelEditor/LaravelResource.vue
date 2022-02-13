@@ -1,7 +1,9 @@
 <template>
   <div class="form">
-    <div class="inline">
-      <TextBox placeholder="Count create" v-model="model.seederCount"/>
+    <div class="inline" v-for="item of model.props">
+      <TextBox placeholder="Name" :value="item.name" disabled/>
+      Использовать в ресурсе
+      <input type="checkbox" v-model="item.inResource">
     </div>
 
     <div class="RenderCode">
@@ -9,23 +11,32 @@
       <div class="codeForSave">
       <pre><?php
 
-namespace Database\Seeders;
+namespace App\Http\Resources;
 
-use App\Models\{{className}};
-use Illuminate\Database\Seeder;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class {{className}}Seeder extends Seeder
+class {{className}}Resource extends JsonResource
 {
+    public static $wrap = null;
+
     /**
-     * Run the database seeds.
+     * Transform the resource into an array.
      *
-     * @return void
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
      */
-    public function run()
+    public function toArray($request)
     {
-        {{className}}::factory()->count({{ model.seederCount }})->create();
+        return [
+            {{ simpleItems.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => $this->${getJsonName(e)},`).join('\n\t    ') }}
+            {{ referenceItemsList.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => ${getClassName(e)}Resource::collection($this->${getJsonName(e)}),`).join('\n\t    ') }}
+            {{ referenceItems.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => ${getClassName(e)}Resource::collection($this->${getJsonName(e)}),`).join('\n\t    ') }}
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }
+
 
       </pre>
       </div>
@@ -40,7 +51,7 @@ import _ from "lodash";
 import {UpperFirstLetter} from "@/utils/utils";
 import {simpleTypes} from "@/views/ApiClient/generate_code_api_client";
 import TextBox from "@/components/TextBox.vue";
-import SelectBox from "@/components/SelectBox.vue";
+import {getClassName, getJsonName} from "@/views/ModelEditor/LaravelSeederFactory.vue";
 
 const VueBase = Vue.extend({
   props: {
@@ -56,24 +67,16 @@ const VueBase = Vue.extend({
   },
 })
 
-export function getJsonName(item: PropItem) {
-  return item.jsonField ?? item.name
-}
-
-export function getClassName(item: PropItem) {
-  return UpperFirstLetter(_.camelCase(item.name))
-}
-
 @Component({
-  components: {SelectBox, TextBox}
+  components: {TextBox}
 })
-export default class LaravelSeederFactory extends VueBase {
+export default class LaravelResource extends VueBase {
   nameClass!: string
   items!: PropItem[]
   model!: Model
 
   get fileName() {
-    return this.className + 'Seeder.php'
+    return this.className + 'Resource.php'
   }
 
   get tableName() {
@@ -111,6 +114,9 @@ export default class LaravelSeederFactory extends VueBase {
   getNameClass(name: string) {
     return UpperFirstLetter(_.camelCase(name.replace('List<', '')))
   }
+
+  getJsonName = getJsonName;
+  getClassName = getClassName;
 }
 </script>
 
@@ -118,16 +124,16 @@ export default class LaravelSeederFactory extends VueBase {
 .form {
   display: grid;
   grid-template-columns: 1fr;
-  //grid-template-rows: repeat(auto-fill, 50px) 50px;
+  grid-template-rows: repeat(auto-fill, 50px) 50px;
   grid-gap: 1rem;
   min-height: auto !important;
 
   .inline {
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: 300px 300px 300px;
+    grid-template-columns: 300px auto 300px 1fr;
     grid-gap: 1rem;
-
+    align-items: center;
   }
 }
 </style>

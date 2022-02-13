@@ -50,14 +50,14 @@
             <!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
           </template>
         </el-tab-pane>
-        <el-tab-pane label="Export" name="export">
-          <template v-if="codeLang === 'export'">
-            <export-code class="code" :items="items" :model="model" :name-class="name"/>
-          </template>
-        </el-tab-pane>
         <el-tab-pane label="Laravel / Model" name="laravel_model">
           <template v-if="codeLang === 'laravel_model'">
             <laravel-model class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="Laravel / Resource" name="laravel_resource">
+          <template v-if="codeLang === 'laravel_resource'">
+            <laravel-resource class="code" :items="items" :model="model" :name-class="name"/>
           </template>
         </el-tab-pane>
         <el-tab-pane label="Laravel / Migration" name="laravel_migration">
@@ -76,6 +76,11 @@
           </template>
         </el-tab-pane>
       </el-tabs>
+      <el-tab-pane label="Export" name="export">
+        <template v-if="codeLang === 'export'">
+          <export-code class="code" :items="items" :model="model" :name-class="name"/>
+        </template>
+      </el-tab-pane>
     </div>
     <div v-else>
       Не выбрана модель
@@ -101,9 +106,11 @@ import LaravelModel from "@/views/ModelEditor/LaravelModel.vue";
 import LaravelMigration from "@/views/ModelEditor/LaravelMigration.vue";
 import LaravelFactory from "@/views/ModelEditor/LaravelFactory.vue";
 import LaravelSeeder from "@/views/ModelEditor/LaravelSeederFactory.vue";
+import LaravelResource from "@/views/ModelEditor/LaravelResource.vue";
 
 @Component({
   components: {
+    LaravelResource,
     LaravelSeeder,
     LaravelFactory,
     LaravelMigration,
@@ -212,6 +219,10 @@ export default class ModelEditor extends Vue {
         type: 'int',
         defaultValue: '0',
         nullable: false,
+        inResource: true,
+        fakerAppend: '',
+        faker: '',
+        jsonField: 'id',
       },
       {
         name: 'title',
@@ -219,6 +230,10 @@ export default class ModelEditor extends Vue {
         type: 'String',
         defaultValue: '""',
         nullable: false,
+        fakerAppend: '',
+        faker: '',
+        inResource: true,
+        jsonField: 'title'
       }]
   }
 
@@ -256,6 +271,7 @@ export default class ModelEditor extends Vue {
     faker: '',
     fakerAppend: '',
     jsonField: '',
+    inResource: true,
   }
 
   restoreFormState(uuid: string) {
@@ -282,6 +298,7 @@ export default class ModelEditor extends Vue {
       faker: '',
       fakerAppend: '',
       jsonField: '',
+      inResource: true,
     }
   };
 

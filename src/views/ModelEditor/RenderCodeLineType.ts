@@ -20,6 +20,7 @@ export interface PropItem {
     jsonField?: string
     faker?: string
     fakerAppend?: string
+    inResource?: boolean
 }
 
 export function getPropItemTypeFromSwaggerType(type: OpenAPIV3.NonArraySchemaObjectType | OpenAPIV3.ArraySchemaObjectType | "") {

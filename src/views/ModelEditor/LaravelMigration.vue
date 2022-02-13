@@ -39,15 +39,8 @@ class CreateServiceItemsTable extends Migration
 </template>
 
 <script lang="ts">
-import {
-  renderCodeLineType,
-  renderCodeLinePropConstr,
-  renderCodeCopyWithContent,
-  renderCodeCopyWithParams, PropItem, Model
-} from "./RenderCodeLineType";
-import getStateDefaultCode from "@/utils/getStateDefaultCode";
+import {Model, PropItem} from "./RenderCodeLineType";
 import {Component, Vue} from 'vue-property-decorator';
-import {JsonData, Prop} from "@/utils/interfaces";
 import _ from "lodash";
 import {UpperFirstLetter} from "@/utils/utils";
 import {simpleTypes} from "@/views/ApiClient/generate_code_api_client";

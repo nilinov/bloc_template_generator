@@ -17,6 +17,8 @@ export interface PropItem {
     defaultValue: '' | '0' | 'false' | 'true' | string,
     nullable: boolean,
     jsonField?: string
+    faker?: string
+    fakerAppend?: string
 }
 
 export function getPropItemTypeFromSwaggerType(type: OpenAPIV3.NonArraySchemaObjectType | OpenAPIV3.ArraySchemaObjectType | "") {

@@ -65,6 +65,11 @@
             <laravel-migration class="code" :items="items" :model="model" :name-class="name"/>
           </template>
         </el-tab-pane>
+        <el-tab-pane label="Laravel / Factory" name="laravel_factory">
+          <template v-if="codeLang === 'laravel_factory'">
+            <laravel-factory class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <div v-else>
@@ -89,9 +94,11 @@ import RenderCodeElementTable from "@/views/ModelEditor/RenderCodeElementTable.v
 import ExportCode from "@/views/ModelEditor/ExportCode.vue";
 import LaravelModel from "@/views/ModelEditor/LaravelModel.vue";
 import LaravelMigration from "@/views/ModelEditor/LaravelMigration.vue";
+import LaravelFactory from "@/views/ModelEditor/LaravelFactory.vue";
 
 @Component({
   components: {
+    LaravelFactory,
     LaravelMigration,
     LaravelModel,
     RenderCodeElementTable,

@@ -8,16 +8,8 @@
 </template>
 
 <script lang="ts">
-import {
-  renderCodeLineType,
-  renderCodeLinePropConstr,
-  renderCodeCopyWithContent,
-  renderCodeCopyWithParams, PropItem, Model
-} from "./RenderCodeLineType";
-import getStateDefaultCode from "@/utils/getStateDefaultCode";
+import {Model, PropItem} from "./RenderCodeLineType";
 import {Component, Vue} from 'vue-property-decorator';
-import {BlocState, JsonData, Prop} from "@/utils/interfaces";
-import {getEnumContent} from '@/utils/getStateDefaultCode';
 import _ from "lodash";
 
 @Component({

@@ -41,7 +41,6 @@ import {UpperFirstLetter} from "@/utils/utils";
 import {simpleTypes} from "@/views/ApiClient/generate_code_api_client";
 import TextBox from "@/components/TextBox.vue";
 import SelectBox from "@/components/SelectBox.vue";
-import {fuzzy} from "@/main";
 
 const VueBase = Vue.extend({
   props: {
@@ -108,37 +107,6 @@ export default class LaravelSeederFactory extends VueBase {
   getNameClass(name: string) {
     return UpperFirstLetter(_.camelCase(name.replace('List<', '')))
   }
-
-  options = [
-      '$this->faker->userName',
-      '$this->faker->name()',
-      '$this->faker->safeEmail',
-      '$this->faker->unique()->safeEmail()',
-      '$this->faker->company',
-      '$this->faker->phoneNumber',
-      '$this->faker->sentence(4)',
-      '$this->faker->sentence',
-      '$this->faker->boolean',
-      '$this->faker->randomElement([?])',
-      '$this->faker->numberBetween(?)',
-      '?'
-  ]
-
-  querySearchModel(queryString: string, cb: Function) {
-    console.log(queryString)
-    const models: string[] = this.options;
-    var results = queryString ? models.filter(model => fuzzy(model.toLowerCase(), queryString.toLowerCase())) : models;
-
-    cb(results.map(model => ({value: model, item: model})));
-  }
-
-  handleSelectModel(item: PropItem, val: { value: string, item: string }) {
-    console.log('handleSelectModel')
-    item.faker = val.item;
-    // item.faker = val.item;
-  }
-
-
 }
 </script>
 

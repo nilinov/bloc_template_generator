@@ -125,6 +125,7 @@ export default class ModelEditor extends Vue {
   AdditionalInfo = '';
   isEnum: boolean = false;
   isOpen = true;
+  seederCount = 5;
 
   codeLang = 'dart'
 
@@ -150,6 +151,11 @@ export default class ModelEditor extends Vue {
 
   @Watch('items', {immediate: false, deep: true})
   onChildChanged4(val: any, oldVal: any) {
+    this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
+  }
+
+  @Watch('seederCount', {immediate: false, deep: true})
+  onChildChanged41(val: any, oldVal: any) {
     this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
   }
 
@@ -197,6 +203,7 @@ export default class ModelEditor extends Vue {
     this.uuid = Math.random().toString();
     this.isEnum = false;
     this.AdditionalInfo = '';
+    this.seederCount = 5;
 
     this.items = [
       {
@@ -222,6 +229,7 @@ export default class ModelEditor extends Vue {
       desc: this.desc,
       props: this.items,
       isEnum: this.isEnum,
+      seederCount: this.seederCount,
     }
   }
 
@@ -245,6 +253,9 @@ export default class ModelEditor extends Vue {
     type: 'String',
     nullable: false,
     defaultValue: '',
+    faker: '',
+    fakerAppend: '',
+    jsonField: '',
   }
 
   restoreFormState(uuid: string) {
@@ -255,6 +266,7 @@ export default class ModelEditor extends Vue {
       this.desc = item.desc;
       this.items = item.props;
       this.isEnum = item.isEnum;
+      this.seederCount = item.seederCount ?? 5;
       if (this.isEnum) this.AdditionalInfo = 'enum'
       else this.AdditionalInfo = 'class'
     }
@@ -267,6 +279,9 @@ export default class ModelEditor extends Vue {
       type: 'String',
       nullable: false,
       defaultValue: '',
+      faker: '',
+      fakerAppend: '',
+      jsonField: '',
     }
   };
 

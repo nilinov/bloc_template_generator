@@ -8,6 +8,7 @@ export interface Model {
     desc: string,
     props: PropItem[],
     isEnum: boolean,
+    seederCount?: number
 }
 
 export interface PropItem {

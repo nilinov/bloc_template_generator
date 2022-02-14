@@ -60,8 +60,9 @@ export function getJsonName(item: PropItem) {
   return item.jsonField ?? item.name
 }
 
-export function getClassName(item: PropItem) {
-  return UpperFirstLetter(_.camelCase(item.name))
+export function getClassName(item: PropItem | string) {
+  const name = typeof item == 'string' ? item : item.name;
+  return UpperFirstLetter(_.camelCase(name))
 }
 
 @Component({

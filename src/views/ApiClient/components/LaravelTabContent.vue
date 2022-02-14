@@ -20,6 +20,7 @@ import {Component, Vue} from "vue-property-decorator";
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 import {generateLaravelApi} from "@/views/ApiClient/generate_laravel_api";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
+import {generateLaravelController} from "@/views/ApiClient/generate_laravel_controller";
 
 function getNameController(func: ApiFunction) {
   return `${func.tag}Controller`
@@ -65,7 +66,7 @@ export default class LaravelTab extends Vue {
     if (this.laravelTab == 'api.php') {
       return generateLaravelApi(this.allModels, this.allFunctions);
     } else {
-      return this.laravelTab
+      return generateLaravelController(this.selectedApiFunc, this.allModels)
     }
   }
 }

@@ -1,43 +1,42 @@
 <template>
-    <div class="form">
-      <div class="inline" v-for="item of model.props">
-        <TextBox placeholder="Name" :value="item.name" disabled/>
-        Использовать в ресурсе
-        <input type="checkbox" v-model="item.inResource">
-      </div>
+  <div class="form">
+    <div class="inline">
+      <TextBox placeholder="Name" v-model="model.requestName"/>
+    </div>
 
     <div class="RenderCode">
       <span class="fileName">{{ fileName }}</span>
       <div class="codeForSave">
       <pre><?php
 
-namespace App\Http\Resources;
+namespace App\Http\Requests;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Foundation\Http\FormRequest;
 
-class {{className}}Resource extends JsonResource
+class {{model.requestName}}Request extends FormRequest
 {
-    public static $wrap = null;
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
 
     /**
-     * Transform the resource into an array.
+     * Get the validation rules that apply to the request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function rules()
     {
         return [
-            {{ simpleItems.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => $this->${getJsonName(e)},`).join('\n\t    ') }}
-            {{ referenceItemsList.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => ${getClassName(e)}Resource::collection($this->whenLoaded('${getJsonName(e)}')),`).join('\n\t    ') }}
-            {{ referenceItems.filter(e => e.inResource).map(e => `'${getJsonName(e)}' => ${getClassName(e)}Resource::collection($this->whenLoaded('${getJsonName(e)}')),`).join('\n\t    ') }}
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            {{code}}
         ];
     }
 }
-
-
       </pre>
       </div>
     </div>
@@ -51,7 +50,8 @@ import _ from "lodash";
 import {UpperFirstLetter} from "@/utils/utils";
 import {simpleTypes} from "@/views/ApiClient/generate_code_api_client";
 import TextBox from "@/components/TextBox.vue";
-import {getClassName, getJsonName} from "@/views/ModelEditor/LaravelSeederFactory.vue";
+import {getPhpType} from "@/views/ModelEditor/LaravelModel.vue";
+import {getClassName} from "@/views/ModelEditor/LaravelSeederFactory.vue";
 
 const VueBase = Vue.extend({
   props: {
@@ -70,21 +70,17 @@ const VueBase = Vue.extend({
 @Component({
   components: {TextBox}
 })
-export default class LaravelResource extends VueBase {
+export default class LaravelRequest extends VueBase {
   nameClass!: string
   items!: PropItem[]
   model!: Model
 
   get fileName() {
-    return this.className + 'Resource.php'
-  }
-
-  get tableName() {
-    return _.snakeCase(this.nameClass)
+    return getClassName(this.model.requestName + 'Request') + '.php'
   }
 
   get className() {
-    return UpperFirstLetter(_.camelCase(this.nameClass))
+    return (this.model.requestName ?? UpperFirstLetter(_.camelCase(this.nameClass))) + 'Request'
   }
 
   get allModels(): Model[] {
@@ -115,8 +111,9 @@ export default class LaravelResource extends VueBase {
     return UpperFirstLetter(_.camelCase(name.replace('List<', '')))
   }
 
-  getJsonName = getJsonName;
-  getClassName = getClassName;
+  get code() {
+    return this.simpleItems.map(e => `"${e.name}" => [${e.nullable ? '' : '"required", '}"${getPhpType(e)}", ],\n\t    `).join('')
+  }
 }
 </script>
 
@@ -124,16 +121,16 @@ export default class LaravelResource extends VueBase {
 .form {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(auto-fill, 50px) 50px;
+  grid-template-rows: 50px 1fr;
   grid-gap: 1rem;
   min-height: auto !important;
 
   .inline {
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: 300px auto 300px 1fr;
+    grid-template-columns: 300px 300px 300px;
     grid-gap: 1rem;
-    align-items: center;
+
   }
 }
 </style>

@@ -75,12 +75,17 @@
             <laravel-factory class="code" :items="items" :model="model" :name-class="name"/>
           </template>
         </el-tab-pane>
+        <el-tab-pane label="Laravel / Request" name="laravel_request">
+          <template v-if="codeLang === 'laravel_request'">
+            <laravel-request class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="Export" name="export">
+          <template v-if="codeLang === 'export'">
+            <export-code class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
       </el-tabs>
-      <el-tab-pane label="Export" name="export">
-        <template v-if="codeLang === 'export'">
-          <export-code class="code" :items="items" :model="model" :name-class="name"/>
-        </template>
-      </el-tab-pane>
     </div>
     <div v-else>
       Не выбрана модель
@@ -107,6 +112,7 @@ import LaravelMigration from "@/views/ModelEditor/LaravelMigration.vue";
 import LaravelFactory from "@/views/ModelEditor/LaravelFactory.vue";
 import LaravelSeeder from "@/views/ModelEditor/LaravelSeederFactory.vue";
 import LaravelResource from "@/views/ModelEditor/LaravelResource.vue";
+import LaravelRequest from "@/views/ModelEditor/LaravelRequest.vue";
 
 @Component({
   components: {
@@ -115,6 +121,7 @@ import LaravelResource from "@/views/ModelEditor/LaravelResource.vue";
     LaravelFactory,
     LaravelMigration,
     LaravelModel,
+    LaravelRequest,
     RenderCodeElementTable,
     RenderCodeTypeScript,
     RenderEnumCode,
@@ -133,6 +140,7 @@ export default class ModelEditor extends Vue {
   isEnum: boolean = false;
   isOpen = true;
   seederCount = 5;
+  requestName = '';
 
   codeLang = 'dart'
 
@@ -163,6 +171,11 @@ export default class ModelEditor extends Vue {
 
   @Watch('seederCount', {immediate: false, deep: true})
   onChildChanged41(val: any, oldVal: any) {
+    this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
+  }
+
+  @Watch('requestName', {immediate: false, deep: true})
+  onChildChanged42(val: any, oldVal: any) {
     this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
   }
 
@@ -211,6 +224,7 @@ export default class ModelEditor extends Vue {
     this.isEnum = false;
     this.AdditionalInfo = '';
     this.seederCount = 5;
+    this.requestName = '';
 
     this.items = [
       {
@@ -245,6 +259,7 @@ export default class ModelEditor extends Vue {
       props: this.items,
       isEnum: this.isEnum,
       seederCount: this.seederCount,
+      requestName: this.requestName,
     }
   }
 
@@ -283,6 +298,7 @@ export default class ModelEditor extends Vue {
       this.items = item.props;
       this.isEnum = item.isEnum;
       this.seederCount = item.seederCount ?? 5;
+      this.requestName = item.requestName ?? '';
       if (this.isEnum) this.AdditionalInfo = 'enum'
       else this.AdditionalInfo = 'class'
     }

@@ -1,6 +1,7 @@
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 import {getSchemaDescByClass} from "@/views/ApiClient/generate_swagger_file";
+import {getClassName} from "@/views/ModelEditor/LaravelSeederFactory.vue";
 
 export function generateLaravelApi(allModels: Model[], allFunctions: ApiFunction[]) {
     console.log(`generateLaravelApi`, allModels, allFunctions)
@@ -56,8 +57,13 @@ export function generateLaravelApi(allModels: Model[], allFunctions: ApiFunction
     function getRoute(func: ApiFunction) {
         const model = allModels.find(model => model.uuid == func.modelUUID);
 
-        return `Route::${func.method}('${func.path}', [App\\Http\\Controllers\\${func.tag ?? model?.name ?? func.name}Controller::class, '${func.name}']);`
+        return `Route::${func.method}('${func.path}', '${func.name}');`
 
+    }
+
+    const allControllers: {[x: string]: string} = {}
+    for(let item of allFunctions) {
+        allControllers[item.tag] = item.tag;
     }
 
     return `<?php
@@ -76,7 +82,10 @@ use Illuminate\\Support\\Facades\\Route;
 |
 */
 
-${allFunctions.map(e => getRoute(e)).join('\n\n')}
+${Object.values(allControllers).map(tag => `Route::controller(${getClassName(tag)}Controller::class)->group(function () {
+    ${allFunctions.filter(e => e.tag == tag).map(e => getRoute(e)).join('\n    ')}
+});
+`).join('\n\n')}
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

@@ -48,6 +48,12 @@
               <pre class="codeForSave" v-text="code"></pre>
             </template>
           </el-tab-pane>
+          <el-tab-pane label="typescript" name="typescript">
+            <template v-if="lang === 'typescript'">
+              <span class="fileName">api.ts</span>
+              <pre class="codeForSave" v-text="code"></pre>
+            </template>
+          </el-tab-pane>
           <el-tab-pane label="Swagger" name="swagger">
             <template v-if="lang === 'swagger'">
               <span class="fileName">swagger.json</span>
@@ -74,13 +80,15 @@ import {ACTIONS_API_FUNCTIONS} from "@/store/api_functions";
 import {generateSwaggerFile} from "@/views/ApiClient/generate_swagger_file";
 import LaravelTabContent from "@/views/ApiClient/components/LaravelTabContent.vue";
 import {emptyApiFunction} from "@/utils/emptyApiFunction";
+import {generateCodeApiClientTs} from "@/views/ApiClient/generate_code_api_client_ts";
 
 @Component({
   components: {LaravelTabContent, FormEdit}
 })
 export default class ApiClient extends Vue {
 
-  lang = 'swagger'
+  lang = 'typescript'
+  // lang = 'swagger'
   // lang = 'dart'
   // lang = 'laravel'
 
@@ -134,6 +142,8 @@ export default class ApiClient extends Vue {
     console.log(this.allModels)
     if (this.lang == 'dart') {
       this.code = generateCodeApiClient(this.allFunctions, this.allModels);
+    } else if (this.lang == 'typescript') {
+      this.code = generateCodeApiClientTs(this.allFunctions, this.allModels);
     } else if (this.lang == 'laravel') {
       this.code = "";
     } else {

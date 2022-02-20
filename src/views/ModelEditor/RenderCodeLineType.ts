@@ -8,6 +8,8 @@ export interface Model {
     desc: string,
     props: PropItem[],
     isEnum: boolean,
+    seederCount?: number,
+    requestName?: string
 }
 
 export interface PropItem {
@@ -17,6 +19,9 @@ export interface PropItem {
     defaultValue: '' | '0' | 'false' | 'true' | string,
     nullable: boolean,
     jsonField?: string
+    faker?: string
+    fakerAppend?: string
+    inResource?: boolean
 }
 
 export function getPropItemTypeFromSwaggerType(type: OpenAPIV3.NonArraySchemaObjectType | OpenAPIV3.ArraySchemaObjectType | "") {

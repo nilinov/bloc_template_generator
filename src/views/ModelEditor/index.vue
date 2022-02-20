@@ -5,6 +5,7 @@
            @click="$router.push(`/Model/${item.uuid}`)">{{ item.name }}
       </div>
       <div class="model" @click="$router.push(`/Model/Add`)">Добавить</div>
+      <div class="model" @click="importModel">Import</div>
     </div>
     <div class="content" v-if="isOpen">
       <h4>Edit model {{ name }}
@@ -49,11 +50,48 @@
             <!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
           </template>
         </el-tab-pane>
+        <el-tab-pane label="Laravel / Model" name="laravel_model">
+          <template v-if="codeLang === 'laravel_model'">
+            <laravel-model class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="Laravel / Resource" name="laravel_resource">
+          <template v-if="codeLang === 'laravel_resource'">
+            <laravel-resource class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="Laravel / Migration" name="laravel_migration">
+          <template v-if="codeLang === 'laravel_migration'">
+            <laravel-migration class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="Laravel / Seeder" name="laravel_seeder">
+          <template v-if="codeLang === 'laravel_seeder'">
+            <laravel-seeder class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="Laravel / Factory" name="laravel_factory">
+          <template v-if="codeLang === 'laravel_factory'">
+            <laravel-factory class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="Laravel / Request" name="laravel_request">
+          <template v-if="codeLang === 'laravel_request'">
+            <laravel-request class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="Export" name="export">
+          <template v-if="codeLang === 'export'">
+            <export-code class="code" :items="items" :model="model" :name-class="name"/>
+          </template>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <div v-else>
       Не выбрана модель
     </div>
+    <input type="file" id="files" ref="files" @change="handleFileSelect"/>
+
   </div>
 </template>
 
@@ -68,9 +106,22 @@ import {Model, PropItem} from "@/views/ModelEditor/RenderCodeLineType";
 import RenderEnumCode from "@/views/ModelEditor/RenderEnumCode.vue";
 import RenderCodeTypeScript from "@/views/ModelEditor/RenderCodeTypeScript.vue";
 import RenderCodeElementTable from "@/views/ModelEditor/RenderCodeElementTable.vue";
+import ExportCode from "@/views/ModelEditor/ExportCode.vue";
+import LaravelModel from "@/views/ModelEditor/LaravelModel.vue";
+import LaravelMigration from "@/views/ModelEditor/LaravelMigration.vue";
+import LaravelFactory from "@/views/ModelEditor/LaravelFactory.vue";
+import LaravelSeeder from "@/views/ModelEditor/LaravelSeederFactory.vue";
+import LaravelResource from "@/views/ModelEditor/LaravelResource.vue";
+import LaravelRequest from "@/views/ModelEditor/LaravelRequest.vue";
 
 @Component({
   components: {
+    LaravelResource,
+    LaravelSeeder,
+    LaravelFactory,
+    LaravelMigration,
+    LaravelModel,
+    LaravelRequest,
     RenderCodeElementTable,
     RenderCodeTypeScript,
     RenderEnumCode,
@@ -78,6 +129,7 @@ import RenderCodeElementTable from "@/views/ModelEditor/RenderCodeElementTable.v
     TextBox,
     RenderCode,
     PropLine,
+    ExportCode,
   },
 })
 export default class ModelEditor extends Vue {
@@ -87,6 +139,8 @@ export default class ModelEditor extends Vue {
   AdditionalInfo = '';
   isEnum: boolean = false;
   isOpen = true;
+  seederCount = 5;
+  requestName = '';
 
   codeLang = 'dart'
 
@@ -112,6 +166,16 @@ export default class ModelEditor extends Vue {
 
   @Watch('items', {immediate: false, deep: true})
   onChildChanged4(val: any, oldVal: any) {
+    this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
+  }
+
+  @Watch('seederCount', {immediate: false, deep: true})
+  onChildChanged41(val: any, oldVal: any) {
+    this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
+  }
+
+  @Watch('requestName', {immediate: false, deep: true})
+  onChildChanged42(val: any, oldVal: any) {
     this.$store.dispatch(ACTIONS.SET_MODEL, this.model);
   }
 
@@ -159,6 +223,8 @@ export default class ModelEditor extends Vue {
     this.uuid = Math.random().toString();
     this.isEnum = false;
     this.AdditionalInfo = '';
+    this.seederCount = 5;
+    this.requestName = '';
 
     this.items = [
       {
@@ -167,6 +233,10 @@ export default class ModelEditor extends Vue {
         type: 'int',
         defaultValue: '0',
         nullable: false,
+        inResource: true,
+        fakerAppend: '',
+        faker: '',
+        jsonField: 'id',
       },
       {
         name: 'title',
@@ -174,6 +244,10 @@ export default class ModelEditor extends Vue {
         type: 'String',
         defaultValue: '""',
         nullable: false,
+        fakerAppend: '',
+        faker: '',
+        inResource: true,
+        jsonField: 'title'
       }]
   }
 
@@ -184,6 +258,8 @@ export default class ModelEditor extends Vue {
       desc: this.desc,
       props: this.items,
       isEnum: this.isEnum,
+      seederCount: this.seederCount,
+      requestName: this.requestName,
     }
   }
 
@@ -207,6 +283,10 @@ export default class ModelEditor extends Vue {
     type: 'String',
     nullable: false,
     defaultValue: '',
+    faker: '',
+    fakerAppend: '',
+    jsonField: '',
+    inResource: true,
   }
 
   restoreFormState(uuid: string) {
@@ -217,6 +297,8 @@ export default class ModelEditor extends Vue {
       this.desc = item.desc;
       this.items = item.props;
       this.isEnum = item.isEnum;
+      this.seederCount = item.seederCount ?? 5;
+      this.requestName = item.requestName ?? '';
       if (this.isEnum) this.AdditionalInfo = 'enum'
       else this.AdditionalInfo = 'class'
     }
@@ -229,6 +311,10 @@ export default class ModelEditor extends Vue {
       type: 'String',
       nullable: false,
       defaultValue: '',
+      faker: '',
+      fakerAppend: '',
+      jsonField: '',
+      inResource: true,
     }
   };
 
@@ -245,10 +331,47 @@ export default class ModelEditor extends Vue {
     this.$store.dispatch(ACTIONS.LOGIN)
   };
 
-  handleRemove() {
+  async handleRemove() {
     this.$store.commit(MUTATIONS.REMOVE_MODEL, this.uuid)
     this.$router.push({name: 'Model'})
+    await this.$store.dispatch(ACTIONS.SET_MODELS, this.allModels);
+    await this.$notify({message: 'Модель удалена', title: ''})
   }
+
+  importModel() {
+    (this.$refs?.files as any)?.click()
+  }
+
+  handleFileSelect(evt: any) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    console.log('handleFileSelect')
+    const files = evt.target.files ?? evt.dataTransfer.files; // FileList object.
+    const f = files[0];
+    if (f.type == "application/json" || f.type == '') {
+      const reader = new FileReader();
+      const _this = this;
+      reader.onload = (function (theFile: any) {
+        return function (e: any) {
+          const text = e.target.result
+          try {
+            _this.importProject(JSON.parse(text))
+          } catch (e) {
+          }
+        }
+      })(f);
+      reader.readAsText(f);
+    }
+  }
+
+  async importProject(json: any) {
+
+    this.$store.commit(MUTATIONS.ADD_MODEL, json)
+    await this.$store.dispatch(ACTIONS.SET_MODELS, this.allModels);
+    await this.$notify({message: 'Модель импортирована', title: ''})
+  }
+
 }
 
 </script>
@@ -306,6 +429,10 @@ export default class ModelEditor extends Vue {
       }
     }
   }
+}
+
+#files {
+  display: none;
 }
 
 </style>

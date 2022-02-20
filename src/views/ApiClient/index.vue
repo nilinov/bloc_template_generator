@@ -90,7 +90,7 @@ export default class ApiClient extends Vue {
   lang = 'typescript'
   // lang = 'swagger'
   // lang = 'dart'
-  // lang = 'laravel'
+  lang = 'laravel'
 
   get allFunctions(): ApiFunction[] {
     return this.$store.getters.allApiFunctions ?? [];

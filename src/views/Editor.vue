@@ -130,7 +130,7 @@ export default class GenerateScreen extends Vue {
     }
   }
 
-  download(name, text) {
+  download(name: string, text: string) {
     downloadURI(name, text);
   }
 

@@ -12,6 +12,7 @@
         <div>
           <el-tag
               v-for="item of tags"
+              :key="`key-${item}-tag`"
               @click="selectTag !== item ? selectTag = item : selectTag = ''"
               style="margin-right: .5rem; cursor: pointer;"
               :type="item === selectTag ? `success` : ''"
@@ -48,8 +49,8 @@
               <pre class="codeForSave" v-text="code"></pre>
             </template>
           </el-tab-pane>
-          <el-tab-pane label="typescript" name="typescript">
-            <template v-if="lang === 'typescript'">
+          <el-tab-pane label="TypeScript" name="typescript_api_client">
+            <template v-if="lang === 'typescript_api_client'">
               <span class="fileName">api.ts</span>
               <pre class="codeForSave" v-text="code"></pre>
             </template>
@@ -87,10 +88,10 @@ import {generateCodeApiClientTs} from "@/views/ApiClient/generate_code_api_clien
 })
 export default class ApiClient extends Vue {
 
-  lang = 'typescript'
+  lang = 'typescript_api_client'
   // lang = 'swagger'
   // lang = 'dart'
-  lang = 'laravel'
+  // lang = 'laravel'
 
   get allFunctions(): ApiFunction[] {
     return this.$store.getters.allApiFunctions ?? [];
@@ -142,7 +143,7 @@ export default class ApiClient extends Vue {
     console.log(this.allModels)
     if (this.lang == 'dart') {
       this.code = generateCodeApiClient(this.allFunctions, this.allModels);
-    } else if (this.lang == 'typescript') {
+    } else if (this.lang == 'typescript_api_client') {
       this.code = generateCodeApiClientTs(this.allFunctions, this.allModels);
     } else if (this.lang == 'laravel') {
       this.code = "";

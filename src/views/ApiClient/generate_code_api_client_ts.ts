@@ -39,7 +39,7 @@ const api = {
             const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
             const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
 
-            return `async ${e.name}(${getParamsApiFunction(e)}): ApiResponse<${model.name}> {
+            return `async ${e.name}(${getParamsApiFunction(e)}): ApiResponse<${model?.name}> {
         const params: { [x: string]: any } = {};
         ${codePaginate}${codeFilter}${codeSearch}
         ${postParams(e)}
@@ -51,7 +51,7 @@ const api = {
                 .then(r => r.json())
                 .then(r => new ApiResponse(r));
         } catch (error) {
-            return new ApiResponse<${model.name}>(undefined, error);
+            return new ApiResponse<${model?.name}>(undefined, error);
         }
       }\n`;
         }

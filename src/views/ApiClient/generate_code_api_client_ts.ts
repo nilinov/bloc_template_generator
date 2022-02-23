@@ -6,9 +6,9 @@ import {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api
 function generateCodeApiClientTs(functions: ApiFunction[] = [], models: Model[] = []) {
     console.log('generate code', [...functions.map(e => ({...e}))])
 
-    return `import {ApiResponse} from 'utils'
+    return `import {ApiResponse} from './utils'
 
-const api = {
+export const api = {
   ${functions.map(e => {
         const model = models.find(e1 => e1.uuid == e.modelUUID);
         // console.log(`render request ${e?.name}`, e, model)
@@ -18,7 +18,7 @@ const api = {
             const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
             const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
 
-            return `async ${e.name}(${getParamsApiFunction(e)}): ApiResponse<${model.name}[]> {
+            return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model.name}[]>> {
         const params: { [x: string]: any } = {};
         ${codePaginate}${codeFilter} ${codeSearch}
         
@@ -31,7 +31,7 @@ const api = {
         } catch (error) {
             return new ApiResponse<${model.name}[]>(undefined, error);
         }
-      }\n`;
+      },\n`;
         }
 
         if (!e.isList) {
@@ -39,7 +39,7 @@ const api = {
             const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
             const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
 
-            return `async ${e.name}(${getParamsApiFunction(e)}): ApiResponse<${model?.name}> {
+            return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model.name}[]>> {
         const params: { [x: string]: any } = {};
         ${codePaginate}${codeFilter}${codeSearch}
         ${postParams(e)}
@@ -53,9 +53,9 @@ const api = {
         } catch (error) {
             return new ApiResponse<${model?.name}>(undefined, error);
         }
-      }\n`;
+      },\n`;
         }
-    }).join(',\n')}
+    }).join('\n')}
 }
 `
 }

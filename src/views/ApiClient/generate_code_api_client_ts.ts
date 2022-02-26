@@ -44,7 +44,7 @@ export const api = {
         ${codePaginate}${codeFilter}${codeSearch}
         ${postParams(e)}
 
-        const path = ${'"' + e.path + '"' + (e.method === 'GET' ? ' + "?" + new URLSearchParams(params)' : '')};
+        const path = ${'"' + e.path + '"' + e.params?.filter(e => e.place == 'in-path').map(e => `.replace('{${e.name}}', ${"`${" + e.name + "}`"})`) + (e.method === 'GET' ? ' + "?" + new URLSearchParams(params)' : '')};
 
         try {
         return await fetch(path, {method: "${e.method}", ${e.method !== 'GET' ? "body: JSON.stringify(params)" : ""}})

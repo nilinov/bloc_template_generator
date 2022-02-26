@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Editor from '../views/Editor.vue'
+import StateEditor from '../views/StateEditor/index.vue'
 import Project from '../views/Project/index.vue'
 import ModelEditor from '../views/ModelEditor/index.vue'
 import ApiClient from "@/views/ApiClient/index.vue";
@@ -14,7 +14,7 @@ const routes: Array<RouteConfig> = [
   {
     path: '/State',
     name: 'Home',
-    component: Editor
+    component: StateEditor
   },
   {
     alias: "/",

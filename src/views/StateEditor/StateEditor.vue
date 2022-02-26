@@ -16,6 +16,7 @@
       <div class="space"></div>
       <SelectBox class="select-box" v-model="typeTemplate" :options="templates" @input="updateCode"/>
       <SelectBox class="select-box" v-model="dataTemplate" :options="templatesData" @input="updateCode"/>
+      <slot></slot>
     </div>
     <div class="areas">
       <div class="area-event">
@@ -52,7 +53,7 @@ import {snakeCase} from "lodash";
 import {downloadURI} from "@/main";
 
 @Component({components: {TextBox, SelectBox}})
-export default class GenerateScreen extends Vue {
+export default class StateEditor extends Vue {
   nameBloc = 'Coupon';
   nameClassEntity = 'Coupon';
   typeTemplate = 'cubit-list';
@@ -167,7 +168,7 @@ export default class GenerateScreen extends Vue {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/style";
+@import "../../assets/style";
 
 .generate-screen {
   background-color: $color-white;
@@ -198,6 +199,7 @@ export default class GenerateScreen extends Vue {
 
 .select-box {
   width: 197px;
+  margin-right: 10px;
 }
 
 .areas {

@@ -39,7 +39,7 @@ export const api = {
             const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
             const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
 
-            return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model.name}[]>> {
+            return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model?.name}[]>> {
         const params: { [x: string]: any } = {};
         ${codePaginate}${codeFilter}${codeSearch}
         ${postParams(e)}

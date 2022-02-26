@@ -268,6 +268,13 @@ export function getVariables(props: { [x: string]: Prop }, params?: { required: 
     return `{ \n${res.join('')} }`;
 }
 
+export function getEmptyObjectTs(props: { [x: string]: Prop }) {
+    let res = [];
+    res = Object.keys(props).map((name, index) => `${name}: ${props[name].default},`);
+
+    return `${res.join('\n      ')}`;
+}
+
 function getNullableProp(prop: Prop, defValue: boolean = false) {
     return prop.typeTemplate?.nullable ?? false
 }

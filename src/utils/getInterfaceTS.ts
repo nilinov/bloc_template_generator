@@ -1,10 +1,17 @@
 import {JsonData} from "./interfaces";
-import {getVariableAndType, getVariables, getVariablesNames} from "./utils";
+import {getEmptyObjectTs, getVariableAndType, getVariables, getVariablesNames} from "./utils";
 
 export function getInterfaceTS(data: JsonData, params = {}): string {
     return `interface ${data.name} {
   ${getVariableAndType(data.state.props ?? {}, {lang: 'ts'})}  
-}`.split('integer').join('number')
+}
+
+export function getEmpty${data.name} () {
+   return {
+      ${getEmptyObjectTs(data.state.props)}  
+   };
+}
+`.split('integer').join('number')
 }
 
 export function getEnumTS(data: JsonData, params = {}): string {

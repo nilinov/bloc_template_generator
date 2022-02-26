@@ -3,7 +3,8 @@
     <span class="fileName">{{ fileName }}</span>
     <div class="codeForSave">
       <!--      <span>import '../_imports.dart';</span><br><br>-->
-      <pre v-if="model" v-text="getElementUiTable(model, {postfix: ''})"></pre>
+      <pre v-if="model && !isForm" v-text="getTypeScriptTable(model, {postfix: ''})"></pre>
+      <pre v-if="model && isForm" v-text="getTypeScriptForm(model, {postfix: ''})"></pre>
     </div>
   </div>
 </template>
@@ -13,7 +14,8 @@ import {Model, PropItem} from "./RenderCodeLineType";
 import {Component, Vue} from 'vue-property-decorator';
 import {JsonData, Prop} from "@/utils/interfaces";
 import _ from "lodash";
-import {getElementUiTable} from "@/utils/getElementUiTable";
+import {getTypeScriptTable} from "@/utils/getTypeScriptTable";
+import {getTypeScriptForm} from "@/utils/getTypeScriptForm";
 
 const VueBase = Vue.extend({
   props: {
@@ -28,11 +30,13 @@ const VueBase = Vue.extend({
 @Component({
   props: {
     nameClass: String,
+    isForm: Boolean
   }
 })
 export default class RenderCodeElementTable extends VueBase {
   nameClass!: string
   items!: PropItem[]
+  isForm!: boolean
 
   get allModels() : Model[] {
     return this.$store.getters.allModelsItems;
@@ -63,10 +67,11 @@ export default class RenderCodeElementTable extends VueBase {
   }
 
   get fileName() {
-    return _.snakeCase(this.nameClass) + '_columns.ts'
+    return _.snakeCase(this.nameClass) + (this.isForm ? '_form.ts' : '_columns.ts')
   }
 
-  getElementUiTable = getElementUiTable;
+  getTypeScriptTable = getTypeScriptTable;
+  getTypeScriptForm = getTypeScriptForm;
 }
 </script>
 

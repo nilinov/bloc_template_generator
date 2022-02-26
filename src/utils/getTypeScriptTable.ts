@@ -1,5 +1,5 @@
 import {JsonData} from "./interfaces";
-import {getVariableAndType, getVariables} from "./utils";
+import {getVariableAndType, getVariables, lowercaseFirstLetter} from "./utils";
 import {Model} from "../views/ModelEditor/RenderCodeLineType";
 
 function getColumn(title: string, type: string, code: string, render?: string, className?: string) {
@@ -10,23 +10,24 @@ function getColumn(title: string, type: string, code: string, render?: string, c
         }`
 }
 
-export function getElementUiTable(data: Model, params = {}): string {
+export function getTypeScriptTable(data: Model, params = {}): string {
     const className = data.name;
+    const exampl = lowercaseFirstLetter(className);
     return `
-export default table: AppTable<${className}> = {
+export const ${exampl}Table: AppTable<${className}> = {
     title: '${data.desc}',
     columns: [
 ${data.props.map((prop) => {
         if (['String',].includes(prop.type)) {
-            return getColumn(prop.name, 'plain', prop.desc)
+            return getColumn(prop.desc, 'plain', prop.name)
         }
 
         if (['number', 'int', 'double'].includes(prop.type)) {
-            return getColumn(prop.name, 'plain', prop.desc)
+            return getColumn(prop.desc, 'plain', prop.name)
         }
         
         if (prop.type == 'DateTime') {
-            return getColumn(prop.name, 'plain', prop.desc, "return `${dateFormatter(row.updatedAt ?? row.createdAt ?? '')}`", data.name)
+            return getColumn(prop.desc, 'plain', prop.name, "return `${dateFormatter(row.updatedAt ?? row.createdAt ?? '')}`", data.name)
         }
 
         return `\t`;

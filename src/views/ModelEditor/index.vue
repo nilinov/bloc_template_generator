@@ -49,6 +49,11 @@
             <render-code-element-table class="code" :items="items" :name-class="name"/>
           </template>
         </el-tab-pane>
+        <el-tab-pane label="TypeScript / Form" name="typescript__form">
+          <template v-if="codeLang === 'typescript__form'">
+            <render-code-element-table class="code" :items="items" :name-class="name" :is-form="true"/>
+          </template>
+        </el-tab-pane>
         <el-tab-pane label="Laravel / Model" name="laravel_model">
           <template v-if="codeLang === 'laravel_model'">
             <laravel-model class="code" :items="items" :model="model" :name-class="name"/>

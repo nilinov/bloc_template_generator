@@ -44,10 +44,9 @@
             <render-code-type-script class="code" :items="items" :name-class="name" :is-enum="isEnum"/>
           </template>
         </el-tab-pane>
-        <el-tab-pane label="VueJS / ElementUI / Table" name="vue_js_element_ui_table">
-          <template v-if="codeLang === 'vue_js_element_ui_table'">
-            <render-code-element-table class="code" v-if="!isEnum" :items="items" :name-class="name"/>
-            <!--            <render-enum-code v-if="isEnum" :items="items" :name-class="name"/>-->
+        <el-tab-pane label="TypeScript / Table" name="typescript__table">
+          <template v-if="codeLang === 'typescript__table'">
+            <render-code-element-table class="code" :items="items" :name-class="name"/>
           </template>
         </el-tab-pane>
         <el-tab-pane label="Laravel / Model" name="laravel_model">

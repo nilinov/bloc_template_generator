@@ -3,17 +3,16 @@
     <span class="fileName">{{ fileName }}</span>
     <div class="codeForSave">
       <!--      <span>import '../_imports.dart';</span><br><br>-->
-      <pre v-text="getElementUiTable(bloc, {postfix: ''})"></pre>
+      <pre v-if="model" v-text="getElementUiTable(model, {postfix: ''})"></pre>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {PropItem} from "./RenderCodeLineType";
+import {Model, PropItem} from "./RenderCodeLineType";
 import {Component, Vue} from 'vue-property-decorator';
 import {JsonData, Prop} from "@/utils/interfaces";
 import _ from "lodash";
-import {getInterfaceTS} from "@/utils/getInterfaceTS";
 import {getElementUiTable} from "@/utils/getElementUiTable";
 
 const VueBase = Vue.extend({
@@ -26,10 +25,22 @@ const VueBase = Vue.extend({
   },
 })
 
-@Component({})
+@Component({
+  props: {
+    nameClass: String,
+  }
+})
 export default class RenderCodeElementTable extends VueBase {
   nameClass!: string
   items!: PropItem[]
+
+  get allModels() : Model[] {
+    return this.$store.getters.allModelsItems;
+  }
+
+  get model() {
+    return (this.allModels).find(e => e.name == this.nameClass)
+  }
 
   get stateProps() {
     const res: { [x: string]: Prop } = {};
@@ -51,26 +62,8 @@ export default class RenderCodeElementTable extends VueBase {
     return res;
   }
 
-  get bloc(): JsonData {
-    return {
-      name: this.nameClass + 'Table',
-      state: {
-        props: this.stateProps,
-      },
-      events: [],
-      bloc: {
-        case_event: {},
-        onError: false,
-      },
-      actionProp: {
-        name: '',
-        typeName: '',
-      }
-    }
-  }
-
   get fileName() {
-    return _.snakeCase(this.nameClass) + '_table.vue'
+    return _.snakeCase(this.nameClass) + '_columns.ts'
   }
 
   getElementUiTable = getElementUiTable;

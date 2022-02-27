@@ -8,7 +8,7 @@ export function getInterfaceTS(data: JsonData, params = {}): string {
 
 export function getEmpty${data.name} () {
    return {
-      ${getEmptyObjectTs(data.state.props)}  
+      ${getEmptyObjectTs(data.state.props ?? {})}  
    };
 }
 `.split('integer').join('number')

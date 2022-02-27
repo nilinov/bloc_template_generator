@@ -57,7 +57,7 @@ export function generateLaravelApi(allModels: Model[], allFunctions: ApiFunction
     function getRoute(func: ApiFunction) {
         const model = allModels.find(model => model.uuid == func.modelUUID);
 
-        return `Route::${func.method}('${func.path}', '${func.name}');`
+        return `Route::${func.method}('${func.path.replace('/api', '')}', '${func.name}');`
 
     }
 

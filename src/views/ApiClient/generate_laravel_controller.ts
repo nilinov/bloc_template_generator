@@ -15,7 +15,9 @@ function getControllerMethod(func: ApiFunction, allModels: Model[] = []) {
             content = `$items = ${model?.name}::all()->values(); \n\n        return new ${model?.name}Collection($items);`
         }
         if (func.isList && func.hasPaginate) {
-            content = `//TODO Реализовать генерацию варианта списка с пагинацией, учесть возможность поиска, фильтров и сортировки`
+            content = `$items = ${model?.name}::orderBy('id','DESC')->paginate(10);
+
+        return $items;`
         }
         if (!func.isList) {
             request = `Request $request, ${className} ${exemplarName}`
@@ -25,7 +27,16 @@ function getControllerMethod(func: ApiFunction, allModels: Model[] = []) {
 
     if (func.method == 'POST') {
         if (!func.isList) {
-            content = `if ($request->validate((new ${className}UpdateRequest())->rules(0))) { \n\n        $item = new ${className}($request->input()); \n\n        $item->save(); \n\n        return new ${className}Resource($item); }  \n\n        return false;`
+            content = `if ($request->validate((new ${className}UpdateRequest())->rules())) {
+
+            ${exemplarName} = new ${className}($request->input());
+
+            ${exemplarName}->save();
+
+            return new ${className}Resource(${exemplarName});
+        }
+
+        return false;`
         } else {
             content = `//TODO`
         }
@@ -33,10 +44,10 @@ function getControllerMethod(func: ApiFunction, allModels: Model[] = []) {
 
     if (func.method == 'DELETE') {
         if (!func.isList) {
-            request = `Request $request, ${className} ${exemplarName}`
-            content = `${exemplarName}->delete();
-        
-        return response()->noContent();`
+            request = `Request $request, int $id`
+            content = `${className}::destroy($id);
+
+        return new Product();`
         } else {
             content = `//TODO`
         }
@@ -44,10 +55,15 @@ function getControllerMethod(func: ApiFunction, allModels: Model[] = []) {
 
     if (func.method == 'PUT') {
         if (!func.isList) {
-            request = `${className}UpdateRequest $request, ${className} ${exemplarName}`
-            content = `${exemplarName}->update($request->validated());
+            request = `Request $request, int $id`
+            content = `if ($request->validate((new ${className}UpdateRequest())->rules())) {
+            ${exemplarName} = ${className}::find($id);
 
-        return new ${className}Resource(${exemplarName});`
+            ${exemplarName}->update($request->input());
+
+            return new ${className}Resource(${exemplarName});
+        }
+        return false;`
         } else {
             content = `//TODO`
         }

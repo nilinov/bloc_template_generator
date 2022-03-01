@@ -87,7 +87,7 @@ namespace App\\Http\\Controllers;
 
 use Illuminate\\Http\\Request;
 
-class ${tag}BaseController extends ${tag}Controller
+class ${tag}BaseController extends Controller
 {
     ${functions.map(e => getControllerMethod(e, allModels)).join('\n\n    ')}
 }

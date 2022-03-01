@@ -37,7 +37,7 @@ export enum MUTATIONS_${postfix} {
     UPDATE_PENDING = 'MUTATIONS_${postfix}/UPDATE_PENDING',
 }
 
-export enum ACTIONS_${postfix} {Ï
+export enum ACTIONS_${postfix} {
     INIT = 'ACTIONS_${postfix}/INIT',
     LOAD = 'ACTIONS_${postfix}/LOAD',
     RELOAD = 'ACTIONS_${postfix}/RELOAD',

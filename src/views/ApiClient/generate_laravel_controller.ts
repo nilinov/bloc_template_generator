@@ -47,7 +47,7 @@ function getControllerMethod(func: ApiFunction, allModels: Model[] = []) {
             request = `Request $request, int $id`
             content = `${className}::destroy($id);
 
-        return new Product();`
+        return new ${className}();`
         } else {
             content = `//TODO`
         }
@@ -87,7 +87,7 @@ namespace App\\Http\\Controllers;
 
 use Illuminate\\Http\\Request;
 
-class ${tag}ControllerBase extends ${tag}Controller
+class ${tag}BaseController extends ${tag}Controller
 {
     ${functions.map(e => getControllerMethod(e, allModels)).join('\n\n    ')}
 }

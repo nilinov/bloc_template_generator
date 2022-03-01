@@ -101,9 +101,18 @@ function getParamsApiFunction(e: ApiFunction) {
     }) ?? [];
 
     if (e.isList) {
-        if (e.hasSearch) res.push('String? search,')
-        if (e.hasPaginate) res.push('int page = 1,')
-        if (e.hasFilter) res.push('Map<String, dynamic>? filters,')
+        if (e.hasSearch) {
+            res.push('search')
+            res2.push('search: string')
+        }
+        if (e.hasPaginate) {
+            res.push('page')
+            res2.push('page: number')
+        }
+        if (e.hasFilter) {
+            res.push('filters')
+            res2.push('filters: { [x: string]: any }')
+        }
     }
 
     return res.length ? `{${res.join('')}}: {${res2.join('')}}` : ''

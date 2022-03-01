@@ -7,17 +7,17 @@
         <pre v-if="typeModule === 'list'">{{
             getCode({
               modelName: typeLabel,
-              apiMethod: apiFunction ? apiFunction.name : '',
+              apis: allApiFunctionsByTag,
               vuexModuleName: nameBloc
             })
           }}</pre>
-        <pre v-if="typeModule === 'entity'">{{
-            getCodeEntity({
-              modelName: typeLabel,
-              apiMethod: apiFunction ? apiFunction.name : '',
-              vuexModuleName: nameBloc
-            })
-          }}</pre>
+<!--        <pre v-if="typeModule === 'entity'">{{-->
+<!--            getCodeEntity({-->
+<!--              modelName: typeLabel,-->
+<!--              apiMethod: apiFunction ? apiFunction.name : '',-->
+<!--              vuexModuleName: nameBloc-->
+<!--            })-->
+<!--          }}</pre>-->
       </div>
     </div>
 
@@ -42,23 +42,23 @@ export enum TypeModule {
 @Component({
   components: {TextBox, SelectBox}, props: {
     nameBloc: String,
-    apiFunctionUuid: String,
     typeLabel: String,
     typeModule: String,
+    tag: String,
   }
 })
 export default class StateEditorTs extends Vue {
   nameBloc!: string;
-  apiFunctionUuid!: string;
   typeLabel!: string;
   typeModule!: TypeModule;
-
-  get apiFunction() {
-    return this.allApiFunctions.find(e => e.uuid == this.apiFunctionUuid);
-  }
+  tag!: string;
 
   get allApiFunctions(): ApiFunction[] {
     return this.$store.getters.allApiFunctions ?? [];
+  }
+
+  get allApiFunctionsByTag(): ApiFunction[] {
+    return ((this.$store.getters.allApiFunctions ?? []) as ApiFunction[]).filter(e => e.tag == this.tag)
   }
 
   get fileName() {

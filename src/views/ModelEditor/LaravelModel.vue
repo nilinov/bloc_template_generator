@@ -51,7 +51,7 @@ class {{className}} extends Model
 <script lang="ts">
 import {Model, PropItem} from "./RenderCodeLineType";
 import {Component, Vue} from 'vue-property-decorator';
-import _ from "lodash";
+import _, {camelCase, upperFirst} from "lodash";
 import {UpperFirstLetter} from "@/utils/utils";
 import {simpleTypes} from "@/views/ApiClient/generate_code_api_client";
 
@@ -87,7 +87,7 @@ export default class LaravelModel extends VueBase {
   model!: Model
 
   get fileName() {
-    return _.snakeCase(this.nameClass) + '.php'
+    return upperFirst(camelCase(this.nameClass)) + '.php'
   }
 
   get tableName() {

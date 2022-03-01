@@ -19,5 +19,5 @@ export function getTypeScriptForm(data: Model, params = {}): string {
 export const ${exampl}Fields: AppFormField<${className}>[] = [
 ${data.props.map(e => getField(e)).join(', \n')},
         {...FieldBtnSave, width: '350px', key: 'action'},
-  ]};`
+  ];`
 }

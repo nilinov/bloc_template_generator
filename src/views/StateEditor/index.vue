@@ -9,7 +9,7 @@
     </el-tabs>
 
 
-    <el-tabs v-model="typeModule" v-if="allApiFunctionsTag.length">
+    <el-tabs v-model="typeModule" v-if="tag">
       <el-tab-pane label="List" name="list">
 
       </el-tab-pane>
@@ -22,23 +22,23 @@
     </el-tabs>
 
 
-    <div class="props"  v-if="allApiFunctionsTag.length">
-      <text-box class="text-box" placeholder="Name bloc" v-model="nameBloc"/>
-      <el-autocomplete
-          class="inline-input text-box"
-          v-model="typeLabel"
-          :fetch-suggestions="querySearchModel"
-          placeholder="Модель данных"
-          @select="handleSelectModel"
-      ></el-autocomplete>
-      <el-select v-model="apiFunctionUUID" placeholder="Api Request" clearable>
-        <el-option
-            v-for="item in allApiFunctionsTag"
-            :key="item.uuid"
-            :label="item.name"
-            :value="item.uuid">
-        </el-option>
-      </el-select>
+    <div class="props" v-if="allApiFunctionsTag.length">
+      <text-box class="text-box" placeholder="Name state" v-model="nameBloc"/>
+      <!--      <el-autocomplete-->
+      <!--          class="inline-input text-box"-->
+      <!--          v-model="typeLabel"-->
+      <!--          :fetch-suggestions="querySearchModel"-->
+      <!--          placeholder="Модель данных"-->
+      <!--          @select="handleSelectModel"-->
+      <!--      ></el-autocomplete>-->
+      <!--      <el-select v-model="apiFunctionUUID" placeholder="Api Request" clearable>-->
+      <!--        <el-option-->
+      <!--            v-for="item in allApiFunctionsTag"-->
+      <!--            :key="item.uuid"-->
+      <!--            :label="item.name"-->
+      <!--            :value="item.uuid">-->
+      <!--        </el-option>-->
+      <!--      </el-select>-->
 
       <div class="space"></div>
 
@@ -49,10 +49,10 @@
     </div>
 
     <state-editor-ts
-        :api-function-uuid="apiFunctionUUID"
         :name-bloc="nameBloc"
         :type-label="typeLabel"
         :type-module="typeModule"
+        :tag="tag"
     />
   </div>
 </template>
@@ -66,6 +66,7 @@ import TextBox from "@/components/TextBox.vue";
 import {snakeCase} from "lodash";
 import {getClassName} from "@/views/ModelEditor/LaravelSeederFactory.vue";
 import {fuzzy} from "@/main";
+import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 
 @Component({
   components: {TextBox, StateEditorTs, StateEditor}
@@ -74,10 +75,9 @@ export default class StateEditorIndex extends Vue {
   codeLang = 'typescript'
   tag = '';
 
-  nameBloc = 'Coupon';
+  nameBloc = '';
 
-  apiFunctionUUID = '';
-  typeLabel = 'Coupon'
+  typeLabel = ''
 
   typeModule = TypeModule.list;
 
@@ -89,16 +89,20 @@ export default class StateEditorIndex extends Vue {
     return `${snakeCase(this.nameBloc)}_state.dart`
   }
 
-  get apiFunction() {
-    return this.allApiFunctions.find(e => e.uuid == this.apiFunctionUUID);
-  }
-
   get allApiFunctions(): ApiFunction[] {
     return (this.$store.getters.allApiFunctions ?? [] as ApiFunction[])
   }
 
   get allApiFunctionsTag(): ApiFunction[] {
     return this.allApiFunctions.filter(e => e.tag == this.tag)
+  }
+
+  get apiFunctionList() {
+    return this.allApiFunctions.find(e => e.tag == this.tag && e.method == 'GET' && !e.path.includes('{id}'))
+  }
+
+  get allModels(): Model[] {
+    return this.$store.getters.allModelsItems;
   }
 
   get fileName() {
@@ -118,8 +122,15 @@ export default class StateEditorIndex extends Vue {
     this.tag = this.allTags[0];
   }
 
+  @Watch('apiFunctionList')
+  handleChange2() {
+    if (this.apiFunctionList)
+      this.typeLabel = this.allModels.find(e => e.uuid == this.apiFunctionList?.modelUUID)?.name ?? '';
+  }
+
   mounted() {
     this.tag = this.allTags[0];
+    this.nameBloc = this.tag;
   }
 
   querySearchModel(queryString: string, cb: Function) {

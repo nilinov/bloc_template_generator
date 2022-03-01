@@ -2,7 +2,7 @@ import {JsonData} from "./interfaces";
 import {getEmptyObjectTs, getVariableAndType, getVariables, getVariablesNames} from "./utils";
 
 export function getInterfaceTS(data: JsonData, params = {}): string {
-    return `interface ${data.name} {
+    return `export interface ${data.name} {
   ${getVariableAndType(data.state.props ?? {}, {lang: 'ts'})}  
 }
 

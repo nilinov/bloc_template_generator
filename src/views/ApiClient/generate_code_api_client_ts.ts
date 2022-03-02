@@ -25,7 +25,7 @@ export const api = {
         const path = basePath + ${'"' + e.path + '"' + (e.method === 'GET' ? ' + "?" + new URLSearchParams(params)' : '')};
         
         try {
-        return await fetch(path, {method: "${e.method}", ${e.method !== 'GET' ? "body: JSON.stringify(params)" : ""}})
+        return await fetch(path, {method: "${e.method}" ${e.method !== 'GET' ? ", body: JSON.stringify(params)" : ""}, headers: headers})
                 .then(r => r.json())
                 .then(r => new ApiResponse(r));
         } catch (error) {
@@ -47,7 +47,7 @@ export const api = {
         const path = basePath + ${'"' + e.path + '"' + e.params?.filter(e => e.place == 'in-path').map(e => `.replace('{${e.name}}', ${"`${" + e.name + "}`"})`) + (e.method === 'GET' ? ' + "?" + new URLSearchParams(params)' : '')};
 
         try {
-        return await fetch(path, {method: "${e.method}", ${e.method !== 'GET' ? "body: JSON.stringify(params)" : ""}})
+        return await fetch(path, {method: "${e.method}" ${e.method !== 'GET' ? ", body: JSON.stringify(params)" : ""}, headers: headers})
                 .then(r => r.json())
                 .then(r => new ApiResponse(r));
         } catch (error) {

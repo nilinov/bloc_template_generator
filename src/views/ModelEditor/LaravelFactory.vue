@@ -40,7 +40,7 @@ class {{className}}Factory extends Factory
     public function definition()
     {
         return [
-            {{ model.props.filter(e => e.faker).map(e => `'${e.name}' => ${e.faker.replace('?', e.fakerAppend)},`).join('\n\t    ') }}
+            {{ model.props.filter(e => e.faker).map(e => `'${(e.jsonField || e.name)}' => ${e.faker.replace('?', e.fakerAppend)},`).join('\n\t    ') }}
         ];
     }
 }

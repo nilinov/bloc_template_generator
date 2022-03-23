@@ -11,13 +11,13 @@
               vuexModuleName: nameBloc
             })
           }}</pre>
-<!--        <pre v-if="typeModule === 'entity'">{{-->
-<!--            getCodeEntity({-->
-<!--              modelName: typeLabel,-->
-<!--              apiMethod: apiFunction ? apiFunction.name : '',-->
-<!--              vuexModuleName: nameBloc-->
-<!--            })-->
-<!--          }}</pre>-->
+        <pre v-if="typeModule === 'entity'">{{
+            getCodeEntity({
+              modelName: typeLabel,
+              apis: allApiFunctionsByTag,
+              vuexModuleName: nameBloc
+            })
+          }}</pre>
       </div>
     </div>
 

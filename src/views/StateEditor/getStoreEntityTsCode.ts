@@ -1,9 +1,13 @@
 import {snakeCase} from "lodash";
+import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
+import {lowercaseFirstLetter} from "@/utils/utils";
 
-export function getStoreEntityTsCode(params: { modelName: string, apiMethod: string, vuexModuleName: string }) {
+export function getStoreEntityTsCode(params: { modelName: string, apis: ApiFunction[], vuexModuleName: string }) {
     const postfix = snakeCase(params.vuexModuleName + '_single').toUpperCase()
     const modelName = params.modelName;
-    const examplarModel = snakeCase(params.vuexModuleName + '_single')
+    const examplarModel = lowercaseFirstLetter(params.vuexModuleName + 'Single')
+
+    const methodGetEntity = params.apis.find(e => e.method == 'GET' && e.path.includes('{id}'))
 
     return `import {Module} from "vuex/types";
 import {RootState} from "@/store/index";
@@ -58,7 +62,7 @@ export const ${modelName}SingleModule: Module<State, RootState> = {
         async [ACTIONS_${postfix}.LOAD]({commit, state, dispatch}, params: {id: number}) {
             console.log('ACTIONS_${postfix}.LOAD')
             commit(MUTATIONS_${postfix}.UPDATE_PENDING, true)
-            const res = await api.${params.apiMethod}(params);
+            const res = await api.${methodGetEntity?.name}(params);
             const items = [res, ...state.items.filter(e => e.id != params.id)]
 
             commit(MUTATIONS_${postfix}.SET, {isPending: false, items})

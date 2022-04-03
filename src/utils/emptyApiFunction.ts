@@ -9,7 +9,7 @@ export function emptyApiFunction(): ApiFunction {
         method: 'GET',
         modelUUID: '',
         isList: false,
-        isMock: true,
+        isMock: false,
         hasFilter: false,
         hasPaginate: false,
         hasSearch: false,

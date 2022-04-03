@@ -20,6 +20,7 @@
             {{ item }}
           </el-tag>
 
+          <el-button :style="`float: right;`" size="s" @click="dialogVisible = true">Создать ресурс</el-button>
         </div>
         <br>
         <hr>
@@ -69,6 +70,25 @@
         </el-tabs>
       </el-col>
     </el-row>
+    <el-dialog
+        :visible.sync="dialogVisible"
+        title="Создать ресурс"
+        width="30%"
+    >
+      <div class="resource-form">
+        <el-select v-model="resource.modelUUID" placeholder="Выберите модель">
+          <el-option v-for="item of allModels" :value="item.uuid" :label="item.name"></el-option>
+        </el-select>
+        <el-input v-model="resource.title" placeholder="Подсказка"></el-input>
+      </div>
+      <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="handleCreateResource"
+        >Создать</el-button
+        >
+      </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -82,6 +102,7 @@ import {generateSwaggerFile} from "@/views/ApiClient/generate_swagger_file";
 import LaravelTabContent from "@/views/ApiClient/components/LaravelTabContent.vue";
 import {emptyApiFunction} from "@/utils/emptyApiFunction";
 import {generateCodeApiClientTs} from "@/views/ApiClient/generate_code_api_client_ts";
+import {snakeCase} from "lodash";
 
 @Component({
   components: {LaravelTabContent, FormEdit}
@@ -98,6 +119,13 @@ export default class ApiClient extends Vue {
   }
 
   code = '';
+
+  dialogVisible = false;
+
+  resource = {
+    modelUUID: '',
+    title: ''
+  }
 
   created() {
     if (!this.$store.state.isPending)
@@ -167,6 +195,86 @@ export default class ApiClient extends Vue {
       this.allFunctions.splice(index, 1)
     }
   }
+
+  handleCreateResource() {
+    const model = this.allModels.find(e => e.uuid == this.resource.modelUUID)
+    const title = this.resource.title.toLowerCase()
+    if (model) {
+      const path = snakeCase(model.name).split('_').join('-')
+
+      this.allFunctions.push({
+        ...emptyApiFunction(),
+        desc: `Получить список ${title}`,
+        isList: true,
+        hasPaginate: true,
+        path: `/api/v1/${path}`,
+        modelUUID: model.uuid,
+        name: `get${model.name}`,
+        tag: model.name,
+      })
+
+      this.allFunctions.push({
+        ...emptyApiFunction(),
+        desc: `Создать ${title}`,
+        method: 'POST',
+        isList: false,
+        path: `/api/v1/${path}`,
+        modelUUID: model.uuid,
+        name: `create${model.name}`,
+        tag: model.name,
+        params: [
+          {
+            name: 'payload',
+            type: model.name,
+            place: 'body'
+          }
+        ]
+      })
+
+      this.allFunctions.push({
+        ...emptyApiFunction(),
+        desc: `Обновить ${title}`,
+        method: 'PUT',
+        isList: false,
+        path: `/api/v1/${path}/{id}`,
+        modelUUID: model.uuid,
+        name: `update${model.name}`,
+        tag: model.name,
+        params: [
+          {
+            name: 'id',
+            type: 'int',
+            place: 'in-path'
+          },
+          {
+            name: 'payload',
+            type: model.name,
+            place: 'body'
+          }
+        ]
+      })
+
+      this.allFunctions.push({
+        ...emptyApiFunction(),
+        desc: `Удалить ${title}`,
+        method: 'DELETE',
+        isList: false,
+        path: `/api/v1/${path}/{id}`,
+        modelUUID: model.uuid,
+        name: `delete${model.name}`,
+        tag: model.name,
+        params: [
+          {
+            name: 'id',
+            type: 'int',
+            place: 'in-path'
+          },
+        ]
+      })
+
+      this.dialogVisible = false;
+    }
+  }
 }
 
 
@@ -186,5 +294,12 @@ export default class ApiClient extends Vue {
 
     background-color: $color-gray-100;
   }
+}
+
+.resource-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  grid-gap: 1rem;
 }
 </style>

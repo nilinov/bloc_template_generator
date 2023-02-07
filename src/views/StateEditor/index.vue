@@ -49,6 +49,7 @@
     </div>
 
     <state-editor-ts
+        :is-snack-case="isSnackcase"
         :name-bloc="nameBloc"
         :type-label="typeLabel"
         :type-module="typeModule"
@@ -76,6 +77,7 @@ export default class StateEditorIndex extends Vue {
   tag = '';
 
   nameBloc = '';
+  isSnackcase = true;
 
   typeLabel = ''
 

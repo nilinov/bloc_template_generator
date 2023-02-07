@@ -58,6 +58,7 @@ import _ from "lodash";
 })
 export default class RenderEnumCode extends Vue {
   nameClass!: string
+  isSnackcase!: boolean
   items!: PropItem[]
 
   get stateProps() {
@@ -79,6 +80,7 @@ export default class RenderEnumCode extends Vue {
   get bloc(): JsonData {
     return {
       name: this.nameClass,
+      isSnackcase: this.isSnackcase,
       state: {
         props: this.stateProps,
       },

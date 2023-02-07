@@ -26,7 +26,7 @@ class ${bloc.name}State {
   }
 
   @override
-  toMap() => ${toMap(bloc.state.props ?? {})};
+  toMap() => ${toMap(bloc.state.props ?? {}, bloc.isSnackcase)};
 
   ${getGetters(bloc.state.getters ?? {})}
 }

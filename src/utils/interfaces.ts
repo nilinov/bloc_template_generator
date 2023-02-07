@@ -56,6 +56,7 @@ export interface Bloc {
 
 export interface JsonData {
     name: string,
+    isSnackcase: boolean,
     state: BlocState,
     events: BlocEvent[],
     bloc: Bloc,

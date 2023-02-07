@@ -38,6 +38,7 @@ const VueBase = Vue.extend({
 export default class RenderCode extends VueBase {
   nameClass!: string
   items!: PropItem[]
+  isSnackcase!: boolean
 
   get stateProps() {
     const res: {[x: string]: Prop} = {};
@@ -63,6 +64,7 @@ export default class RenderCode extends VueBase {
   get bloc(): JsonData {
     return {
       name: this.nameClass,
+      isSnackcase: this.isSnackcase,
       state: {
         props: this.stateProps,
       },

@@ -55,6 +55,7 @@ import {downloadURI} from "@/main";
 @Component({components: {TextBox, SelectBox}})
 export default class StateEditor extends Vue {
   nameBloc = 'Coupon';
+  isSnackcase = true;
   nameClassEntity = 'Coupon';
   typeTemplate = 'cubit-list';
   dataTemplate = 'sample-view';
@@ -141,13 +142,13 @@ export default class StateEditor extends Vue {
     const hasPaginate = this.apiFunction?.hasPaginate ?? true;
     const hasFilter = this.apiFunction?.hasFilter ?? true;
 
-    let data = sampleLoadList(this.nameBloc, this.nameClassEntity, {ApiCall, hasSearch, hasPaginate, hasFilter});
+    let data = sampleLoadList(this.nameBloc, this.nameClassEntity, {ApiCall, hasSearch, hasPaginate, hasFilter, isSnackcase: this.isSnackcase});
     switch (this.dataTemplate) {
       case "sample-list":
-        data = sampleLoadList(this.nameBloc, this.nameClassEntity, {ApiCall, hasSearch, hasPaginate, hasFilter});
+        data = sampleLoadList(this.nameBloc, this.nameClassEntity, {ApiCall, hasSearch, hasPaginate, hasFilter, isSnackcase: this.isSnackcase});
         break;
       case "sample-view":
-        data = sampleLoadView(this.nameBloc, this.nameClassEntity, {ApiCall});
+        data = sampleLoadView(this.nameBloc, this.nameClassEntity, {ApiCall, isSnackcase: this.isSnackcase});
         break;
     }
 

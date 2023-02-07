@@ -3,13 +3,12 @@ import {
   fromMap,
   getAllFinalVariables, getClearWithParams,
   getCopyWithParams,
-  getGetters,
   getVariableAndType,
   getVariables,
   toMap
 } from "./utils";
-import {EmptyGetter, EmptyProps} from "./templates/cubit-list/state.cubit-list.template";
-import {getDefaultValue, getVariablesAndDefault} from "./templates/bloc-default/bloc.default.tempalte";
+import {EmptyProps} from "./templates/cubit-list/state.cubit-list.template";
+import {getVariablesAndDefault} from "./templates/bloc-default/bloc.default.tempalte";
 
 export default (bloc: JsonData, params = {postfix: 'State'}) => {
   return `
@@ -32,7 +31,7 @@ export default (bloc: JsonData, params = {postfix: 'State'}) => {
         ${getClearWithParams(bloc, {addAction: bloc.actionProp})});
     }
   
-    toJson() => ${toMap(bloc.state.props ?? EmptyProps)};
+    toJson() => ${toMap(bloc.state.props ?? EmptyProps, bloc.isSnackcase)};
     
     static ${bloc.name}${params?.postfix} fromJson(Map<String, dynamic> json) => 
         ${bloc.name}${params?.postfix}(${fromMap(bloc.state.props ?? EmptyProps, {addAction: bloc.actionProp})});

@@ -44,16 +44,16 @@ export function getFullType(prop: Prop, params?: { noRequired?: boolean, lang: C
     return `${prop.typeName}${afterNoRequired}`;
 }
 
-export function toMap(props: { [name: string]: Prop }) {
+export function toMap(props: { [name: string]: Prop }, isSnackcase: boolean) {
     console.log(`toMap()`, props)
 
     return '{\n' + Object.keys(props).map((key) => {
         const prop = props[key];
-        const field = prop.jsonField ?? key;
+        const field = isSnackcase ? prop.jsonField ?? key : key;
         const nullable = prop.typeTemplate?.nullable ? '?' : '';
 
         if (prop.typeTemplate?.array || prop.typeName?.indexOf('List<') == 0) {
-            return `"${field}": '[' + (${key}${prop.typeTemplate?.nullable ? ' ?? []' : ''}).map((e) => e.toJson()).join(', ') + ']'`;
+            return `"${field}": ${key}${prop.typeTemplate?.nullable ? ' ?? []' : ''}`;
         } else if (prop.typeTemplate?.enum) {
             return `"${field}": ${_.camelCase(prop.typeName)}ToJson(${key})`;
         } else if (prop.typeTemplate?.double) {

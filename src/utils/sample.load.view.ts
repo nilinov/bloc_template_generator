@@ -52,8 +52,9 @@ const eventName = {
     loaded: 'loaded',
 }
 
-const sampleLoadView = (name: string, itemType: string, params = {ApiCall: 'ApiCall'}): JsonData => ({
+const sampleLoadView = (name: string, itemType: string, params = {ApiCall: 'ApiCall', isSnackcase: true}): JsonData => ({
     name: `${name}`,
+    isSnackcase: params.isSnackcase,
     state: {
         props: props(itemType),
         getters: getters(itemType)

@@ -36,6 +36,7 @@ const VueBase = Vue.extend({
 })
 export default class RenderCodeTypeScript extends VueBase {
   nameClass!: string
+  isSnackcase!: boolean
   items!: PropItem[]
   isEnum!: boolean
 
@@ -62,6 +63,7 @@ export default class RenderCodeTypeScript extends VueBase {
   get bloc(): JsonData {
     return {
       name: this.nameClass,
+      isSnackcase: this.isSnackcase,
       state: {
         props: this.stateProps,
       },

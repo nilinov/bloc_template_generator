@@ -87,12 +87,14 @@ const eventName = {
 
 const sampleLoadList = (name: string, itemType: string, params = {
     ApiCall: 'ApiCall',
+    isSnackcase: true,
     hasSearch: true,
     hasPaginate: true,
     hasFilter: true,
 }): JsonData => {
     return ({
         name: `${name}`,
+        isSnackcase: params.isSnackcase,
         state: {
             props: props(itemType),
             getters: getters(itemType)

@@ -24,7 +24,7 @@ class ${bloc.name}State {
       ${getCopyWithParams(bloc, {addAction: bloc.actionProp})});
   }
 
-  toMap() => ${toMap(bloc.state.props ?? {})};
+  toMap() => ${toMap(bloc.state.props ?? {}, bloc.isSnackcase)};
   
   static empty() => ${bloc.name}State(${getVariablesAndDefault(bloc, {addAction: bloc.actionProp})});
 

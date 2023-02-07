@@ -12,6 +12,8 @@
 
       <el-input v-model="project_name" @change="handleRename"/>
 
+      <el-checkbox v-model="is_snackcase"  @change="handleChangeIsSnackcase">Snackcase</el-checkbox>
+      
       <el-button @click="handleExport">Экспорт проекта</el-button>
       <el-button @click="handleImport">Импорт проекта</el-button>
 
@@ -35,6 +37,7 @@ export default class Project extends Vue {
 
   project_uuid?: string = '';
   project_name?: string = '';
+  is_snackcase?: boolean = true;
   message = '';
 
   mounted() {
@@ -50,6 +53,7 @@ export default class Project extends Vue {
   reset() {
     this.project_uuid = this.$store.getters.project?.uuid;
     this.project_name = this.$store.getters.project?.name;
+    this.is_snackcase = this.$store.getters.project?.is_snackcase;
   }
 
   get allProjects() {
@@ -63,6 +67,10 @@ export default class Project extends Vue {
 
   handleRename(name: string) {
     this.$store.dispatch(ACTIONS_PROJECT.SET, {...this.$store.getters.project, name})
+  }
+
+  handleChangeIsSnackcase(is_snackcase: boolean) {
+    this.$store.dispatch(ACTIONS_PROJECT.SET, {...this.$store.getters.project, is_snackcase})
   }
 
   handleExport() {
@@ -150,7 +158,7 @@ export default class Project extends Vue {
 
   .Project {
     display: grid;
-    grid-template-columns: 300px auto 300px 300px;
+    grid-template-columns: 300px auto 300px 300px 300px;
     grid-gap: 1rem;
 
     align-items: start;

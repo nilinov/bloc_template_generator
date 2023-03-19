@@ -32,8 +32,8 @@ export function getCodeFunctionTs(models: Model[], e: ApiFunction) {
         
         try {
         return await fetch(path, {method: "${e.method}" ${e.method !== 'GET' ? ", body: JSON.stringify(params)" : ""}, headers: headers})
-                .then(r => r.json())
-                .then(r => new ApiResponse(r));
+                .then(async r => ([r, await r.json()]))
+                .then(r => [200, 201].includes(r[0].status) ? new ApiResponse(r[1]) : new ApiResponse(undefined, r[1]));
         } catch (error) {
             return new ApiResponse<${model.name}[]>(undefined, error);
         }

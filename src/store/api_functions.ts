@@ -64,7 +64,10 @@ export const apiFunctionsModule: Module<State, RootState> = {
 
             if (ctx.rootState.db) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.RESTORE, items);
-                await api.storeApiFunctions(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
+
+                for(const item of items) {
+                    await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, item, item.uuid);
+                }
             }
 
             ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, false);
@@ -74,10 +77,7 @@ export const apiFunctionsModule: Module<State, RootState> = {
             const localJson = JSON.stringify(local, Object.keys(local as any).sort())
             const itemJson = JSON.stringify(item, Object.keys(item as any).sort())
 
-            console.log(localJson)
-            console.log(itemJson)
-
-            if (ctx.rootState.db && localJson != itemJson ) {
+            if (ctx.rootState.db && localJson != itemJson) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.SET, item);
                 await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, item, item.uuid);
             }
@@ -92,6 +92,15 @@ export const apiFunctionsModule: Module<State, RootState> = {
     getters: {
         allApiFunctions(state): ApiFunction[] {
             return state.items;
+        },
+        tagsApiFunctions(state) {
+            const tags = state.items.map(e => e.tag).filter(e => e);
+
+            const res: { [x: string]: boolean } = {}
+
+            for (const tag of tags) res[tag] = true;
+
+            return Object.keys(res);
         }
     }
 }

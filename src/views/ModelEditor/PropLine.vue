@@ -1,6 +1,11 @@
 <template>
   <div class="ModelEditor" :class="{isEnum}">
-    <TextBox class="text-box" placeholder="Name property" v-model="item.name" @input="updateJsonField"/>
+    <TextBox
+        class="text-box"
+        placeholder="Name property"
+        v-model="item.name"
+        @input="updateJsonField"
+    />
 
     <!--    <SelectBox v-if="!isEnum" class="select-box" placeholder="Select type" :options="options" v-model="item.type"/>-->
 

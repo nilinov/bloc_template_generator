@@ -143,7 +143,14 @@ export default new Vuex.Store<RootState>({
         },
         async [ACTIONS.SET_MODEL]({state, commit}, item: Model) {
             const local = state.models.find(e => e.uuid == item.uuid) ?? {};
-            if (state.db && JSON.stringify(item, Object.keys(item as any).sort()) != JSON.stringify(local, Object.keys(local as any).sort())) {
+
+            const localJson = JSON.stringify(local, Object.keys(local as any).sort())
+            const itemJson = JSON.stringify(item, Object.keys(item as any).sort())
+
+            console.log(itemJson)
+            console.log(localJson)
+
+            if (state.db && itemJson != localJson) {
                 commit(MUTATIONS.SET_MODEL, item)
                 api.storeModel(state.db, state.project_uuid, item, item.uuid);
             }

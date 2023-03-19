@@ -19,13 +19,10 @@ const api = {
     storeModels: storeModels,
     storeModel: storeModel,
     removeModel: removeModel,
-    getProjects: async (db: firebase.database.Database): Promise<IProject[]> => {
-        return (await db.ref(getProjectsPath()).get()).val()
-    },
-    storeProjects: async (db: firebase.database.Database, projects: IProject[]) => {
-        return db.ref(getProjectsPath()).set(projects)
-    },
+    getProjects: getProjects,
+    storeProjects: storeProjects,
 }
+
 
 export default api;
 export {api};
@@ -60,16 +57,16 @@ async function getApiFunctions(db: firebase.database.Database, project: string):
 
     if (res instanceof Object) res = Object.values(res);
 
-     res = (res.map((e: ApiFunction) => ({
+    res = (res.map((e: ApiFunction) => ({
         ...e,
         params: e.params ?? []
     })));
 
-     const res2: { [key: string]: ApiFunction } = {};
+    const res2: { [key: string]: ApiFunction } = {};
 
-     (res as ApiFunction[]).forEach((e) => {
-         res2[e.uuid] = e;
-     })
+    (res as ApiFunction[]).forEach((e) => {
+        res2[e.uuid] = e;
+    })
 
     return middleware(req, Object.values(res2), 'GET', undefined);
 }
@@ -108,6 +105,14 @@ async function removeModel(db: firebase.database.Database, project: string, uuid
 
 async function getAllProjects(db: firebase.database.Database): Promise<IProject[]> {
     return middleware(getProjectsPath(), (((await (await db.ref(getProjectsPath()).get()).val()) as IProject[]) ?? []), 'GET', undefined);
+}
+
+async function getProjects(db: firebase.database.Database): Promise<IProject[]> {
+    return middleware(getProjectsPath(), (await db.ref(getProjectsPath()).get()).val(), 'GET', undefined)
+}
+
+async function storeProjects(db: firebase.database.Database, projects: IProject[]) {
+    return middleware(getProjectsPath(), db.ref(getProjectsPath()).set(projects), 'POST', projects)
 }
 
 function getProjectApiFunctions(project: string) {

@@ -1,11 +1,11 @@
 import {ApiFunction} from "../views/ApiClient/generate_code_api_client";
 
-export function emptyApiFunction(): ApiFunction {
+export function emptyApiFunction(count: number): ApiFunction {
     return {
-        uuid: Math.random().toString(),
+        uuid: `${count}_` + Math.random().toString(),
         desc: '',
         name: '',
-        path: '/',
+        path: '',
         method: 'GET',
         modelUUID: '',
         isList: false,

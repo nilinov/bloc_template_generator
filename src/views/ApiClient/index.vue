@@ -118,6 +118,10 @@ export default class ApiClient extends Vue {
     return this.$store.getters.allApiFunctions ?? [];
   }
 
+  get tags(): string[] {
+    return this.$store.getters.tagsApiFunctions ?? [];
+  }
+
   code = '';
 
   dialogVisible = false;
@@ -155,16 +159,6 @@ export default class ApiClient extends Vue {
 
   selectTag = '';
 
-  get tags() {
-    const tags = this.allFunctions.map(e => e.tag).filter(e => e);
-
-    const res: {[x: string]: boolean} = {}
-
-    for(const tag of tags) res[tag] = true;
-
-    return Object.keys(res);
-  }
-
   updateCode() {
     console.log(this.allModels)
     if (this.lang == 'dart') {
@@ -199,7 +193,7 @@ export default class ApiClient extends Vue {
       const path = snakeCase(model.name).split('_').join('-')
 
       this.allFunctions.push({
-        ...emptyApiFunction(),
+        ...emptyApiFunction(this.allFunctions.length),
         desc: `Получить список ${title}`,
         isList: true,
         hasPaginate: true,
@@ -210,7 +204,7 @@ export default class ApiClient extends Vue {
       })
 
       this.allFunctions.push({
-        ...emptyApiFunction(),
+        ...emptyApiFunction(this.allFunctions.length),
         desc: `Создать ${title}`,
         method: 'POST',
         isList: false,
@@ -228,7 +222,7 @@ export default class ApiClient extends Vue {
       })
 
       this.allFunctions.push({
-        ...emptyApiFunction(),
+        ...emptyApiFunction(this.allFunctions.length),
         desc: `Обновить ${title}`,
         method: 'PUT',
         isList: false,
@@ -251,7 +245,7 @@ export default class ApiClient extends Vue {
       })
 
       this.allFunctions.push({
-        ...emptyApiFunction(),
+        ...emptyApiFunction(this.allFunctions.length),
         desc: `Удалить ${title}`,
         method: 'DELETE',
         isList: false,

@@ -20,7 +20,9 @@
       </div>
 
       <PropLine
-          v-for="(item, index) of items" :item="item" :key="`item-${item.name}-${item.type}`"
+          v-for="(item, index) of items"
+          :item="item"
+          :key="`item-${item.name}-${item.type}`"
           :is-enum="isEnum"
           :all-types="allModelsNames"
           @remove="handleRemoveItem(index)"
@@ -299,7 +301,7 @@ export default class ModelEditor extends Vue {
       this.uuid = item.uuid;
       this.name = item.name;
       this.desc = item.desc;
-      this.items = item.props;
+      this.items = JSON.parse(JSON.stringify(item.props));
       this.isEnum = item.isEnum;
       this.seederCount = item.seederCount ?? 5;
       this.requestName = item.requestName ?? '';
@@ -336,9 +338,8 @@ export default class ModelEditor extends Vue {
   };
 
   async handleRemove() {
-    this.$store.commit(MUTATIONS.REMOVE_MODEL, this.uuid)
+    await this.$store.dispatch(ACTIONS.REMOVE_MODEL, this.uuid);
     this.$router.push({name: 'Model'})
-    await this.$store.dispatch(ACTIONS.SET_MODELS, this.allModels);
     await this.$notify({message: 'Модель удалена', title: ''})
   }
 

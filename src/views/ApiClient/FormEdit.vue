@@ -12,10 +12,25 @@
       <el-button size="small" @click="$emit('remove', localItem)">Удалить</el-button>
     </div>
 
-    <el-input v-model="localItem.name" placeholder="Имя функции"></el-input>
-    <el-input v-model="localItem.path" placeholder="Путь запроса"></el-input>
-    <el-input v-model="localItem.desc" placeholder="Описание функции"></el-input>
-    <el-input v-model="localItem.tag" placeholder="Тег"></el-input>
+    <el-input v-model="localItem.name" placeholder="Имя функции (например getItems)"></el-input>
+    <el-input v-model="localItem.path" placeholder="Путь запроса (/api/v1/model/:id)" @change="updateVariablesPath"></el-input>
+    <el-row>
+      <el-col :span="12">
+        <el-input v-model="localItem.desc" placeholder="Описание функции (текст)"></el-input>
+      </el-col>
+      <el-col :span="12" class="select-tag-wrap">
+        <el-autocomplete
+            class="inline-input"
+            v-model="localItem.tag"
+            :fetch-suggestions="querySearchTag"
+            placeholder="Тег"
+            @select="handleSelectTag"
+            @clear="handleClearTag"
+            clearable
+        ></el-autocomplete>
+
+      </el-col>
+    </el-row>
 
     <el-autocomplete
         class="inline-input"
@@ -53,7 +68,7 @@
       <el-select v-model="localVariable.type" placeholder="Тип">
         <el-option v-for="item in optionsTypeVariable" :key="item" :label="item" :value="item"></el-option>
       </el-select>
-      <el-input v-model="localVariable.name" placeholder="Имя переменной"></el-input>
+      <el-input v-model="localVariable.name" placeholder="Имя переменной (payload - для главной)"></el-input>
       <div @click="handleAddVariable">
         <el-icon name="plus"></el-icon>
       </div>
@@ -75,7 +90,7 @@ export default class FormEdit extends Vue {
 
   localItem: ApiFunction = {
     uuid: Math.random().toString(),
-    path: '/',
+    path: '',
     name: '',
     desc: '',
     method: 'GET',
@@ -169,6 +184,20 @@ export default class FormEdit extends Vue {
     };
   }
 
+  querySearchTag(queryString: string, cb: Function) {
+    console.log(queryString)
+    const tags: string[] = this.$store.getters.tagsApiFunctions;
+    var results = queryString ? tags.filter(this.handleFilterTag(queryString)) : tags;
+
+    cb(results.map(tag => ({value: tag, item: tag})));
+  }
+
+  handleFilterTag(queryString: string) {
+    return (model: string) => {
+      return (fuzzy(model.toLowerCase(), queryString.toLowerCase()));
+    };
+  }
+
   get allModels(): Model[] {
     return this.$store.state.models;
   }
@@ -228,6 +257,26 @@ export default class FormEdit extends Vue {
     this.selectModel = undefined;
     this.localItem.modelUUID = '';
   };
+
+  handleSelectTag(item: { value: string, item: string }) {
+    this.localItem.tag = item.item;
+  };
+
+  handleClearTag() {
+    this.localItem.tag = '';
+  };
+
+  updateVariablesPath() {
+    const variablesRes = this.localItem.params?.filter(e => e.place != 'in-path') ?? [];
+
+    const variables = this.localItem.path.split('/').filter(e => e.includes(':')).map(e => e.replace(':', ''));
+
+    variables.forEach((item) => {
+      variablesRes.push({name: item, type: 'int', place: 'in-path'});
+    })
+
+    Vue.set(this.localItem, 'params', variablesRes)
+  }
 }
 </script>
 
@@ -258,5 +307,13 @@ export default class FormEdit extends Vue {
     grid-gap: 1rem;
     align-items: center;
   }
+}
+
+.el-autocomplete {
+  width: 100%;
+}
+
+.select-tag-wrap {
+  padding-left: 1rem;
 }
 </style>

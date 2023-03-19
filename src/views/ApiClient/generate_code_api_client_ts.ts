@@ -1,6 +1,7 @@
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import _ from "lodash";
 import {ApiFunction, ApiFunctionParam} from "@/views/ApiClient/generate_code_api_client";
+import {generateParams} from "@/views/ApiClient/generate_params";
 
 
 function generateCodeApiClientTs(functions: ApiFunction[] = [], models: Model[] = []) {
@@ -35,14 +36,8 @@ export const api = {
         }
 
         if (!e.isList) {
-            const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
-            const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
-            const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
-
             return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model?.name}>> {
-        const params: { [x: string]: any } = {};
-        ${codePaginate}${codeFilter}${codeSearch}
-        ${postParams(e)}
+        ${generateParams(e)}
 
         const path = basePath + ${'"' + e.path + '"' + e.params?.filter(e => e.place == 'in-path').map(e => `.replace('{${e.name}}', ${"`${" + e.name + "}`"})`).join('') + (e.method === 'GET' ? ' + "?" + new URLSearchParams(params)' : '')};
 
@@ -58,13 +53,6 @@ export const api = {
     }).join('\n')}
 }
 `
-}
-
-function postParams(func: ApiFunction) {
-    if (func.method != 'GET')
-        return func.params?.map(param => `params["${_.snakeCase(param.name)}"] = ${param.name}`).join('\n\t')
-
-    return ''
 }
 
 function bindParams(path: string, params: ApiFunctionParam[] = [], hasPaginate = false) {

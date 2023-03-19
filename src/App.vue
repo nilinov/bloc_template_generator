@@ -34,9 +34,16 @@ export default class App extends Vue {
   }
 
   async mounted() {
-    this.activeIndex = this.$route.path;
+    if (localStorage.getItem('keyValue') == 'JGSADJFHGSD') {
+      this.activeIndex = this.$route.path;
 
-    await this.$store.dispatch(ACTIONS.RESTORE);
+      await this.$store.dispatch(ACTIONS.RESTORE);
+    } else {
+      const key = await this.$prompt('Ключ авторизации', {confirmButtonText: 'Ok', cancelButtonText: 'Cancel'})
+      console.log({key})
+      localStorage.setItem('keyValue', (key as any).value);
+      location.reload()
+    }
   }
 }
 </script>

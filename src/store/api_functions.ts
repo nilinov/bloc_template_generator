@@ -70,7 +70,7 @@ export const apiFunctionsModule: Module<State, RootState> = {
             ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, false);
         },
         async [ACTIONS_API_FUNCTIONS.SET](ctx, item: ApiFunction) {
-            const local = ctx.state.items.find(e => e.uuid == item.uuid);
+            const local = ctx.state.items.find(e => e.uuid == item.uuid) ?? {};
             if (ctx.rootState.db && JSON.stringify(item, Object.keys(item as any).sort()) != JSON.stringify(local, Object.keys(local as any).sort())) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.SET, item);
                 await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, item, item.uuid);

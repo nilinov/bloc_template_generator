@@ -40,7 +40,7 @@
           <hr>
           <br>
         </template>
-        <el-button @click="allFunctions.push(emptyApiFunction)">Добавить</el-button>
+        <el-button @click="allFunctions.push(emptyApiFunction())">Добавить</el-button>
       </el-col>
       <el-col :span="16" class="code">
         <el-tabs v-model="lang">
@@ -132,9 +132,7 @@ export default class ApiClient extends Vue {
       this.updateCode();
   }
 
-  get emptyApiFunction(): ApiFunction {
-    return emptyApiFunction();
-  }
+  emptyApiFunction = emptyApiFunction
 
   get allModels(): Model[] {
     return this.$store.state.models;
@@ -189,10 +187,8 @@ export default class ApiClient extends Vue {
 
   handleRemove(func: ApiFunction) {
     const index = this.allFunctions.findIndex(e => e.uuid == func.uuid)
-    console.log(this.allFunctions.map(e => e.uuid))
-    console.log(func.uuid)
     if (index != -1) {
-      this.allFunctions.splice(index, 1)
+      this.$store.dispatch(ACTIONS_API_FUNCTIONS.REMOVE, func.uuid)
     }
   }
 

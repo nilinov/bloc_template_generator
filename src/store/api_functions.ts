@@ -59,25 +59,27 @@ export const apiFunctionsModule: Module<State, RootState> = {
             ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, false);
         },
         async [ACTIONS_API_FUNCTIONS.SET_ALL](ctx, items: ApiFunction[]) {
+            console.log('ACTIONS_API_FUNCTIONS.SET_ALL')
             ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, true);
 
             if (ctx.rootState.db) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.RESTORE, items);
-                await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
+                await api.storeApiFunctions(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
             }
 
             ctx.commit(MUTATIONS_API_FUNCTIONS.UPDATE_PENDING, false);
         },
         async [ACTIONS_API_FUNCTIONS.SET](ctx, item: ApiFunction) {
-            if (ctx.rootState.db) {
+            const local = ctx.state.items.find(e => e.uuid == item.uuid);
+            if (ctx.rootState.db && JSON.stringify(item, Object.keys(item as any).sort()) != JSON.stringify(local, Object.keys(local as any).sort())) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.SET, item);
-                await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
+                await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, item, item.uuid);
             }
         },
         async [ACTIONS_API_FUNCTIONS.REMOVE](ctx, uuid: string) {
             if (ctx.rootState.db) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.REMOVE, uuid);
-                await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, ctx.state.items);
+                await api.removeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, uuid);
             }
         },
     },

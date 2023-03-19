@@ -142,21 +142,22 @@ export default new Vuex.Store<RootState>({
             }
         },
         async [ACTIONS.SET_MODEL]({state, commit}, item: Model) {
-            if (state.db) {
+            const local = state.models.find(e => e.uuid == item.uuid);
+            if (state.db && JSON.stringify(item, Object.keys(item as any).sort()) != JSON.stringify(local, Object.keys(local as any).sort())) {
                 commit(MUTATIONS.SET_MODEL, item)
-                api.storeModel(state.db, state.project_uuid, state.models);
+                api.storeModel(state.db, state.project_uuid, item, item.uuid);
             }
         },
         async [ACTIONS.SET_MODELS]({state, commit}, items: Model[]) {
             if (state.db) {
                 commit(MUTATIONS.RESTORE_MODELS, items)
-                await api.storeModel(state.db, state.project_uuid, state.models);
+                await api.storeModels(state.db, state.project_uuid, state.models);
             }
         },
         async [ACTIONS.REMOVE_MODEL]({state, commit}, uuid: string) {
             if (state.db) {
                 commit(MUTATIONS.REMOVE_MODEL, uuid)
-                api.storeModel(state.db, state.project_uuid, state.models);
+                api.removeModel(state.db, state.project_uuid, uuid);
             }
         },
         async [ACTIONS.SET_PROJECT]({state, commit, dispatch, getters, rootGetters}, uuid: string) {

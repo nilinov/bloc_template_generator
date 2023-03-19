@@ -233,7 +233,7 @@ export function getAllFinalVariables(variables: { [x: string]: Prop }, params?: 
 
 export const camelToSnakeCase = (str: string = '  ') => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`).split('_').filter(e => e).join('_');
 
-export const UpperFirstLetter = (str: string = '  ') => str[0].toUpperCase() + str.slice(1);
+export const UpperFirstLetter = (str: string = '  ') => (str[0] ?? '').toUpperCase() + str.slice(1);
 
 export const lowercaseFirstLetter = (string: string) =>string.charAt(0).toLowerCase() + string.slice(1);
 

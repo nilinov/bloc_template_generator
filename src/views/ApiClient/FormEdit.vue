@@ -40,7 +40,8 @@
       <el-select v-model="localItem.params[index].type" @input="handleUpdateVariable" placeholder="Тип">
         <el-option v-for="item in optionsTypeVariable" :key="item" :label="item" :value="item"></el-option>
       </el-select>
-      <el-input v-model="localItem.params[index].name" @input="handleUpdateVariable" placeholder="Имя переменной"></el-input>
+      <el-input v-model="localItem.params[index].name" @input="handleUpdateVariable"
+                placeholder="Имя переменной"></el-input>
       <div @click="handleRemoveVariable(index)">
         <el-icon name="minus"></el-icon>
       </div>
@@ -146,9 +147,9 @@ export default class FormEdit extends Vue {
     this.localItem.hasPaginate = this.item.hasPaginate;
     this.localItem.hasSearch = this.item.hasSearch;
     this.localItem.hasFilter = this.item.hasFilter;
-    this.localItem.params = this.item.params;
+    this.localItem.params = JSON.parse(JSON.stringify(this.item.params));
     this.localItem.tag = this.item.tag;
-      this.localItem.isMock = this.item.isMock;
+    this.localItem.isMock = this.item.isMock;
 
     this.selectModel = this.allModels.find(e => e.uuid == this.item.modelUUID)
     this.labelSelectModel = this.selectModel?.name ?? '';
@@ -215,7 +216,7 @@ export default class FormEdit extends Vue {
 
   @Emit('update')
   sendUpdate() {
-    return {...this.localItem};
+    return JSON.parse(JSON.stringify(this.localItem));
   }
 
   handleSelectModel(item: { value: string, item: Model }) {

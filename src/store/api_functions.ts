@@ -71,7 +71,13 @@ export const apiFunctionsModule: Module<State, RootState> = {
         },
         async [ACTIONS_API_FUNCTIONS.SET](ctx, item: ApiFunction) {
             const local = ctx.state.items.find(e => e.uuid == item.uuid) ?? {};
-            if (ctx.rootState.db && JSON.stringify(item, Object.keys(item as any).sort()) != JSON.stringify(local, Object.keys(local as any).sort())) {
+            const localJson = JSON.stringify(local, Object.keys(local as any).sort())
+            const itemJson = JSON.stringify(item, Object.keys(item as any).sort())
+
+            console.log(localJson)
+            console.log(itemJson)
+
+            if (ctx.rootState.db && localJson != itemJson ) {
                 ctx.commit(MUTATIONS_API_FUNCTIONS.SET, item);
                 await api.storeApiFunction(ctx.rootState.db, ctx.rootState.project_uuid, item, item.uuid);
             }

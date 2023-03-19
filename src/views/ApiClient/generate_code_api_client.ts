@@ -30,38 +30,44 @@ function generateCodeApiClient(functions: ApiFunction[] = [], models: Model[] = 
 
     return `import 'package:mad_teams/_imports.dart';
 class Api {
-  ${functions.map(e => {
-        const model = models.find(e1 => e1.uuid == e.modelUUID);
-        // console.log(`render request ${e?.name}`, e, model)
+  ${functions.map(e => getCodeFunction(models, e)).join('\n')}
+}
+`
+}
 
-        if (model && e.isList) {
-            const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
-            const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
-            const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
+export function getCodeFunction(models: Model[], e: ApiFunction) {
 
-            return `static Future<ApiResponse<List<${model.name}>>> ${e.name}(${getParamsApiFunction(e)}) async {
+    const model = models.find(e1 => e1.uuid == e.modelUUID);
+    // console.log(`render request ${e?.name}`, e, model)
+
+    if (model && e.isList) {
+        const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
+        const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
+        const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
+
+        return `static Future<ApiResponse<List<${model.name}>>> ${e.name}(${getParamsApiFunction(e)}) async {
         final Map<String, dynamic> params = {};
         ${codePaginate}${codeFilter} ${codeSearch}
-        
+
         try {
-        return await ApiClient.dio
+            return await ApiClient.dio
             ${e.method == 'GET' ? `.get('${bindParams(e.path, e.params, e.isMock && e.isList)}', queryParameters: params)` : `.post('${bindParams(e.path, e.params, e.isMock && e.isList)}', data: params)`}
-            .then((value) => ApiResponse(
-                  ${model.name}.listFromJson(value.data['data']),
-                  meta: MetaPage.fromJson(value.data['meta']),
-                ));
+                .then((value) => ApiResponse(
+                        ${model.name}.listFromJson(value.data['data']),
+                    meta: MetaPage.fromJson(value.data['meta']),
+        ));
         } catch (error) {
             return ApiResponse(<${model.name}>[], error: error);
         }
-      }\n`;
-        }
+    }\n`;
+    }
 
-        if (!e.isList) {
-            const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
-            const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
-            const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
+    if (!e.isList) {
+        const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
+        const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
+        const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
 
-            return `static Future<${model ? `ApiResponse<${model.name}>` : 'dynamic'}> ${e.name}(${getParamsApiFunction(e)}) async {
+        return `static Future<${model ? `ApiResponse<${model.name}>` : 'dynamic'}> ${e.name}(${getParamsApiFunction(e)}) async {
         final Map<String, dynamic> params = {};
         ${codePaginate}${codeFilter}${codeSearch}
         ${postParams(e)}
@@ -73,10 +79,9 @@ class Api {
             ${model ? `return ApiResponse<${model.name}>(${model.name}.empty(), error: error);` : `debugPrint(error.toString()); return error;`}
         }
       }\n`;
-        }
-    }).join('\n')}
-}
-`
+    }
+
+    return '';
 }
 
 function postParams(func: ApiFunction) {

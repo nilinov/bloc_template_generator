@@ -3,6 +3,19 @@ import {ApiFunction} from "@/views/ApiClient/generate_code_api_client";
 import {getSchemaDescByClass} from "@/views/ApiClient/generate_swagger_file";
 import {getClassName} from "@/views/ModelEditor/LaravelSeederFactory.vue";
 
+export function getRoute(allModels: Model[], func: ApiFunction) {
+    const model = allModels.find(model => model.uuid == func.modelUUID);
+
+    return `Route::${func.method.toLowerCase()}('${func.path.replace('/api', '')}', '${func.name}');`
+
+}
+
+export function getRoute2(func: ApiFunction) {
+
+    return `Route::${func.method?.toLowerCase()}('${func.path}', [${getClassName(func.tag ?? '')}Controller::class, '${func.name}']);`
+
+}
+
 export function generateLaravelApi(allModels: Model[], allFunctions: ApiFunction[]) {
     console.log(`generateLaravelApi`, allModels, allFunctions)
 
@@ -54,12 +67,6 @@ export function generateLaravelApi(allModels: Model[], allFunctions: ApiFunction
     }
 
 
-    function getRoute(func: ApiFunction) {
-        const model = allModels.find(model => model.uuid == func.modelUUID);
-
-        return `Route::${func.method}('${func.path.replace('/api', '')}', '${func.name}');`
-
-    }
 
     const allControllers: {[x: string]: string} = {}
     for(let item of allFunctions) {
@@ -83,7 +90,7 @@ use Illuminate\\Support\\Facades\\Route;
 */
 
 ${Object.values(allControllers).map(tag => `Route::controller(${getClassName(tag)}Controller::class)->group(function () {
-    ${allFunctions.filter(e => e.tag == tag).map(e => getRoute(e)).join('\n    ')}
+    ${allFunctions.filter(e => e.tag == tag).map(e => getRoute(allModels, e)).join('\n    ')}
 });
 `).join('\n\n')}
 

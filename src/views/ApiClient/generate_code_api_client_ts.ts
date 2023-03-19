@@ -10,16 +10,21 @@ function generateCodeApiClientTs(functions: ApiFunction[] = [], models: Model[] 
     return `import {ApiResponse} from './utils'
 
 export const api = {
-  ${functions.map(e => {
-        const model = models.find(e1 => e1.uuid == e.modelUUID);
-        // console.log(`render request ${e?.name}`, e, model)
+  ${functions.map(e => getCodeFunctionTs(models, e)).join('\n')}
+}
+`
+}
 
-        if (model && e.isList) {
-            const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
-            const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
-            const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
+export function getCodeFunctionTs(models: Model[], e: ApiFunction) {
+    const model = models.find(e1 => e1.uuid == e.modelUUID);
+    // console.log(`render request ${e?.name}`, e, model)
 
-            return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model.name}[]>> {
+    if (model && e.isList) {
+        const codePaginate = e.hasPaginate && !e.isMock ? 'params[\'page\'] = page;' : '';
+        const codeSearch = e.hasSearch ? 'if (search != null) { params[\'search\'] = search; }' : '';
+        const codeFilter = e.hasFilter ? 'if (filters != null) { params.addAll(params); }' : '';
+
+        return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model.name}[]>> {
         const params: { [x: string]: any } = {};
         ${codePaginate}${codeFilter} ${codeSearch}
         
@@ -33,10 +38,10 @@ export const api = {
             return new ApiResponse<${model.name}[]>(undefined, error);
         }
       },\n`;
-        }
+    }
 
-        if (!e.isList) {
-            return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model?.name}>> {
+    if (!e.isList) {
+        return `async ${e.name}(${getParamsApiFunction(e)}): Promise<ApiResponse<${model?.name}>> {
         ${generateParams(e)}
 
         const path = basePath + ${'"' + e.path + '"' + e.params?.filter(e => e.place == 'in-path').map(e => `.replace('{${e.name}}', ${"`${" + e.name + "}`"})`).join('') + (e.method === 'GET' ? ' + "?" + new URLSearchParams(params)' : '')};
@@ -49,10 +54,7 @@ export const api = {
             return new ApiResponse<${model?.name}>(undefined, error);
         }
       },\n`;
-        }
-    }).join('\n')}
-}
-`
+    }
 }
 
 function bindParams(path: string, params: ApiFunctionParam[] = [], hasPaginate = false) {

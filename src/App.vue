@@ -4,6 +4,7 @@
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
         <el-menu-item index="/">Models</el-menu-item>
         <el-menu-item index="/ApiClient">Api Client</el-menu-item>
+        <el-menu-item index="/ApiExport">Api export</el-menu-item>
         <el-menu-item index="/State">State</el-menu-item>
         <el-menu-item index="/MockEditor">Mock</el-menu-item>
         <el-menu-item index="/Proxy">KrakenD</el-menu-item>

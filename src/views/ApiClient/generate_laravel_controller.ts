@@ -3,7 +3,7 @@ import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import {camelCase} from "lodash";
 import {getClassName} from "@/views/ModelEditor/LaravelSeederFactory.vue";
 
-function getControllerMethod(func: ApiFunction, allModels: Model[] = []) {
+export function getControllerMethod(func: ApiFunction, allModels: Model[] = []) {
     let request = 'Request $request'
     let content = ``
     const model = allModels.find(e => e.uuid == func.modelUUID)

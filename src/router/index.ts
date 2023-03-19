@@ -7,6 +7,7 @@ import ApiClient from "@/views/ApiClient/index.vue";
 import MockEditor from "@/views/Mock/index.vue";
 import Proxy from "@/views/Proxy/index.vue";
 import Admin from "@/views/Admin/index.vue";
+import ApiExport from "@/views/Export/index.vue";
 
 Vue.use(VueRouter)
 
@@ -36,6 +37,11 @@ const routes: Array<RouteConfig> = [
     path: '/ApiClient',
     name: 'ApiClient',
     component: ApiClient
+  },
+  {
+    path: '/ApiExport',
+    name: 'ApiExport',
+    component: ApiExport
   },
   {
     path: '/MockEditor',

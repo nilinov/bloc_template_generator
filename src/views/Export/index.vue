@@ -1,116 +1,52 @@
 <template>
-  <div>
-    <el-row v-if="!$store.state.isPending">
-      <el-col :span="4" v-if="false">
-        <div class="grid-content bg-purple">
-          <template v-if="allFunctions.length === 0">
-            Нет запросов
-          </template>
-        </div>
-      </el-col>
-      <el-col :span="16">
-        <el-tag
-            v-for="item of tags"
-            :key="`key-${item}-tag`"
-            @click="selectTag !== item ? selectTag = item : selectTag = ''"
-            style="margin-right: .5rem; cursor: pointer;"
-            :type="item === selectTag ? `success` : ''"
-        >
-          {{ item }}
-        </el-tag>
-      </el-col>
-      <el-col span="8">
-        <el-button @click="lang = 'Dart'"> Dart</el-button>
-        <el-button @click="lang = 'TypeScript'"> TypeScript</el-button>
-        <el-button @click="lang = 'Laravel'"> Laravel</el-button>
-        <el-button style="float:right;" size="s" @click="dialogVisible = true">Создать ресурс</el-button>
-      </el-col>
+  <el-col :span="24" class="code">
+    <el-tabs v-model="lang">
+      <el-tab-pane label="Dart" name="dart">
+        <template v-if="lang === 'dart'">
+          <span class="fileName">api.dart</span>
+          <pre class="codeForSave" v-text="code"></pre>
+        </template>
+      </el-tab-pane>
+      <el-tab-pane label="TypeScript" name="typescript_api_client">
+        <template v-if="lang === 'typescript_api_client'">
+          <span class="fileName">api.ts</span>
+          <pre class="codeForSave" v-text="code"></pre>
+        </template>
+      </el-tab-pane>
+      <el-tab-pane label="Swagger" name="swagger">
+        <template v-if="lang === 'swagger'">
+          <span class="fileName">swagger.json</span>
+          <pre class="codeForSave" v-text="code"></pre>
+        </template>
+      </el-tab-pane>
+      <el-tab-pane label="Laravel" name="laravel">
+        <template v-if="lang === 'laravel'">
+          <LaravelTabContent/>
+        </template>
+      </el-tab-pane>
+    </el-tabs>
+  </el-col>
 
-      <el-col span="24">
-        <br>
-        <hr>
-        <br>
-
-      </el-col>
-
-      <el-col :span="8">
-        <div
-            class="item-row"
-            v-for="(item, index) of allFunctions"
-            v-if="selectTag !== '' ? item.tag === selectTag : true"
-        >
-          <FormEdit
-              :item="item"
-              @remove="handleRemove"
-              @update="handleUpdate"
-              :key="`form-${item.uuid}`"
-          />
-
-          <div class="code">
-            {{lang}} <br><br>
-            <pre v-if="lang == 'Dart'">{{ getCodeFunction(allModels, item) }}</pre>
-            <pre v-if="lang == 'TypeScript'"> {{ getCodeFunctionTs(allModels, item) }}</pre>
-
-            <template v-if="lang == 'Laravel'">
-              <pre>{{ getRoute2(item) }}</pre>
-
-              <br>
-
-              <pre> {{ getControllerMethod(item, allModels) }}</pre>
-            </template>
-          </div>
-
-          <br>
-          <hr>
-          <br>
-        </div>
-        <el-button @click="allFunctions.push(emptyApiFunction())">Добавить</el-button>
-
-      </el-col>
-    </el-row>
-    <el-dialog
-        :visible.sync="dialogVisible"
-        title="Создать ресурс"
-        width="30%"
-    >
-      <div class="resource-form">
-        <el-select v-model="resource.modelUUID" placeholder="Выберите модель">
-          <el-option v-for="item of allModels" :value="item.uuid" :label="item.name"></el-option>
-        </el-select>
-        <el-input v-model="resource.title" placeholder="Подсказка"></el-input>
-      </div>
-      <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleCreateResource"
-        >Создать</el-button
-        >
-      </span>
-      </template>
-    </el-dialog>
-  </div>
 </template>
 
 <script lang="ts">
 import {Component, Vue, Watch} from "vue-property-decorator";
 import {Model} from "@/views/ModelEditor/RenderCodeLineType";
 import FormEdit from "@/views/ApiClient/FormEdit.vue";
-import {ApiFunction, generateCodeApiClient, getCodeFunction} from "@/views/ApiClient/generate_code_api_client";
+import {ApiFunction, generateCodeApiClient} from "@/views/ApiClient/generate_code_api_client";
 import {ACTIONS_API_FUNCTIONS} from "@/store/api_functions";
 import {generateSwaggerFile} from "@/views/ApiClient/generate_swagger_file";
 import LaravelTabContent from "@/views/ApiClient/components/LaravelTabContent.vue";
 import {emptyApiFunction} from "@/utils/emptyApiFunction";
-import {generateCodeApiClientTs, getCodeFunctionTs} from "@/views/ApiClient/generate_code_api_client_ts";
+import {generateCodeApiClientTs} from "@/views/ApiClient/generate_code_api_client_ts";
 import {snakeCase} from "lodash";
-import {getControllerMethod} from "./generate_laravel_controller";
-import {getRoute, getRoute2} from "./generate_laravel_api";
 
 @Component({
-  methods: {getRoute2, getRoute, getControllerMethod, getCodeFunctionTs},
   components: {LaravelTabContent, FormEdit}
 })
-export default class ApiClient extends Vue {
+export default class ApiExport extends Vue {
 
-  lang = 'Dart'
+  lang = 'typescript_api_client'
   // lang = 'swagger'
   // lang = 'dart'
   // lang = 'laravel'
@@ -122,8 +58,6 @@ export default class ApiClient extends Vue {
   get tags(): string[] {
     return this.$store.getters.tagsApiFunctions ?? [];
   }
-
-  getCodeFunction = getCodeFunction;
 
   code = '';
 
@@ -269,20 +203,9 @@ export default class ApiClient extends Vue {
     }
   }
 }
-
-
 </script>
 
 <style scoped lang="scss">
-.item-row {
-  width: 90vw;
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  align-items: start;
-  justify-content: start;
-  grid-gap: 1rem;
-}
-
 .code {
   padding: 0 1rem;
 
@@ -291,19 +214,11 @@ export default class ApiClient extends Vue {
   }
 
   pre {
-    width: 100%;
-    max-width: 100%;
-    overflow: auto;
+    overflow: hidden;
     padding: 1rem;
 
     background-color: $color-gray-100;
   }
 }
 
-.resource-form {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto;
-  grid-gap: 1rem;
-}
 </style>
